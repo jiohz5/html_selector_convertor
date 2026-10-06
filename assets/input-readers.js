@@ -1,0 +1,89 @@
+/* 입력 형식 등록과 HTML 데이터 읽기. 새 형식은 READERS에 등록한다.
+ * 입력 HTML의 노드를 화면에 붙이지 않고 표의 문자열 또는 내장 spec만 반환한다. */
+(() => {
+  'use strict';
+
+  function textOf(node) {
+    const copy = node.cloneNode(true);
+    copy.querySelectorAll('script,style,template,noscript,iframe,object,embed').forEach((el) => el.remove());
+    copy.querySelectorAll('br').forEach((el) => el.replaceWith(document.createTextNode('\n')));
+    return copy.textContent.replace(/\r\n?/g, '\n').trim();
+  }
+
+  function htmlTable(table, toTable) {
+    if (table.querySelector('table')) throw new Error('중첩 표는 지원하지 않습니다. 단일 표로 정리해 주세요.');
+    const headRows = table.tHead ? Array.from(table.tHead.rows) : [];
+    if (headRows.length > 1) throw new Error('여러 줄 머리글은 지원하지 않습니다. 머리글을 한 행으로 정리해 주세요.');
+    const rows = Array.from(table.rows).filter((row) => row.closest('table') === table && !row.closest('tfoot'));
+    if (rows.length < 2) throw new Error('머리글과 데이터 행이 있는 표가 필요합니다.');
+    const header = headRows[0] || rows[0];
+    const width = header.cells.length;
+    if (!width) throw new Error('머리글 열을 찾지 못했습니다.');
+    for (const row of rows) {
+      const cells = Array.from(row.cells);
+      if (cells.some((cell) => cell.rowSpan !== 1 || cell.colSpan !== 1)) {
+        throw new Error('병합 셀(rowspan·colspan)은 지원하지 않습니다. 셀 병합을 풀어 주세요.');
+      }
+      if (cells.length !== width) throw new Error('행마다 열 수가 다릅니다. 모든 행의 열 수를 맞춰 주세요.');
+    }
+    const body = rows.filter((row) => row !== header).map((row) => Array.from(row.cells, textOf));
+    return toTable(Array.from(header.cells, textOf), body);
+  }
+
+  function readHTML(text, name, context) {
+    // template의 분리된 문서 조각은 스크립트와 외부 리소스를 활성화하지 않는다.
+    const template = document.createElement('template');
+    template.innerHTML = text;
+    const root = template.content;
+    const markers = Array.from(root.querySelectorAll('[id="hc-spec"]'));
+    if (markers.length) {
+      const marker = markers[0];
+      if (markers.length !== 1 || marker.tagName !== 'SCRIPT' || marker.type.toLowerCase() !== 'application/json') {
+        throw new Error('HTML의 내장 spec 표식이 올바르지 않습니다.');
+      }
+      let spec;
+      try { spec = JSON.parse(marker.textContent); } catch (e) { throw new Error(`HTML의 내장 spec JSON을 읽지 못했습니다: ${e.message}`); }
+      const arrays = ['kpis', 'charts', 'tables', 'sections'];
+      const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+      if (!spec || typeof spec !== 'object' || Array.isArray(spec) ||
+          typeof spec.meta?.title !== 'string' || !spec.meta.title.trim() ||
+          arrays.some((key) => spec[key] != null && (!Array.isArray(spec[key]) || !spec[key].every(isObject))) ||
+          (spec.summary != null && typeof spec.summary !== 'string' &&
+            (!Array.isArray(spec.summary) || !spec.summary.every((value) => typeof value === 'string')))) {
+        throw new Error('HTML의 내장 spec 형식이 올바르지 않습니다(meta.title과 올바른 데이터 영역이 필요).');
+      }
+      return { kind: 'spec', name, spec };
+    }
+    const candidates = Array.from(root.querySelectorAll('table')).filter((table) => !table.parentElement?.closest('table'));
+    if (!candidates.length) throw new Error('HTML에서 데이터 표나 내장 spec을 찾지 못했습니다.');
+    const tables = candidates.map((table, index) => {
+      const title = table.caption ? textOf(table.caption) : table.id;
+      const entry = { id: `table-${index}`, label: `표 ${index + 1}${title ? ` · ${title}` : ''}` };
+      try { entry.table = htmlTable(table, context.tableFromRows); } catch (e) { entry.error = e.message; }
+      return entry;
+    });
+    const first = tables.find((entry) => entry.table);
+    if (!first) throw new Error(tables.map((entry) => `${entry.label}: ${entry.error}`).join('\n'));
+    return { kind: 'html', name, tables, tableId: first.id };
+  }
+
+  const READERS = [
+    { id: 'delimited', extensions: ['csv', 'tsv', 'txt'], label: 'CSV·TSV·TXT', read: (buffer, file, ctx) => ctx.readDelimited(ctx.decodeText(buffer), file.name) },
+    { id: 'workbook', extensions: ['xlsx', 'xlsm', 'xls'], label: '엑셀', read: (buffer, file, ctx) => ctx.readWorkbook(buffer, file.name) },
+    { id: 'json', extensions: ['json'], label: 'JSON', read: (buffer, file, ctx) => ctx.readJSON(ctx.decodeText(buffer), file.name) },
+    { id: 'html', extensions: ['html', 'htm'], label: 'HTML', read: (buffer, file, ctx) => readHTML(ctx.decodeText(buffer), file.name, ctx) },
+  ];
+
+  async function read(file, context) {
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    const reader = READERS.find((entry) => entry.extensions.includes(ext));
+    if (!reader) throw new Error(`지원하지 않는 파일 형식입니다(.${ext}). ${READERS.map((entry) => entry.label).join(' · ')} 파일을 넣어 주세요.`);
+    return reader.read(await file.arrayBuffer(), file, context);
+  }
+
+  window.HC_INPUT = {
+    read,
+    accept: () => READERS.flatMap((entry) => entry.extensions.map((ext) => `.${ext}`)).join(','),
+    hint: () => READERS.map((entry) => entry.label).join(' · '),
+  };
+})();

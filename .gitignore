@@ -1,0 +1,5 @@
+tests/convertor/out/
+tests/previewer/out/
+__pycache__/
+*.pyc
+.superpowers/

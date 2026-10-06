@@ -3,6 +3,7 @@
 // 사용 (html/ 폴더에서):
 //   node tests/previewer/browser_test.mjs page     # ① 고르기: 카드·필터·검색·미리보기·선택·내보내기·다크·모바일
 //   node tests/previewer/browser_test.mjs make     # ② 만들기: 선택 연동·샘플·엑셀·CSV·디자인 변경·다운로드·spec·모바일
+//   node tests/previewer/browser_test.mjs html     # HTML 입력: 표·spec 재입력·스크립트 차단·실패 후 초기화 (assert)
 //   node tests/previewer/browser_test.mjs search   # 검색만
 //   node tests/previewer/browser_test.mjs embed    # 페이지 안 미리보기가 되는 데모를 전부 실제로 열어 캡처 (몇 분 걸림)
 //   node tests/previewer/browser_test.mjs page dist/html-previewer.html   # 단일 파일판 검사
@@ -12,6 +13,7 @@ import { mkdtempSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
+import assert from 'node:assert/strict';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '..', '..');
@@ -25,7 +27,7 @@ const mode = process.argv[2] || 'page';
 const pagePath = resolve(ROOT, process.argv[3] || 'index.html');
 const outDir = join(HERE, 'out', mode);
 process.argv[5] = process.argv[5] || join(ROOT, 'tests', 'convertor', 'fixtures'); // make 모드의 테스트 입력 폴더
-const PORT = mode === 'embed' ? 9334 : mode === 'make' ? 9335 : 9333;
+const PORT = mode === 'embed' ? 9334 : mode === 'make' ? 9335 : mode === 'html' ? 9336 : 9333;
 mkdirSync(outDir, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const log = (...a) => console.log(...a);
@@ -125,6 +127,295 @@ const click = (sel) => evaluate(`(() => { const e = document.querySelector(${JSO
 const url = pathToFileURL(pagePath).href;
 
 try {
+  if (mode === 'html') {
+    const fixtures = join(ROOT, 'tests', 'convertor', 'fixtures', 'html-input');
+    const S = 'window.HC.make.state';
+    const sourceRequests = [];
+    const sourceOrigin = 'https://html-import-test.invalid';
+    cdp.on((m) => {
+      if (m.method === 'Network.requestWillBeSent' && m.params.request.url.startsWith(sourceOrigin)) {
+        sourceRequests.push(m.params.request.url);
+      }
+    });
+    await cdp.send('Network.enable');
+    // The test records attempted source requests, while blocking contact with the sentinel host.
+    await cdp.send('Network.setBlockedURLs', { urls: [`${sourceOrigin}/*`] });
+    const waitUntil = async (expression, description, maxMs = 8000) => {
+      const t0 = Date.now();
+      while (Date.now() - t0 < maxMs) {
+        if (await evaluate(expression)) return;
+        await sleep(50);
+      }
+      const error = await evaluate(`document.getElementById('mk-error').textContent`);
+      assert.fail(`${description} timed out${error ? `: ${error}` : ''}`);
+    };
+    const setFile = async (path) => {
+      const { root } = await cdp.send('DOM.getDocument', { depth: -1 });
+      const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector: '#mk-file' });
+      assert.ok(nodeId, 'the main file input exists');
+      await cdp.send('DOM.setFileInputFiles', { files: [path], nodeId });
+    };
+    const load = async (filename, directory = fixtures) => {
+      await setFile(join(directory, filename));
+      await waitUntil(`${S}.source?.name === ${JSON.stringify(filename)} && ${S}.spec && ${S}.html.length > 0 && document.getElementById('mk-error').hidden`, `import ${filename}`);
+    };
+    const table = () => evaluate(`({ columns: ${S}.table.columns, rows: ${S}.table.rows })`);
+    const total = () => evaluate(`${S}.spec.kpis.find(k => k.label === '총 매출')?.value`);
+    const assertEmpty = async (filename) => {
+      const result = await evaluate(`({
+        html: ${S}.html, spec: ${S}.spec, table: ${S}.table, source: ${S}.source,
+        frame: document.getElementById('mk-frame').srcdoc,
+        empty: !document.getElementById('mk-empty').hidden,
+        previewHidden: document.getElementById('mk-device').hidden,
+        panelsHidden: ['mk-file-info', 'mk-cols', 'mk-content'].every(id => document.getElementById(id).hidden),
+        actionsDisabled: ['mk-download', 'mk-save-spec', 'mk-open', 'mk-ai-copy'].every(id => document.getElementById(id).disabled)
+      })`);
+      assert.deepEqual(result, {
+        html: '', spec: null, table: null, source: null, frame: '',
+        empty: true, previewHidden: true, panelsHidden: true, actionsDisabled: true,
+      }, `${filename}: failed import clears the previous result and actions`);
+    };
+
+    await navigate(`${url}#make`);
+    await evaluate('localStorage.clear()');
+    await navigate(`${url}?html-test=1#make`);
+    await waitUntil('Boolean(window.HC?.make?.state)', 'converter initialization');
+
+    // A CSV fallback, TFOOT inclusion, or flattened markup changes these hand-checked values.
+    await load('simple-th.html');
+    assert.deepEqual(await table(), {
+      columns: ['부서', '매출'], rows: [['서울', '100'], ['부산', '200']],
+    }, 'TH headings and body cells are imported as data');
+    assert.equal(await total(), 300, 'TFOOT total is excluded from the aggregation');
+    assert.equal(await evaluate("document.querySelector('.mk-sheet').hidden"), true, 'one table needs no table selector');
+    log('PASS: TH headings and TFOOT exclusion');
+
+    await load('simple-td.htm');
+    assert.deepEqual(await table(), {
+      columns: ['부서', '매출'], rows: [['서울', '100'], ['부산', '200']],
+    }, 'a first row of TD headings and the HTM extension are supported');
+    assert.equal(await total(), 300);
+    const accept = await evaluate("document.getElementById('mk-file').accept.split(',').map(s => s.trim())");
+    assert.ok(accept.includes('.html') && accept.includes('.htm'), 'the picker offers HTML and HTM files');
+    log('PASS: TD headings and HTML/HTM picker support');
+
+    await load('text-bom.html');
+    assert.deepEqual(await table(), {
+      columns: ['부서', '매출', '메모', '빈칸'],
+      rows: [['서울 & 경기', '100', '첫째\n둘째', null], ['부산 <지점>', '200', '메모', null]],
+    }, 'UTF-8 BOM, entities, BR text separation and empty cells survive import');
+    assert.equal(await total(), 300);
+    log('PASS: BOM, text and empty cells');
+
+    await load('multiple-tables.html');
+    const choices = await evaluate(`({
+      visible: !document.querySelector('.mk-sheet').hidden,
+      label: document.getElementById('mk-sheet-label')?.textContent.trim(),
+      options: [...document.getElementById('mk-sheet').options].map(o => ({value: o.value, label: o.textContent}))
+    })`);
+    assert.equal(choices.visible, true);
+    assert.equal(choices.label, '표', 'HTML choices are labelled as tables');
+    assert.equal(choices.options.length, 2);
+    assert.notEqual(choices.options[0].value, choices.options[1].value, 'duplicate captions have independent selection values');
+    assert.ok(choices.options.every(o => o.label.includes('월별 매출')));
+    assert.deepEqual(await table(), { columns: ['부서', '매출'], rows: [['서울', '100'], ['부산', '200']] });
+    const firstHtml = await evaluate(`${S}.html`);
+    await evaluate(`(() => { const select = document.getElementById('mk-sheet'); select.value = ${JSON.stringify(choices.options[1].value)}; select.dispatchEvent(new Event('change')); })()`);
+    await waitUntil(`${S}.html !== ${JSON.stringify(firstHtml)} && ${S}.spec.kpis.find(k => k.label === '총 매출')?.value === 30`, 'second table render');
+    assert.deepEqual(await table(), { columns: ['부서', '매출'], rows: [['서울', '10'], ['부산', '20']] });
+    assert.equal(await total(), 30);
+    log('PASS: duplicate captions and table switching');
+    await shot('html_tables');
+
+    await load('mixed-tables.html');
+    assert.deepEqual(await table(), { columns: ['부서', '매출'], rows: [['서울', '100'], ['부산', '200']] }, 'an unsupported candidate does not prevent importing another valid table');
+    assert.equal(await total(), 300);
+    log('PASS: valid table alongside an unsupported candidate');
+
+    // Expectations originate in the literal spec, not the renderer output.
+    const originalSpec = {
+      meta: { title: 'HTML 재입력', subtitle: '문자열 </script> 그대로', source: '직접 작성한 spec' },
+      summary: ['서울과 부산의 매출 합계는 300입니다.', '</script><script>top.__htmlImportSentinel = true</script>'],
+      kpis: [{ label: '매출', value: 300, unit: '원' }],
+      charts: [{ id: 'sales', title: '지역 매출', type: 'bar', x: ['서울', '부산'], series: [{ name: '매출', data: [100, 200] }] }],
+      tables: [{ id: 'detail', title: '지역 표', columns: [{ key: 'region', label: '부서' }, { key: 'sales', label: '매출', type: 'number' }], rows: [{ region: '서울', sales: 100 }, { region: '부산', sales: 200 }] }],
+      sections: [{ id: 'notes', title: '참고', text: '내용 보존 확인', bullets: ['합계 300', '문자열 </script>'], charts: ['sales'], tables: ['detail'] }],
+    };
+    const ownHtml = await evaluate(`window.HC.build(${JSON.stringify(originalSpec)}, 'tabler', { chartLib: 'echarts' }).html`);
+    const conflictingTable = '<table><tr><th>잘못된 값</th></tr><tr><td>999</td></tr></table>';
+    writeFileSync(join(outDir, 'own-roundtrip.html'), ownHtml.replace('</body>', `${conflictingTable}</body>`), 'utf8');
+    await load('own-roundtrip.html', outDir);
+    assert.deepEqual(await evaluate(`${S}.spec`), originalSpec, 'embedded hc-spec preserves every original content field and wins over static markup');
+    assert.equal(await evaluate(`${S}.table`), null);
+    assert.equal(await evaluate('window.__htmlImportSentinel'), undefined, 'closing-script text stays data');
+    assert.equal(await evaluate("document.getElementById('mk-cols').hidden"), true);
+    log('PASS: complete own-export round trip and embedded-spec precedence');
+
+    await load('active-markup.html');
+    assert.deepEqual(await table(), { columns: ['부서', '매출'], rows: [['서울', '100'], ['부산', '200']] }, 'active tags contribute no script/style text to cells');
+    assert.equal(await total(), 300);
+    // Allow delayed image errors and resource discovery to surface before checking the sentinels.
+    await sleep(600);
+    assert.equal(await evaluate('window.__htmlImportSentinel'), undefined, 'source script and event attributes never execute');
+    assert.deepEqual(sourceRequests, [], 'source resources never start a network request');
+    assert.equal(await evaluate(`${S}.html.includes(${JSON.stringify(sourceOrigin)})`), false, 'source URLs do not persist in regenerated HTML');
+    assert.equal(await evaluate(`JSON.stringify(${S}.spec).includes('__htmlImportSentinel')`), false, 'source script text does not persist in spec');
+    log('PASS: inert source markup and resources');
+
+    for (const [filename, reason] of [
+      ['invalid-spec.html', /spec|JSON/i],
+      ['invalid-spec-shape.html', /spec|title/i],
+      ['null-spec-item.html', /spec/i],
+      ['no-table.html', /표|table/i],
+      ['nested-table.html', /중첩|nested/i],
+      ['merged-table.html', /병합|rowspan|colspan|merged/i],
+      ['ragged-table.html', /열|cell|column/i],
+    ]) {
+      await load('simple-th.html');
+      if (filename === 'invalid-spec.html') {
+        await evaluate("(() => { const title = document.getElementById('mk-title'); title.value = '예약된 이전 결과'; title.dispatchEvent(new Event('input')); })()");
+      }
+      await setFile(join(fixtures, filename));
+      await waitUntil("!document.getElementById('mk-error').hidden && document.getElementById('mk-error').textContent.trim().length > 0", `reject ${filename}`);
+      const error = await evaluate("document.getElementById('mk-error').textContent");
+      assert.match(error, reason, `${filename}: useful reason for rejection`);
+      if (filename === 'invalid-spec.html') await sleep(700);
+      await assertEmpty(filename);
+      log(`PASS: ${filename} rejects and clears stale results`);
+    }
+
+    writeFileSync(join(outDir, 'csv-regression.csv'), '부서,매출\n서울,100\n부산,200\n', 'utf8');
+    await load('csv-regression.csv', outDir);
+    assert.deepEqual(await table(), { columns: ['부서', '매출'], rows: [['서울', '100'], ['부산', '200']] }, 'CSV still imports after failed HTML');
+    assert.equal(await total(), 300);
+    assert.equal(await evaluate("document.querySelector('.mk-sheet').hidden"), true);
+    assert.deepEqual(sourceRequests, []);
+    log('PASS: CSV regression');
+
+    // The established spec contract permits string summaries, null optional regions and meta only.
+    for (const [filename, expectedSpec] of [
+      ['string-summary-roundtrip.html', { meta: { title: '문단 요약' }, summary: '본문 한 문단', kpis: null, charts: null, tables: null, sections: null }],
+      ['meta-only-roundtrip.html', { meta: { title: '빈 보고서' } }],
+    ]) {
+      try {
+        const generated = await evaluate(`window.HC.build(${JSON.stringify(expectedSpec)}, 'tabler').html`);
+        writeFileSync(join(outDir, filename), generated, 'utf8');
+        await setFile(join(outDir, filename));
+        await waitUntil(`!document.getElementById('mk-error').hidden || (${S}.source?.name === ${JSON.stringify(filename)} && ${S}.html.length > 0)`, `settle ${filename}`);
+        const error = await evaluate("document.getElementById('mk-error').textContent");
+        assert.equal(await evaluate("document.getElementById('mk-error').hidden"), true, `${filename}: own HC.build export must import successfully${error ? ` (${error})` : ''}`);
+        assert.deepEqual(await evaluate(`${S}.spec`), expectedSpec, `${filename}: preserve the complete literal spec`);
+        log(`PASS: ${filename} preserves the established spec contract`);
+      } catch (e) {
+        // Report both independent compatibility regressions before returning a nonzero exit.
+        problems.push(`테스트 실패: ${e.message}`);
+      }
+    }
+
+    // These fixtures isolate unsupported header structure and unregistered extensions.
+    for (const [filename, reason] of [
+      ['multirow-thead.html', /머리글|thead|header/i],
+      ['unsupported.pdf', /지원|형식|확장자|unsupported|format/i],
+      ['unsupported.md', /지원|형식|확장자|unsupported|format/i],
+      ['invalid-records.json', /JSON/i],
+    ]) {
+      await load('simple-th.html');
+      await setFile(join(fixtures, filename));
+      await waitUntil("!document.getElementById('mk-error').hidden", `reject ${filename}`);
+      assert.match(await evaluate("document.getElementById('mk-error').textContent"), reason);
+      await assertEmpty(filename);
+      log(`PASS: ${filename} rejects and clears stale results`);
+    }
+
+    await load('records.json');
+    assert.deepEqual(await table(), { columns: ['부서', '매출'], rows: [['서울', 100], ['부산', 200]] }, 'JSON records retain typed values through the registered reader');
+    assert.equal(await total(), 300);
+    log('PASS: JSON records');
+
+    const setSpecFile = async (path) => {
+      const { root } = await cdp.send('DOM.getDocument', { depth: -1 });
+      const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector: '#mk-spec-file' });
+      assert.ok(nodeId, 'the spec picker exists');
+      await cdp.send('DOM.setFileInputFiles', { files: [path], nodeId });
+    };
+    writeFileSync(join(outDir, 'picker-spec.json'), JSON.stringify(originalSpec), 'utf8');
+    await setSpecFile(join(outDir, 'picker-spec.json'));
+    await waitUntil(`${S}.source?.name === 'picker-spec.json' && ${S}.specFromFile && ${S}.html.length > 0`, 'spec picker success');
+    assert.deepEqual(await evaluate(`${S}.spec`), originalSpec, 'the dedicated spec picker preserves complete content');
+    assert.equal(await evaluate(`${S}.table`), null);
+    log('PASS: spec picker success');
+
+    // Valid records are still invalid input for the dedicated spec picker.
+    await setSpecFile(join(fixtures, 'records.json'));
+    await waitUntil("!document.getElementById('mk-error').hidden", 'spec picker rejects records');
+    assert.match(await evaluate("document.getElementById('mk-error').textContent"), /spec/i);
+    await assertEmpty('records.json through spec picker');
+    log('PASS: spec picker failure');
+
+    // Delay only the byte-read boundary; both imports still use the real File and parser.
+    const startDelayedMainImport = async (name, contents) => evaluate(`(() => {
+      const file = new File([${JSON.stringify(contents)}], ${JSON.stringify(name)});
+      const readBytes = file.arrayBuffer.bind(file);
+      file.arrayBuffer = async () => {
+        await new Promise(resolve => { window.__releaseImport = resolve; });
+        return readBytes();
+      };
+      window.__delayedImport = window.HC.make.ingest(file);
+    })()`);
+    const releaseMainImport = async () => evaluate(`(async () => {
+      window.__releaseImport();
+      await window.__delayedImport;
+      await new Promise(resolve => setTimeout(resolve, 50));
+    })()`);
+
+    await startDelayedMainImport('late-a.html', '<table><tr><th>부서</th><th>매출</th></tr><tr><td>서울</td><td>900</td></tr></table>');
+    await load('simple-th.html');
+    await releaseMainImport();
+    assert.deepEqual(await table(), { columns: ['부서', '매출'], rows: [['서울', '100'], ['부산', '200']] }, 'a late first main import cannot replace the later file');
+    assert.equal(await total(), 300);
+    assert.equal(await evaluate(`${S}.source.name`), 'simple-th.html');
+    log('PASS: latest main-file import wins');
+
+    await startDelayedMainImport('late-invalid.json', '{broken JSON');
+    await setSpecFile(join(outDir, 'picker-spec.json'));
+    await waitUntil(`${S}.source?.name === 'picker-spec.json' && ${S}.specFromFile && ${S}.html.length > 0`, 'newer spec picker import');
+    await releaseMainImport();
+    assert.deepEqual(await evaluate(`${S}.spec`), originalSpec, 'an older main-file failure cannot clear a newer spec-picker result');
+    assert.equal(await evaluate(`${S}.source.name`), 'picker-spec.json');
+    assert.equal(await evaluate("document.getElementById('mk-error').hidden"), true);
+    assert.equal(await evaluate("document.getElementById('mk-download').disabled"), false);
+    log('PASS: newer spec picker survives older main-file failure');
+
+    // Delay a File created by the actual spec picker, then restore its byte-reader immediately.
+    await evaluate(`(() => {
+      const readBytes = File.prototype.arrayBuffer;
+      window.__specReadStarted = false;
+      window.__specReadFinished = false;
+      File.prototype.arrayBuffer = async function () {
+        if (this.name !== 'picker-spec.json') return readBytes.call(this);
+        File.prototype.arrayBuffer = readBytes;
+        window.__specReadStarted = true;
+        await new Promise(resolve => { window.__releaseSpecRead = resolve; });
+        const result = await readBytes.call(this);
+        window.__specReadFinished = true;
+        return result;
+      };
+    })()`);
+    await setSpecFile(join(outDir, 'picker-spec.json'));
+    await waitUntil('window.__specReadStarted', 'delayed spec picker byte read');
+    await load('simple-th.html');
+    await evaluate('window.__releaseSpecRead()');
+    await waitUntil('window.__specReadFinished', 'older spec byte read finishes');
+    await sleep(50);
+    assert.deepEqual(await table(), { columns: ['부서', '매출'], rows: [['서울', '100'], ['부산', '200']] }, 'an older spec-picker import cannot replace a newer main-file result');
+    assert.equal(await total(), 300);
+    assert.equal(await evaluate(`${S}.source.name`), 'simple-th.html');
+    assert.equal(await evaluate(`${S}.specFromFile`), false);
+    log('PASS: newer main file survives older spec-picker completion');
+
+    await shot('html_input');
+  }
+
   if (mode === 'page') {
     await navigate(url);
     await evaluate(`localStorage.clear()`);
@@ -402,5 +693,5 @@ try {
   try {
     execFileSync('powershell', ['-NoProfile', '-Command', `Get-CimInstance Win32_Process -Filter "Name='msedge.exe'" | Where-Object { $_.CommandLine -like '*${profile}*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }`]);
   } catch { /* 무시 */ }
-  process.exit(0);
+  process.exit(problems.length ? 1 : 0);
 }

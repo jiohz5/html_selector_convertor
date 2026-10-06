@@ -1,0 +1,13 @@
+<!doctype html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://html-import-test.invalid/source.css">
+<style>@import url("https://html-import-test.invalid/import.css");</style>
+<script>top.__htmlImportSentinel = true;</script>
+<script src="https://html-import-test.invalid/source.js"></script>
+<img src="https://html-import-test.invalid/source.png" onerror="top.__htmlImportSentinel = true">
+<iframe src="https://html-import-test.invalid/source-frame" srcdoc="<script>top.__htmlImportSentinel = true;</script>"></iframe>
+<table onclick="top.__htmlImportSentinel = true">
+  <tr><th>부서</th><th>매출</th></tr>
+  <tr><td>서울<script>top.__htmlImportSentinel = true;</script><style>.source{display:none}</style><template>숨겨진 데이터</template><noscript>실행하지 않을 데이터</noscript></td><td>100</td></tr>
+  <tr><td><a href="javascript:top.__htmlImportSentinel = true">부산</a></td><td>200</td></tr>
+</table>

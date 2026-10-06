@@ -122,24 +122,24 @@
   }
 
   async function readFile(file) {
-    const name = file.name;
-    const ext = (name.split('.').pop() || '').toLowerCase();
-    const buf = await file.arrayBuffer();
-    if (ext === 'xlsx' || ext === 'xlsm' || ext === 'xls') {
-      const XLSX = await loadSheetJS();
-      const wb = XLSX.read(buf, { type: 'array', cellDates: true });
-      return { kind: 'workbook', name, workbook: wb, sheets: wb.SheetNames };
-    }
-    const text = decodeText(buf);
-    if (ext === 'json' || /^\s*[[{]/.test(text)) {
-      let data;
-      try { data = JSON.parse(text); } catch (e) { throw new Error(`JSON을 읽지 못했습니다: ${e.message}`); }
-      if (isSpec(data)) return { kind: 'spec', name, spec: data };
-      return { kind: 'table', name, table: tableFromJSON(data) };
-    }
-    const rows = parseCSV(text, ext === 'tsv' ? '\t' : detectDelimiter(text));
-    if (rows.length < 2) throw new Error('머리글과 데이터 행이 있는 표를 찾지 못했습니다.');
-    return { kind: 'table', name, table: tableFromRows(rows[0], rows.slice(1)) };
+    return window.HC_INPUT.read(file, {
+      decodeText, isSpec, tableFromRows,
+      async readWorkbook(buffer, name) {
+        const XLSX = await loadSheetJS();
+        const workbook = XLSX.read(buffer, { type: 'array', cellDates: true });
+        return { kind: 'workbook', name, workbook, sheets: workbook.SheetNames };
+      },
+      readJSON(text, name) {
+        let data;
+        try { data = JSON.parse(text); } catch (e) { throw new Error(`JSON을 읽지 못했습니다: ${e.message}`); }
+        return isSpec(data) ? { kind: 'spec', name, spec: data } : { kind: 'table', name, table: tableFromJSON(data) };
+      },
+      readDelimited(text, name) {
+        const rows = parseCSV(text, /\.tsv$/i.test(name) ? '\t' : detectDelimiter(text));
+        if (rows.length < 2) throw new Error('머리글과 데이터 행이 있는 표를 찾지 못했습니다.');
+        return { kind: 'table', name, table: tableFromRows(rows[0], rows.slice(1)) };
+      },
+    });
   }
 
   function sheetTable(wb, sheet) {
@@ -319,7 +319,7 @@
   }
 
   function buildSpec(model) {
-    const { cols, table, fileName, sheet } = model;
+    const { cols, table, fileName, sheet, tableLabel } = model;
     const n = table.rows.length;
     const time = cols.find((c) => c.role === 'time');
     let measures = cols.filter((c) => c.role === 'sum' || c.role === 'mean').slice(0, 6).map((c) => ({ col: c, agg: c.role, ...measureMeta(c) }));
@@ -556,7 +556,7 @@
       meta: {
         title: base ? (/(현황|분석|보고|리포트|요약|실적)$/.test(base) ? base : `${base} 현황`) : '데이터 요약',
         subtitle: T ? `${T.range} · ${n.toLocaleString('ko-KR')}행` : `${n.toLocaleString('ko-KR')}행 · ${table.columns.length}개 열`,
-        source: `${fileName}${sheet ? ` · ${sheet} 시트` : ''} (${n.toLocaleString('ko-KR')}행)`,
+        source: `${fileName}${sheet ? ` · ${sheet} 시트` : tableLabel ? ` · ${tableLabel}` : ''} (${n.toLocaleString('ko-KR')}행)`,
         generatedAt: isoLocal(new Date()).slice(0, 10),
       },
       summary,
@@ -591,7 +591,7 @@
   if (!$('#view-make')) return;
   const el = {
     view: $('#view-make'), pick: $('#view-pick'), drop: $('#mk-drop'), file: $('#mk-file'), sample: $('#mk-sample'),
-    specBtn: $('#mk-spec-btn'), specFile: $('#mk-spec-file'), info: $('#mk-file-info'), sheet: $('#mk-sheet'),
+    specBtn: $('#mk-spec-btn'), specFile: $('#mk-spec-file'), info: $('#mk-file-info'), sheet: $('#mk-sheet'), sheetLabel: $('#mk-sheet-label'),
     colsPanel: $('#mk-cols'), colBody: $('#mk-col-body'), gran: $('#mk-gran'),
     contentPanel: $('#mk-content'), title: $('#mk-title'), subtitle: $('#mk-subtitle'), summary: $('#mk-summary'),
     design: $('#mk-design-select'), picked: $('#mk-picked'), kit: $('#mk-kit'), chart: $('#mk-chart'),
@@ -697,7 +697,7 @@
   function regenerate() {
     if (!st.table) return;
     const prev = st.spec;
-    const spec = buildSpec({ cols: st.cols, table: st.table, fileName: st.source.name, sheet: st.source.sheet, gran: st.gran });
+    const spec = buildSpec({ cols: st.cols, table: st.table, fileName: st.source.name, sheet: st.source.sheet, tableLabel: st.source.tableLabel, gran: st.gran });
     if (prev && st.edited.title) spec.meta.title = prev.meta.title;
     if (prev && st.edited.subtitle) spec.meta.subtitle = prev.meta.subtitle;
     if (prev && st.edited.summary) spec.summary = prev.summary;
@@ -728,6 +728,23 @@
   const previewHtml = (html) => html.replace(/<head[^>]*>/i, (m) => m + PREVIEW_SHIM);
 
   let renderTimer = 0;
+  let inputGeneration = 0;
+  function clearResult() {
+    clearTimeout(renderTimer);
+    Object.assign(st, { source: null, table: null, cols: [], spec: null, specFromFile: false, html: '', edited: { title: false, subtitle: false, summary: false } });
+    el.frame.srcdoc = '';
+    el.empty.hidden = false;
+    el.device.hidden = true;
+    el.info.hidden = true;
+    el.colsPanel.hidden = true;
+    el.contentPanel.hidden = true;
+    el.sheet.innerHTML = '';
+    el.sheet.closest('label').hidden = true;
+    el.colBody.innerHTML = '';
+    [el.title, el.subtitle, el.summary].forEach((input) => { input.value = ''; });
+    el.status.textContent = '';
+    [el.download, el.saveSpec, el.open, el.aiCopy].forEach((button) => { button.disabled = true; });
+  }
   function scheduleRender(ms = 250) {
     clearTimeout(renderTimer);
     renderTimer = setTimeout(render, ms);
@@ -752,6 +769,7 @@
       showError('');
       fit();
     } catch (e) {
+      clearResult();
       showError(`만들지 못했습니다: ${e.message}`);
     }
   }
@@ -785,27 +803,55 @@
   }
 
   // ── 데이터 넣기 ──
-  async function ingest(file) {
+  function sourceTable(src, selection) {
+    if (src.kind === 'workbook') {
+      const table = sheetTable(src.workbook, selection);
+      if (!table) throw new Error('데이터가 있는 시트를 찾지 못했습니다.');
+      src.sheet = selection;
+      return table;
+    }
+    if (src.kind === 'html') {
+      const entry = src.tables.find((candidate) => candidate.id === selection);
+      if (!entry?.table) throw new Error(entry?.error || '선택한 HTML 표를 찾지 못했습니다.');
+      src.tableId = entry.id;
+      src.tableLabel = entry.label;
+      return entry.table;
+    }
+    return src.table;
+  }
+
+  async function ingest(file, { specOnly = false } = {}) {
+    const generation = ++inputGeneration;
+    clearResult();
     showError('');
     el.status.textContent = `${file.name} 읽는 중…`;
     try {
       const src = await readFile(file);
+      if (generation !== inputGeneration) return;
+      if (specOnly && src.kind !== 'spec') throw new Error('spec.json 형식이 아닙니다(meta·kpis·charts·tables 등이 필요).');
       if (src.kind === 'spec') { useSpec(src.spec, src.name); return; }
       let table = src.table;
       if (src.kind === 'workbook') {
         const sheets = src.sheets.filter((s) => sheetTable(src.workbook, s));
         if (!sheets.length) throw new Error('데이터가 있는 시트를 찾지 못했습니다.');
-        src.sheet = sheets[0];
-        table = sheetTable(src.workbook, src.sheet);
+        table = sourceTable(src, sheets[0]);
+        el.sheetLabel.textContent = '시트';
         el.sheet.innerHTML = sheets.map((s) => `<option>${esc(s)}</option>`).join('');
         el.sheet.closest('label').hidden = sheets.length < 2;
+      } else if (src.kind === 'html') {
+        table = sourceTable(src, src.tableId);
+        el.sheetLabel.textContent = '표';
+        el.sheet.innerHTML = src.tables.map((entry) => `<option value="${esc(entry.id)}"${entry.table ? '' : ' disabled'}>${esc(entry.label)}${entry.error ? ` · 사용 불가: ${esc(entry.error)}` : ''}</option>`).join('');
+        el.sheet.value = src.tableId;
+        el.sheet.closest('label').hidden = src.tables.length < 2;
       } else {
         el.sheet.closest('label').hidden = true;
       }
       useTable(src, table);
     } catch (e) {
+      if (generation !== inputGeneration) return;
+      clearResult();
       showError(e.message);
-      el.status.textContent = '';
     }
   }
 
@@ -898,20 +944,16 @@
   el.sample.addEventListener('click', () => ingest(new File([buildSample()], SAMPLE_NAME, { type: 'text/csv' })));
   $$('[data-mk-sample]').forEach((b) => b.addEventListener('click', () => el.sample.click()));
   el.specBtn.addEventListener('click', () => el.specFile.click());
-  el.specFile.addEventListener('change', async () => {
+  el.specFile.addEventListener('change', () => {
     const f = el.specFile.files[0];
     el.specFile.value = '';
     if (!f) return;
-    try {
-      const data = JSON.parse(decodeText(await f.arrayBuffer()));
-      if (!isSpec(data)) throw new Error('spec.json 형식이 아닙니다(meta·kpis·charts·tables 등이 필요).');
-      useSpec(data, f.name);
-    } catch (e) { showError(e.message); }
+    ingest(f, { specOnly: true });
   });
   el.sheet.addEventListener('change', () => {
     const src = st.source;
-    src.sheet = el.sheet.value;
-    useTable(src, sheetTable(src.workbook, src.sheet));
+    if (!src) return;
+    try { useTable(src, sourceTable(src, el.sheet.value)); } catch (e) { clearResult(); showError(e.message); }
   });
   el.colBody.addEventListener('change', (e) => {
     const i = e.target.dataset && e.target.dataset.col;
@@ -999,6 +1041,8 @@
   else window.addEventListener('resize', fit);
 
   // ── 시작 ──
+  el.file.accept = window.HC_INPUT.accept();
+  $('#mk-drop-hint').textContent = window.HC_INPUT.hint();
   if (!HC.list().some((d) => d.id === st.design)) st.design = 'tabler';
   if (st.chartLib && !HC.chartLibs().includes(st.chartLib)) st.chartLib = '';
   if (st.kit && !HC.kits()[st.kit]) st.kit = '';
