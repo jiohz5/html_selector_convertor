@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ko" %%HTML_ATTRS%%>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>%%TITLE%%</title>
+  <!--HC:HEAD-->
+  <style>
+    /* ── 키트: 아티클 (단일 칼럼 에세이형 보고서: Tufte·Distill) ──
+       본문 칼럼(--hc-measure)과 넓은 그림 칼럼(--hc-wide)을 나눠 타이포·여백 중심으로 읽히게 한다 */
+    body { font-size: var(--hc-font-size, 17px); line-height: 1.7; }
+    .hc-tools { position: fixed; top: 12px; right: 12px; display: flex; gap: 6px; z-index: 10; opacity: .55; transition: opacity .2s; }
+    .hc-tools:hover, .hc-tools:focus-within { opacity: 1; }
+    .hc-article { max-width: var(--hc-wide, 980px); margin: 0 auto; padding: 72px 24px 64px; }
+    .hc-col { max-width: var(--hc-measure, 680px); }
+    .hc-article-head { margin-bottom: 40px; }
+    .hc-article-head h1 { font-size: var(--hc-title-size, 2.6rem); font-weight: var(--hc-title-weight, 700); line-height: 1.15; letter-spacing: -.02em; margin: 0 0 14px; }
+    .hc-article-head .hc-subtitle { font-size: 1.25rem; color: var(--hc-muted); margin: 0; font-style: var(--hc-subtitle-style, normal); }
+    .hc-byline { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, max-content)); gap: 8px 40px; margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--hc-border); font-size: .8rem; }
+    .hc-byline dt { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--hc-muted); }
+    .hc-byline dd { margin: 0; }
+    .hc-lede { font-size: 1.15rem; }
+    .hc-lede ul { padding-left: 1.2rem; margin: 0; }
+    .hc-lede li + li { margin-top: 6px; }
+    .hc-article h2 { font-size: 1.6rem; font-weight: var(--hc-h2-weight, 600); margin: 2.4em 0 .6em; scroll-margin-top: 24px; max-width: var(--hc-measure, 680px); }
+    .hc-article .hc-prose { max-width: var(--hc-measure, 680px); }
+    .hc-article .hc-prose > .hc-figure, .hc-article .hc-prose > .hc-table-card { max-width: none; width: min(var(--hc-wide, 980px), calc(100vw - 48px)); }
+    .hc-numbers { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 28px; margin: 32px 0; padding: 24px 0; border-top: 1px solid var(--hc-border); border-bottom: 1px solid var(--hc-border); }
+    .hc-number-label { font-size: .8rem; color: var(--hc-muted); }
+    .hc-number-value { font-size: 2rem; line-height: 1.2; font-variant-numeric: tabular-nums; margin: 4px 0; }
+    .hc-number-meta { font-size: .8rem; color: var(--hc-muted); display: flex; gap: 6px; flex-wrap: wrap; }
+    .hc-number .hc-spark { height: 22px; margin-top: 6px; color: var(--hc-muted); }
+    .hc-figure { margin: 36px 0; }
+    .hc-figcap { font-size: .85rem; color: var(--hc-muted); margin-top: 10px; max-width: var(--hc-measure, 680px); line-height: 1.5; }
+    .hc-figcap b { color: var(--hc-fg); font-weight: 600; margin-right: 6px; }
+    .hc-article .hc-table-card { background: transparent; border: 0; box-shadow: none; border-radius: 0; margin: 36px 0; }
+    .hc-article .hc-table-tools { padding: 0 0 8px; }
+    .hc-article :where(.hc-table) { font-size: .9rem; border-top: 2px solid var(--hc-fg); border-bottom: 2px solid var(--hc-fg); }
+    .hc-article :where(.hc-table) :where(thead th) { text-transform: none; letter-spacing: 0; font-size: .8rem; color: var(--hc-fg); border-bottom: 1px solid var(--hc-fg); }
+    .hc-article :where(.hc-table) :where(th, td) { padding-left: 8px; padding-right: 8px; border-bottom-color: transparent; }
+    .hc-article .hc-table-foot { padding: 8px 0 0; }
+    .hc-footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--hc-border); font-size: .8rem; color: var(--hc-muted); display: flex; flex-wrap: wrap; gap: 4px 16px; max-width: var(--hc-measure, 680px); }
+    @media (max-width: 760px) { .hc-article { padding: 56px 16px 48px; } .hc-article-head h1 { font-size: 1.9rem; } .hc-article .hc-prose > .hc-figure, .hc-article .hc-prose > .hc-table-card { width: 100%; } }
+  </style>
+  <!--HC:STYLE-->
+</head>
+<body class="%%BODY_CLASS%%">
+  <div class="hc-tools hc-no-print">
+    <button class="hc-btn" type="button" data-action="print" title="인쇄 / PDF로 저장">⎙</button>
+    <button class="hc-btn" type="button" data-action="theme" aria-label="테마 전환"><span data-slot="theme-icon">☾</span></button>
+  </div>
+
+  <article class="hc-article" id="main">
+    <header class="hc-article-head hc-col">
+      <h1 data-meta="title"></h1>
+      <p class="hc-subtitle" data-meta="subtitle" data-optional></p>
+      <dl class="hc-byline">
+        <div data-hc-meta-wrap><dt>작성</dt><dd data-meta="author" data-optional></dd></div>
+        <div data-hc-meta-wrap><dt>작성일</dt><dd data-meta="generatedAt" data-optional></dd></div>
+        <div data-hc-meta-wrap><dt>데이터</dt><dd data-meta="source" data-optional></dd></div>
+      </dl>
+    </header>
+
+    <div class="hc-lede hc-col" data-requires="summary"><div data-meta="summary"></div></div>
+
+    <section data-anchor="kpis" data-requires="kpis" aria-label="핵심 지표">
+      <div class="hc-numbers" data-region="kpis"></div>
+    </section>
+
+    <div data-region="sections"></div>
+
+    <section data-anchor="charts" data-requires="charts">
+      <h2>그림</h2>
+      <div data-region="charts"></div>
+    </section>
+
+    <section data-anchor="tables" data-requires="tables">
+      <h2>표</h2>
+      <div data-region="tables"></div>
+    </section>
+
+    <footer class="hc-footer">
+      <span data-meta="source" data-optional></span>
+      <span data-meta="generatedAt" data-optional></span>
+      %%CREDIT%%
+    </footer>
+  </article>
+
+  <template id="tpl-kpi" data-good="" data-bad="" data-flat="">
+    <div class="hc-number">
+      <div class="hc-number-label" data-slot="label"></div>
+      <div class="hc-number-value" data-slot="value"></div>
+      <div class="hc-number-meta"><span class="hc-delta" data-slot="delta"></span><span data-slot="delta-label"></span><span data-slot="hint"></span></div>
+      <div class="hc-spark" data-slot="spark"></div>
+    </div>
+  </template>
+
+  <template id="tpl-chart">
+    <figure class="hc-figure">
+      <div data-slot="chart"></div>
+      <figcaption class="hc-figcap"><b data-slot="title"></b><span data-slot="subtitle"></span> <span data-slot="note"></span></figcaption>
+    </figure>
+  </template>
+
+  <template id="tpl-table" data-num="hc-num" data-badge-good="hc-badge hc-badge-good" data-badge-warn="hc-badge hc-badge-warn" data-badge-bad="hc-badge hc-badge-bad" data-badge-info="hc-badge hc-badge-info" data-badge-neutral="hc-badge hc-badge-neutral">
+    <div class="hc-table-card">
+      <div class="hc-table-tools">
+        <div><b data-slot="title"></b> <span class="hc-card-sub" data-slot="subtitle"></span></div>
+        <input class="hc-input" type="search" placeholder="표에서 검색" aria-label="표에서 검색" data-slot="search">
+      </div>
+      <div class="hc-table-wrap"><table class="hc-table" data-slot="table"></table></div>
+      <div class="hc-table-foot"><span data-slot="count"></span><button class="hc-btn" type="button" data-slot="more" hidden></button></div>
+    </div>
+  </template>
+
+  <template id="tpl-section">
+    <section>
+      <h2 data-slot="title"></h2>
+      <div class="hc-prose" data-slot="body"></div>
+    </section>
+  </template>
+
+  <template id="tpl-callout" data-info="hc-callout-info" data-good="hc-callout-good" data-warn="hc-callout-warn" data-bad="hc-callout-bad">
+    <aside class="hc-callout"><strong data-slot="title"></strong><div data-slot="text"></div></aside>
+  </template>
+
+  <script>
+    window.HC_AFTER_RENDER = function () {
+      document.querySelectorAll('[data-hc-meta-wrap]').forEach(function (w) { if (!w.querySelector('dd')) w.remove(); });
+      var b = document.querySelector('.hc-byline');
+      if (b && !b.children.length) b.remove();
+    };
+  </script>
+  <!--HC:BODY_END-->
+</body>
+</html>

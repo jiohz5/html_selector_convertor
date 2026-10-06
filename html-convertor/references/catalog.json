@@ -1,0 +1,988 @@
+{
+  "checkedAt": "2026-10-06",
+  "sourcePath": "C:\\Users\\User\\Desktop\\삼성전자_DS_실습자료\\삼성전자_DS_실습자료\\실습자료\\html\\assets\\templates.js",
+  "categories": [
+    {
+      "id": "dashboard",
+      "label": "대시보드",
+      "hint": "KPI·차트·표로 결과를 한 화면에 요약"
+    },
+    {
+      "id": "report",
+      "label": "보고서·문서",
+      "hint": "분석 보고서, 데이터 리포트, 기술 문서"
+    },
+    {
+      "id": "landing",
+      "label": "소개·랜딩",
+      "hint": "프로젝트·제품을 한 페이지로 소개"
+    },
+    {
+      "id": "slides",
+      "label": "발표",
+      "hint": "결과를 슬라이드로 발표"
+    },
+    {
+      "id": "charts",
+      "label": "차트",
+      "hint": "결과물에 넣을 차트 라이브러리"
+    },
+    {
+      "id": "uikit",
+      "label": "UI 키트",
+      "hint": "컴포넌트·디자인 시스템"
+    }
+  ],
+  "items": [
+    {
+      "id": "tabler",
+      "name": "Tabler",
+      "vendor": "tabler.io",
+      "category": "dashboard",
+      "preview": "https://preview.tabler.io/",
+      "source": "https://github.com/tabler/tabler",
+      "stack": [
+        "Bootstrap 5"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "이번 큐레이션의 기준점입니다. 여백·글자 크기·카드 밀도의 균형이 좋고, 대시보드 외에도 카드·인보이스·가격표 등 페이지가 풍부합니다.",
+      "tags": [
+        "기준",
+        "다크 모드",
+        "KPI",
+        "차트",
+        "표",
+        "인보이스"
+      ]
+    },
+    {
+      "id": "shadcn-dashboard",
+      "name": "shadcn/ui Dashboard",
+      "vendor": "shadcn",
+      "category": "dashboard",
+      "preview": "https://ui.shadcn.com/view/new-york-v4/dashboard-01",
+      "source": "https://github.com/shadcn-ui/ui",
+      "stack": [
+        "React",
+        "Tailwind CSS"
+      ],
+      "htmlReady": false,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "요즘 SaaS 화면의 표준처럼 쓰이는 shadcn/ui 스타일입니다. 무채색 위주의 단정한 카드·차트·표로 구성된 dashboard-01 블록입니다.",
+      "tags": [
+        "모던",
+        "SaaS",
+        "무채색",
+        "블록"
+      ]
+    },
+    {
+      "id": "tremor-dashboard",
+      "name": "Tremor Dashboard",
+      "vendor": "Tremor (Vercel)",
+      "category": "dashboard",
+      "preview": "https://dashboard.tremor.so/overview",
+      "source": "https://blocks.tremor.so/templates",
+      "stack": [
+        "Next.js",
+        "Tailwind CSS"
+      ],
+      "htmlReady": false,
+      "license": "Apache-2.0 (OSS판)",
+      "pricing": "free",
+      "licenseNote": "전체판은 Tremor Blocks에서 무료로 공개(공식 사이트 기재). 축소 OSS판 저장소는 Apache-2.0입니다.",
+      "desc": "차트·지표에 특화된 Tremor의 공식 템플릿입니다. 얇은 선과 작은 글자로 정보 밀도가 높은 데이터 대시보드에 어울립니다.",
+      "tags": [
+        "데이터 밀도",
+        "지표",
+        "SaaS",
+        "차트"
+      ]
+    },
+    {
+      "id": "adminlte",
+      "name": "AdminLTE 4",
+      "vendor": "ColorlibHQ",
+      "category": "dashboard",
+      "preview": "https://adminlte.io/themes/v4/",
+      "source": "https://github.com/ColorlibHQ/AdminLTE",
+      "stack": [
+        "Bootstrap 5"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "가장 널리 쓰인 관리자 템플릿의 v4입니다. 색이 강한 KPI 박스와 익숙한 사이드바 구조라 업무용 화면 구성을 참고하기 좋습니다.",
+      "tags": [
+        "정석",
+        "KPI 박스",
+        "사이드바",
+        "지도"
+      ]
+    },
+    {
+      "id": "adminkit",
+      "name": "AdminKit",
+      "vendor": "AdminKit",
+      "category": "dashboard",
+      "preview": "https://demo.adminkit.io/",
+      "source": "https://github.com/adminkit/adminkit",
+      "stack": [
+        "Bootstrap 5"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "절제된 색과 넓은 여백의 깔끔한 Bootstrap 5 템플릿입니다. 첫 화면에 테마 설정 패널(Pro 안내 포함)이 열려 있습니다.",
+      "tags": [
+        "미니멀",
+        "캘린더",
+        "지도"
+      ]
+    },
+    {
+      "id": "coreui",
+      "name": "CoreUI Free",
+      "vendor": "CoreUI",
+      "category": "dashboard",
+      "preview": "https://coreui.io/demos/bootstrap/5.3/free/",
+      "source": "https://github.com/coreui/coreui-free-bootstrap-admin-template",
+      "stack": [
+        "Bootstrap 5"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "컬러 KPI 카드와 큰 트래픽 차트가 있는 정석형 대시보드입니다. 컴포넌트 문서가 잘 갖춰져 있습니다.",
+      "tags": [
+        "정석",
+        "KPI 카드",
+        "차트"
+      ]
+    },
+    {
+      "id": "sneat",
+      "name": "Sneat Free",
+      "vendor": "ThemeSelection",
+      "category": "dashboard",
+      "preview": "https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/html/",
+      "source": "https://github.com/themeselection/sneat-bootstrap-html-admin-template-free",
+      "stack": [
+        "Bootstrap 5"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "보라색 포인트와 일러스트가 들어간 부드러운 분위기의 대시보드입니다. 메뉴에 Pro 전용 항목이 함께 보입니다.",
+      "tags": [
+        "일러스트",
+        "부드러운",
+        "보라"
+      ]
+    },
+    {
+      "id": "tailadmin",
+      "name": "TailAdmin",
+      "vendor": "TailAdmin",
+      "category": "dashboard",
+      "preview": "https://free-demo.tailadmin.com/",
+      "source": "https://github.com/TailAdmin/tailadmin-free-tailwind-dashboard-template",
+      "stack": [
+        "Tailwind CSS"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "Tailwind CSS 기반 무료 대시보드입니다. 간결한 카드·막대 차트·목표 게이지 구성이라 Tailwind 스타일 결과물에 참고하기 좋습니다.",
+      "tags": [
+        "Tailwind",
+        "게이지",
+        "막대 차트"
+      ]
+    },
+    {
+      "id": "flowbite-admin",
+      "name": "Flowbite Admin",
+      "vendor": "Themesberg",
+      "category": "dashboard",
+      "preview": "https://flowbite-admin-dashboard.vercel.app/",
+      "source": "https://github.com/themesberg/flowbite-admin-dashboard",
+      "stack": [
+        "Tailwind CSS"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "Flowbite 컴포넌트로 만든 Tailwind 관리자 화면입니다. 매출 추이 차트와 상품 순위 목록 같은 커머스형 구성입니다.",
+      "tags": [
+        "커머스",
+        "매출",
+        "목록"
+      ]
+    },
+    {
+      "id": "volt",
+      "name": "Volt",
+      "vendor": "Themesberg",
+      "category": "dashboard",
+      "preview": "https://demo.themesberg.com/volt/pages/dashboard/dashboard.html",
+      "source": "https://github.com/themesberg/volt-bootstrap-5-dashboard",
+      "stack": [
+        "Bootstrap 5"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "어두운 사이드바와 따뜻한 포인트 색의 Bootstrap 5 대시보드입니다. 저장소는 2023년 3월 이후 업데이트가 없습니다.",
+      "tags": [
+        "다크 사이드바",
+        "따뜻한 색"
+      ]
+    },
+    {
+      "id": "mazer",
+      "name": "Mazer",
+      "vendor": "zuramai",
+      "category": "dashboard",
+      "preview": "https://zuramai.github.io/mazer/demo/index.html",
+      "source": "https://github.com/zuramai/mazer",
+      "stack": [
+        "Bootstrap 5"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "밝고 가벼운 톤의 Bootstrap 5 대시보드입니다. 라이트/다크 테마를 모두 제공합니다.",
+      "tags": [
+        "가벼운",
+        "다크 모드"
+      ]
+    },
+    {
+      "id": "windmill",
+      "name": "Windmill Dashboard",
+      "vendor": "Estevan Maito",
+      "category": "dashboard",
+      "preview": "https://windmill-dashboard.vercel.app/",
+      "source": "https://github.com/estevanmaito/windmill-dashboard",
+      "stack": [
+        "Tailwind CSS"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "Tailwind CSS로 만든 가벼운 대시보드입니다. 접근성을 고려했고 다크 테마를 지원합니다.",
+      "tags": [
+        "접근성",
+        "다크 모드",
+        "표"
+      ]
+    },
+    {
+      "id": "material-dashboard",
+      "name": "Material Dashboard 3",
+      "vendor": "Creative Tim",
+      "category": "dashboard",
+      "preview": "https://demos.creative-tim.com/material-dashboard-free/pages/dashboard.html",
+      "source": "https://github.com/creativetimofficial/material-dashboard",
+      "stack": [
+        "Bootstrap 5"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "Google Material Design 느낌의 Bootstrap 5 대시보드입니다. 상단에 제작사 프로모션 배너가 표시됩니다.",
+      "tags": [
+        "머티리얼",
+        "카드"
+      ]
+    },
+    {
+      "id": "soft-ui",
+      "name": "Soft UI Dashboard 3",
+      "vendor": "Creative Tim",
+      "category": "dashboard",
+      "preview": "https://demos.creative-tim.com/soft-ui-dashboard/pages/dashboard.html",
+      "source": "https://github.com/creativetimofficial/soft-ui-dashboard",
+      "stack": [
+        "Bootstrap 5"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "부드러운 그림자와 그라데이션 아이콘의 ‘Soft UI’ 스타일 대시보드입니다. 상단에 제작사 배너가 표시됩니다.",
+      "tags": [
+        "소프트 UI",
+        "그라데이션"
+      ]
+    },
+    {
+      "id": "ant-design-pro",
+      "name": "Ant Design Pro",
+      "vendor": "Ant Group",
+      "category": "dashboard",
+      "preview": "https://preview.pro.ant.design/",
+      "source": "https://github.com/ant-design/ant-design-pro",
+      "stack": [
+        "React",
+        "Ant Design"
+      ],
+      "htmlReady": false,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "앤트 그룹의 엔터프라이즈 관리자 솔루션으로, 데이터가 빽빽한 업무 화면의 정석입니다. 데모는 중국어로 열리며 상단 지구본 아이콘에서 언어를 바꿀 수 있습니다.",
+      "tags": [
+        "엔터프라이즈",
+        "업무 화면",
+        "고밀도"
+      ]
+    },
+    {
+      "id": "shadcn-admin",
+      "name": "Shadcn Admin",
+      "vendor": "satnaing",
+      "category": "dashboard",
+      "preview": "https://shadcn-admin.netlify.app/",
+      "source": "https://github.com/satnaing/shadcn-admin",
+      "stack": [
+        "React",
+        "Tailwind CSS"
+      ],
+      "htmlReady": false,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "shadcn/ui로 만든 관리자 앱 전체 구성입니다. 대시보드·작업·앱·채팅·사용자·설정·인증 화면까지 갖췄습니다.",
+      "tags": [
+        "모던",
+        "앱 전체",
+        "설정"
+      ]
+    },
+    {
+      "id": "catalyst",
+      "name": "Catalyst",
+      "vendor": "Tailwind Labs",
+      "category": "dashboard",
+      "preview": "https://catalyst-demo.tailwindui.com/",
+      "source": null,
+      "stack": [
+        "React",
+        "Tailwind CSS"
+      ],
+      "htmlReady": false,
+      "license": "상용",
+      "pricing": "paid",
+      "licenseNote": "상용 제품입니다. 구매 전에는 디자인 참고용으로만 보세요. (Tailwind Plus)",
+      "desc": "Tailwind CSS 제작사의 공식 애플리케이션 UI 키트입니다. 타이포그래피 중심의 극도로 절제된 디자인입니다.",
+      "tags": [
+        "미니멀",
+        "타이포",
+        "Tailwind Plus"
+      ]
+    },
+    {
+      "id": "metronic",
+      "name": "Metronic 9",
+      "vendor": "Keenthemes",
+      "category": "dashboard",
+      "preview": "https://keenthemes.com/metronic/tailwind/demo1/",
+      "source": "https://keenthemes.com/metronic",
+      "stack": [
+        "Tailwind CSS"
+      ],
+      "htmlReady": true,
+      "license": "상용",
+      "pricing": "paid",
+      "licenseNote": "상용 제품입니다. 구매 전에는 디자인 참고용으로만 보세요.",
+      "desc": "데모와 페이지 수가 매우 많은 대형 상용 관리자 템플릿의 최신 Tailwind판입니다.",
+      "tags": [
+        "대형",
+        "다수 데모"
+      ]
+    },
+    {
+      "id": "observable-framework",
+      "name": "Observable Framework",
+      "vendor": "Observable",
+      "category": "report",
+      "preview": "https://observablehq.observablehq.cloud/framework-example-eia/",
+      "source": "https://github.com/observablehq/framework",
+      "stack": [
+        "Markdown",
+        "JavaScript"
+      ],
+      "htmlReady": false,
+      "license": "ISC",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "Markdown과 JavaScript로 데이터 앱·보고서를 만드는 정적 사이트 도구입니다. 지도·시계열·표가 어우러진 미국 전력망 예제는 ‘분석 보고서형’ 결과물의 좋은 기준입니다.",
+      "tags": [
+        "데이터 리포트",
+        "지도",
+        "시계열"
+      ]
+    },
+    {
+      "id": "quarto",
+      "name": "Quarto Dashboards",
+      "vendor": "Posit",
+      "category": "report",
+      "preview": "https://jjallaire.github.io/customer-churn-dashboard/",
+      "source": "https://github.com/quarto-dev/quarto-cli",
+      "stack": [
+        "Python",
+        "R"
+      ],
+      "htmlReady": false,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "Python·R 분석 결과를 HTML 대시보드로 바로 내보내는 Quarto입니다. 값 박스·차트·표로 구성된 고객 이탈 분석 예제입니다.",
+      "tags": [
+        "분석 결과",
+        "값 박스",
+        "Python"
+      ]
+    },
+    {
+      "id": "tufte-css",
+      "name": "Tufte CSS",
+      "vendor": "Dave Liepmann",
+      "category": "report",
+      "preview": "https://edwardtufte.github.io/tufte-css/",
+      "source": "https://github.com/edwardtufte/tufte-css",
+      "stack": [
+        "CSS"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "에드워드 터프티의 책 스타일을 웹으로 옮긴 CSS입니다. 여백 주석(사이드노트)과 세리프 본문으로 ‘잘 읽히는 보고서’를 만듭니다.",
+      "tags": [
+        "읽기 좋은",
+        "사이드노트",
+        "세리프"
+      ]
+    },
+    {
+      "id": "mkdocs-material",
+      "name": "Material for MkDocs",
+      "vendor": "squidfunk",
+      "category": "report",
+      "preview": "https://squidfunk.github.io/mkdocs-material/",
+      "source": "https://github.com/squidfunk/mkdocs-material",
+      "stack": [
+        "Python",
+        "Markdown"
+      ],
+      "htmlReady": false,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "Markdown 문서를 깔끔한 기술 문서 사이트로 만들어 주는 테마입니다. 검색·탭·코드 블록·다크 모드를 기본으로 지원합니다.",
+      "tags": [
+        "기술 문서",
+        "검색",
+        "다크 모드"
+      ]
+    },
+    {
+      "id": "starlight",
+      "name": "Starlight",
+      "vendor": "Astro",
+      "category": "report",
+      "preview": "https://starlight.astro.build/",
+      "source": "https://github.com/withastro/starlight",
+      "stack": [
+        "Astro"
+      ],
+      "htmlReady": false,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "Astro 기반 문서 테마입니다. 은은한 그라데이션과 카드형 구성으로 모던한 가이드 페이지에 어울립니다.",
+      "tags": [
+        "가이드",
+        "문서"
+      ]
+    },
+    {
+      "id": "distill",
+      "name": "Distill",
+      "vendor": "Distill",
+      "category": "report",
+      "preview": "https://distill.pub/2017/momentum/",
+      "source": "https://github.com/distillpub/template",
+      "stack": [
+        "JavaScript"
+      ],
+      "htmlReady": true,
+      "license": "Apache-2.0",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "인터랙티브 그림이 들어간 연구 논문형 글의 대표 사례(‘Why Momentum Really Works’)입니다. 저널은 2021년부터 휴간 상태입니다.",
+      "tags": [
+        "논문형",
+        "인터랙티브"
+      ]
+    },
+    {
+      "id": "astrowind",
+      "name": "AstroWind",
+      "vendor": "onWidget",
+      "category": "landing",
+      "preview": "https://astrowind.vercel.app/",
+      "source": "https://github.com/onwidget/astrowind",
+      "stack": [
+        "Astro",
+        "Tailwind CSS"
+      ],
+      "htmlReady": false,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "무료·오픈소스 Astro + Tailwind 랜딩 템플릿입니다. 히어로·기능·가격·블로그 등 섹션 구성이 풍부합니다.",
+      "tags": [
+        "랜딩",
+        "블로그",
+        "섹션 다양"
+      ]
+    },
+    {
+      "id": "cruip-open-pro",
+      "name": "Open PRO",
+      "vendor": "Cruip",
+      "category": "landing",
+      "preview": "https://open.cruip.com/",
+      "source": "https://github.com/cruip/open-react-template",
+      "stack": [
+        "Next.js",
+        "Tailwind CSS"
+      ],
+      "htmlReady": false,
+      "license": "GPL-3.0",
+      "pricing": "free",
+      "licenseNote": "GPL-3.0(카피레프트): 수정본을 배포하면 소스 공개 의무가 생깁니다.",
+      "desc": "어두운 배경의 SaaS 랜딩입니다. 제품 영상과 기능 소개 섹션이 돋보입니다.",
+      "tags": [
+        "다크",
+        "SaaS",
+        "영상"
+      ]
+    },
+    {
+      "id": "cruip-simple",
+      "name": "Simple",
+      "vendor": "Cruip",
+      "category": "landing",
+      "preview": "https://simple.cruip.com/",
+      "source": "https://github.com/cruip/tailwind-landing-page-template",
+      "stack": [
+        "Next.js",
+        "Tailwind CSS"
+      ],
+      "htmlReady": false,
+      "license": "GPL-3.0",
+      "pricing": "free",
+      "licenseNote": "GPL-3.0(카피레프트): 수정본을 배포하면 소스 공개 의무가 생깁니다.",
+      "desc": "밝고 단정한 SaaS 랜딩입니다. 여백이 넉넉해 제품·서비스 소개에 무난합니다.",
+      "tags": [
+        "라이트",
+        "SaaS"
+      ]
+    },
+    {
+      "id": "html5up-massively",
+      "name": "Massively",
+      "vendor": "HTML5 UP",
+      "category": "landing",
+      "preview": "https://html5up.net/uploads/demos/massively/",
+      "source": "https://html5up.net/massively",
+      "stack": [
+        "HTML",
+        "CSS"
+      ],
+      "htmlReady": true,
+      "license": "CC BY 3.0",
+      "pricing": "free",
+      "licenseNote": "CC BY 3.0: 무료지만 HTML5 UP 출처 표기가 필요합니다.",
+      "desc": "사진 배경 히어로와 블로그형 카드 목록의 정적 HTML 템플릿입니다.",
+      "tags": [
+        "사진",
+        "블로그",
+        "정적 HTML"
+      ]
+    },
+    {
+      "id": "sb-agency",
+      "name": "Agency",
+      "vendor": "Start Bootstrap",
+      "category": "landing",
+      "preview": "https://startbootstrap.github.io/startbootstrap-agency/",
+      "source": "https://github.com/StartBootstrap/startbootstrap-agency",
+      "stack": [
+        "Bootstrap 5"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "사진 히어로·서비스·포트폴리오·팀 섹션으로 구성된 정통 원페이지 템플릿입니다.",
+      "tags": [
+        "원페이지",
+        "포트폴리오"
+      ]
+    },
+    {
+      "id": "salient",
+      "name": "Salient",
+      "vendor": "Tailwind Labs",
+      "category": "landing",
+      "preview": "https://salient.tailwindui.com/",
+      "source": null,
+      "stack": [
+        "Next.js",
+        "Tailwind CSS"
+      ],
+      "htmlReady": false,
+      "license": "상용",
+      "pricing": "paid",
+      "licenseNote": "상용 제품입니다. 구매 전에는 디자인 참고용으로만 보세요. (Tailwind Plus)",
+      "desc": "Tailwind CSS 제작사의 SaaS 랜딩 템플릿입니다(데모 브랜드: TaxPal).",
+      "tags": [
+        "SaaS",
+        "Tailwind Plus"
+      ]
+    },
+    {
+      "id": "radiant",
+      "name": "Radiant",
+      "vendor": "Tailwind Labs",
+      "category": "landing",
+      "preview": "https://radiant.tailwindui.com/",
+      "source": null,
+      "stack": [
+        "Next.js",
+        "Tailwind CSS"
+      ],
+      "htmlReady": false,
+      "license": "상용",
+      "pricing": "paid",
+      "licenseNote": "상용 제품입니다. 구매 전에는 디자인 참고용으로만 보세요. (Tailwind Plus)",
+      "desc": "화사한 그라데이션의 B2B SaaS 랜딩 템플릿입니다.",
+      "tags": [
+        "그라데이션",
+        "B2B",
+        "Tailwind Plus"
+      ]
+    },
+    {
+      "id": "revealjs",
+      "name": "reveal.js",
+      "vendor": "Hakim El Hattab",
+      "category": "slides",
+      "preview": "https://revealjs.com/demo/",
+      "source": "https://github.com/hakimel/reveal.js",
+      "stack": [
+        "HTML",
+        "JavaScript"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "HTML 슬라이드의 표준입니다. 결과물을 발표 자료로 만들 때 가장 먼저 검토할 도구입니다.",
+      "tags": [
+        "슬라이드",
+        "발표"
+      ]
+    },
+    {
+      "id": "slidev",
+      "name": "Slidev",
+      "vendor": "Slidev",
+      "category": "slides",
+      "preview": "https://sli.dev/demo/starter/",
+      "source": "https://github.com/slidevjs/slidev",
+      "stack": [
+        "Vue",
+        "Markdown"
+      ],
+      "htmlReady": false,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "Markdown으로 쓰는 개발자용 슬라이드입니다. 코드 하이라이트와 다이어그램 표현에 강합니다.",
+      "tags": [
+        "Markdown",
+        "코드",
+        "개발자"
+      ]
+    },
+    {
+      "id": "impressjs",
+      "name": "impress.js",
+      "vendor": "impress.js",
+      "category": "slides",
+      "preview": "https://impress.js.org/",
+      "source": "https://github.com/impress/impress.js",
+      "stack": [
+        "HTML",
+        "JavaScript"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "Prezi처럼 화면이 3D 공간을 이동하는 발표 도구입니다. 임팩트 있는 연출이 필요할 때 씁니다.",
+      "tags": [
+        "3D",
+        "연출"
+      ]
+    },
+    {
+      "id": "echarts",
+      "name": "Apache ECharts",
+      "vendor": "Apache",
+      "category": "charts",
+      "preview": "https://echarts.apache.org/examples/en/index.html",
+      "source": "https://github.com/apache/echarts",
+      "stack": [
+        "JavaScript"
+      ],
+      "htmlReady": true,
+      "license": "Apache-2.0",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "차트 종류와 예제가 가장 풍부한 라이브러리입니다. 대시보드형 결과물의 기본 차트로 추천합니다.",
+      "tags": [
+        "차트",
+        "지도",
+        "대용량"
+      ]
+    },
+    {
+      "id": "chartjs",
+      "name": "Chart.js",
+      "vendor": "Chart.js",
+      "category": "charts",
+      "preview": "https://www.chartjs.org/",
+      "source": "https://github.com/chartjs/Chart.js",
+      "stack": [
+        "JavaScript"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "가볍고 배우기 쉬운 기본 차트 라이브러리입니다. 단일 HTML 파일에 CDN 한 줄로 넣기 좋습니다.",
+      "tags": [
+        "가벼운",
+        "기본 차트"
+      ]
+    },
+    {
+      "id": "plotly",
+      "name": "Plotly.js",
+      "vendor": "Plotly",
+      "category": "charts",
+      "preview": "https://plotly.com/javascript/",
+      "source": "https://github.com/plotly/plotly.js",
+      "stack": [
+        "JavaScript"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "확대·호버가 기본인 인터랙티브 차트입니다. Python(Plotly) 분석 결과와 모양을 맞추기 좋습니다.",
+      "tags": [
+        "인터랙티브",
+        "과학",
+        "Python"
+      ]
+    },
+    {
+      "id": "observable-plot",
+      "name": "Observable Plot",
+      "vendor": "Observable",
+      "category": "charts",
+      "preview": "https://observablehq.github.io/plot/",
+      "source": "https://github.com/observablehq/plot",
+      "stack": [
+        "JavaScript"
+      ],
+      "htmlReady": true,
+      "license": "ISC",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "D3를 만든 팀(Observable)의 탐색적 시각화 라이브러리입니다. 짧은 코드로 깔끔한 기본 스타일의 차트를 만듭니다.",
+      "tags": [
+        "탐색적 분석",
+        "D3"
+      ]
+    },
+    {
+      "id": "apexcharts",
+      "name": "ApexCharts",
+      "vendor": "ApexCharts",
+      "category": "charts",
+      "preview": "https://apexcharts.com/javascript-chart-demos/",
+      "source": "https://github.com/apexcharts/apexcharts.js",
+      "stack": [
+        "JavaScript"
+      ],
+      "htmlReady": true,
+      "license": "듀얼 라이선스",
+      "pricing": "conditional",
+      "licenseNote": "연매출·예산이 200만 달러 이상인 조직은 상용 라이선스가 필요합니다(사내 사용 포함).",
+      "desc": "애니메이션이 매끄러운 모던 차트 라이브러리입니다. 다만 대기업에서 쓰려면 유료 라이선스가 필요합니다.",
+      "tags": [
+        "애니메이션",
+        "모던"
+      ]
+    },
+    {
+      "id": "bootstrap-examples",
+      "name": "Bootstrap 공식 예제",
+      "vendor": "Bootstrap",
+      "category": "uikit",
+      "preview": "https://getbootstrap.com/docs/5.3/examples/",
+      "source": "https://github.com/twbs/bootstrap",
+      "stack": [
+        "Bootstrap 5"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "대시보드·앨범·가격표·체크아웃 등 공식 예제 모음입니다. Bootstrap 기반 결과물의 기본 문법을 익히기 좋습니다.",
+      "tags": [
+        "공식",
+        "예제"
+      ]
+    },
+    {
+      "id": "shadcn-blocks",
+      "name": "shadcn/ui Blocks",
+      "vendor": "shadcn",
+      "category": "uikit",
+      "preview": "https://ui.shadcn.com/blocks",
+      "source": "https://github.com/shadcn-ui/ui",
+      "stack": [
+        "React",
+        "Tailwind CSS"
+      ],
+      "htmlReady": false,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "대시보드·사이드바·로그인 등 바로 붙여 쓰는 shadcn/ui 블록 모음입니다.",
+      "tags": [
+        "블록",
+        "모던"
+      ]
+    },
+    {
+      "id": "daisyui",
+      "name": "daisyUI",
+      "vendor": "Pouya Saadeghi",
+      "category": "uikit",
+      "preview": "https://daisyui.com/components/",
+      "source": "https://github.com/saadeghi/daisyui",
+      "stack": [
+        "Tailwind CSS"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "클래스 이름만으로 컴포넌트를 만드는 Tailwind 플러그인입니다. 테마 전환이 쉬워 결과물 색상을 바꾸기 좋습니다.",
+      "tags": [
+        "테마",
+        "컴포넌트"
+      ]
+    },
+    {
+      "id": "flowbite",
+      "name": "Flowbite",
+      "vendor": "Themesberg",
+      "category": "uikit",
+      "preview": "https://flowbite.com/blocks/",
+      "source": "https://github.com/themesberg/flowbite",
+      "stack": [
+        "Tailwind CSS"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "mixed",
+      "licenseNote": "라이브러리는 MIT, 일부 블록은 Pro(유료)입니다.",
+      "desc": "Tailwind CSS 컴포넌트·블록 모음입니다.",
+      "tags": [
+        "컴포넌트",
+        "블록"
+      ]
+    },
+    {
+      "id": "preline",
+      "name": "Preline UI",
+      "vendor": "Htmlstream",
+      "category": "uikit",
+      "preview": "https://preline.co/blocks/",
+      "source": "https://github.com/htmlstreamofficial/preline",
+      "stack": [
+        "Tailwind CSS"
+      ],
+      "htmlReady": true,
+      "license": "MIT",
+      "pricing": "mixed",
+      "licenseNote": "라이브러리는 MIT, 블록·템플릿 일부는 프리미엄(유료)입니다.",
+      "desc": "Tailwind CSS 블록·템플릿 모음입니다.",
+      "tags": [
+        "블록",
+        "템플릿"
+      ]
+    },
+    {
+      "id": "carbon",
+      "name": "Carbon Design System",
+      "vendor": "IBM",
+      "category": "uikit",
+      "preview": "https://www.carbondesignsystem.com/",
+      "source": "https://github.com/carbon-design-system/carbon",
+      "stack": [
+        "Web Components",
+        "React"
+      ],
+      "htmlReady": false,
+      "license": "Apache-2.0",
+      "pricing": "free",
+      "licenseNote": null,
+      "desc": "IBM의 엔터프라이즈 디자인 시스템입니다. 데이터 표와 폼이 많은 업무형 결과물에 어울립니다.",
+      "tags": [
+        "엔터프라이즈",
+        "디자인 시스템",
+        "표"
+      ]
+    }
+  ]
+}

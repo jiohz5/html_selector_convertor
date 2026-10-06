@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ko" %%HTML_ATTRS%%>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>%%TITLE%%</title>
+  <!--HC:HEAD-->
+  <style>
+    /* ── 키트: 발표 (reveal.js) — 표지 → 요약 → 핵심 지표 → 섹션 → 차트 → 표 → 끝 ──
+       ←/→ 이동, F 전체 화면, O(Esc) 개요, ?print-pdf 를 주소 끝에 붙여 인쇄하면 PDF */
+    html, body { height: 100%; }
+    .reveal-viewport, body { background: var(--hc-bg); }
+    .reveal { font-family: var(--hc-font); font-size: 30px; color: var(--hc-fg); }
+    .reveal .slides { text-align: var(--hc-slide-align, left); }
+    .reveal h1, .reveal h2, .reveal h3 { font-family: var(--hc-font-heading, var(--hc-font)); color: var(--hc-heading, var(--hc-fg)); text-transform: var(--hc-slide-h-transform, none); letter-spacing: -.01em; font-weight: 700; line-height: 1.2; }
+    .reveal h1 { font-size: 2.1em; margin-bottom: .3em; }
+    .reveal h2 { font-size: 1.35em; margin: 0 0 .7em; }
+    .reveal p, .reveal li { line-height: 1.5; }
+    .reveal a { color: var(--hc-primary); }
+    .reveal .slides section { height: 100%; box-sizing: border-box; padding: 0; }
+    .reveal ul { display: block; margin-left: 1em; }
+    .reveal .hc-slide-title { display: flex !important; flex-direction: column; justify-content: center; height: 100%; }
+    .reveal .hc-slide-title h1 { max-width: 90%; }
+    .reveal .hc-slide-title .hc-sub { font-size: .9em; color: var(--hc-muted); margin: 0 0 1.6em; }
+    .reveal .hc-slide-title .hc-meta { font-size: .55em; color: var(--hc-muted); display: flex; gap: 2em; flex-wrap: wrap; border-top: 3px solid var(--hc-primary); padding-top: .8em; width: fit-content; }
+    .reveal .hc-kicker { font-size: .5em; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--hc-primary); margin-bottom: .4em; }
+    .reveal .hc-summary-list li { margin: .45em 0; }
+    .reveal .hc-summary-list li::marker { color: var(--hc-primary); }
+    .reveal .hc-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: .4em; font-size: 16px; }
+    .reveal .hc-kpi { padding: 24px 28px; text-align: left; }
+    .reveal .hc-kpi-label { font-size: 18px; }
+    .reveal .hc-kpi-value { font-size: 52px; }
+    .reveal .hc-kpi-meta { font-size: 17px; }
+    .reveal .hc-kpi-meta .hc-delta { font-size: 17px; }
+    .reveal .hc-prose { font-size: .82em; }
+    .reveal .hc-prose p { margin: 0 0 .7em; }
+    .reveal .hc-prose .hc-figure, .reveal .hc-prose .hc-card { font-size: 16px; }
+    .reveal .hc-callout { font-size: .8em; }
+    .reveal .hc-chart-slide .hc-sub, .reveal .hc-note { font-size: .55em; color: var(--hc-muted); margin: -.8em 0 .8em; }
+    .reveal .hc-note { margin: .6em 0 0; }
+    .reveal .hc-figure .hc-note { font-size: 15px; margin-top: 6px; }
+    .reveal .hc-table-card { font-size: 18px; box-shadow: none; }
+    .reveal .hc-table-tools { display: none; }
+    .reveal table { margin: 0; }
+    .reveal .hc-table { font-size: 22px; }
+    .reveal .hc-table thead th { font-size: 15px; }
+    .reveal .hc-table th, .reveal .hc-table td { border-bottom: 1px solid var(--hc-border); }
+    .reveal .hc-end { display: flex !important; flex-direction: column; justify-content: center; align-items: flex-start; height: 100%; }
+    .reveal .progress { color: var(--hc-primary); height: 4px; }
+    .reveal .slide-number { background: transparent; color: var(--hc-muted); font-family: var(--hc-font); font-size: 14px; }
+    .reveal .controls { color: var(--hc-primary); }
+    .hc-deck-tools { position: fixed; left: 16px; bottom: 14px; z-index: 30; display: flex; gap: 6px; opacity: .5; }
+    .hc-deck-tools:hover { opacity: 1; }
+    .hc-deck-foot { position: fixed; right: 120px; bottom: 16px; z-index: 30; font-size: 12px; color: var(--hc-muted); }
+  </style>
+  <!--HC:STYLE-->
+</head>
+<body class="%%BODY_CLASS%%">
+  <div class="reveal">
+    <div class="slides" data-region="slides"></div>
+  </div>
+  <div class="hc-deck-tools hc-no-print">
+    <button class="hc-btn" type="button" data-action="theme" aria-label="테마 전환"><span data-slot="theme-icon">☾</span></button>
+  </div>
+  <div class="hc-deck-foot hc-no-print">%%CREDIT%%</div>
+
+  <template id="tpl-slide-title">
+    <section class="hc-slide-title">
+      <div class="hc-kicker" data-slot="author"></div>
+      <h1 data-slot="title"></h1>
+      <p class="hc-sub" data-slot="subtitle"></p>
+      <div class="hc-meta"><span data-slot="generatedAt"></span><span data-slot="source"></span></div>
+    </section>
+  </template>
+
+  <template id="tpl-slide-summary">
+    <section>
+      <div class="hc-kicker">Summary</div>
+      <h2>핵심 요약</h2>
+      <div class="hc-summary-list" data-slot="body"></div>
+    </section>
+  </template>
+
+  <template id="tpl-slide-kpis">
+    <section>
+      <div class="hc-kicker">Key numbers</div>
+      <h2 data-slot="title"></h2>
+      <div class="hc-kpi-grid" data-slot="kpis"></div>
+    </section>
+  </template>
+
+  <template id="tpl-kpi" data-good="" data-bad="" data-flat="">
+    <div class="hc-card hc-kpi">
+      <div class="hc-kpi-label" data-slot="label"></div>
+      <div class="hc-kpi-value" data-slot="value"></div>
+      <div class="hc-kpi-meta"><span class="hc-delta" data-slot="delta"></span><span data-slot="delta-label"></span><span data-slot="hint"></span></div>
+      <div class="hc-spark" data-slot="spark"></div>
+    </div>
+  </template>
+
+  <template id="tpl-slide-section">
+    <section>
+      <h2 data-slot="title"></h2>
+      <div class="hc-prose" data-slot="body"></div>
+    </section>
+  </template>
+
+  <template id="tpl-figure">
+    <div class="hc-figure">
+      <div data-slot="chart" style="height:380px"></div>
+      <p class="hc-note"><b data-slot="title"></b> <span data-slot="subtitle"></span> <span data-slot="note"></span></p>
+    </div>
+  </template>
+
+  <template id="tpl-slide-chart">
+    <section class="hc-chart-slide">
+      <h2 data-slot="title"></h2>
+      <p class="hc-sub" data-slot="subtitle"></p>
+      <div data-slot="chart"></div>
+      <p class="hc-note" data-slot="note"></p>
+    </section>
+  </template>
+
+  <template id="tpl-slide-table">
+    <section>
+      <h2 data-slot="title"></h2>
+      <div data-slot="body"></div>
+    </section>
+  </template>
+
+  <template id="tpl-table" data-num="hc-num" data-badge-good="hc-badge hc-badge-good" data-badge-warn="hc-badge hc-badge-warn" data-badge-bad="hc-badge hc-badge-bad" data-badge-info="hc-badge hc-badge-info" data-badge-neutral="hc-badge hc-badge-neutral">
+    <div class="hc-card hc-table-card">
+      <div class="hc-table-tools"><span data-slot="title"></span><span data-slot="subtitle"></span><input data-slot="search"></div>
+      <div class="hc-table-wrap"><table class="hc-table" data-slot="table"></table></div>
+      <div class="hc-table-foot"><span data-slot="count"></span><button class="hc-btn" type="button" data-slot="more" hidden></button></div>
+    </div>
+  </template>
+
+  <template id="tpl-callout" data-info="hc-callout-info" data-good="hc-callout-good" data-warn="hc-callout-warn" data-bad="hc-callout-bad">
+    <div class="hc-callout"><strong data-slot="title"></strong><div data-slot="text"></div></div>
+  </template>
+
+  <template id="tpl-slide-end">
+    <section class="hc-end">
+      <div class="hc-kicker">End</div>
+      <h1>감사합니다</h1>
+    </section>
+  </template>
+
+  <script>
+    window.HC_AFTER_RENDER = function () {
+      if (!window.Reveal) { document.body.insertAdjacentHTML('afterbegin', '<p style="padding:16px">reveal.js를 불러오지 못했습니다(인터넷 연결 확인).</p>'); return; }
+      var isStatic = /[?&]static/.test(location.search) || /HeadlessChrome/.test(navigator.userAgent);
+      // 정적 모드(?static): 스크린샷·검토용으로 글머리표를 처음부터 모두 보여 준다
+      if (isStatic) document.querySelectorAll('.reveal .fragment').forEach(function (el) { el.classList.remove('fragment'); });
+      Reveal.initialize({ fragments: !isStatic, hash: true, slideNumber: 'c/t', progress: true, center: false, width: 1280, height: 720, margin: 0.08, transition: 'slide', pdfSeparateFragments: false });
+      var flush = function () { if (window.HC) setTimeout(window.HC.flush, 30); };
+      Reveal.on('ready', flush);
+      Reveal.on('slidechanged', flush);
+      Reveal.on('resize', flush);
+      Reveal.on('overviewshown', flush);
+    };
+  </script>
+  <!--HC:BODY_END-->
+</body>
+</html>

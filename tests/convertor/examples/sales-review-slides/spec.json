@@ -1,0 +1,655 @@
+{
+  "meta": {
+    "title": "2026년 1~9월 영업 실적 리뷰",
+    "subtitle": "지역별·제품별 실적과 목표 대비 달성률",
+    "source": "sales_2026.xlsx (판매내역 225행, 2026-01 ~ 2026-09)",
+    "generatedAt": "2026-10-06",
+    "author": "영업회의"
+  },
+  "summary": [
+    "1~9월 누적 매출 **63.85억 원**, 목표 65.54억 원 대비 달성률 **97.4%** — 1.69억 원 미달",
+    "9개월 모두 목표 미달. 상반기 98.0% → 3분기 96.2%로 하락, 9월이 95.6%로 최저",
+    "**경기**가 매출 비중 34%의 최대 지역이지만 달성률 96.1%로 최하위 — 전체 미달액의 52%",
+    "제품은 **메모리 B** 96.4%가 가장 낮고, 매출 1위 SSD 2TB도 96.9%",
+    "지역×제품 25개 조합 중 목표 달성은 4개뿐"
+  ],
+  "kpis": [
+    {
+      "label": "누적 매출 (1~9월)",
+      "value": 6385032000,
+      "format": "currency",
+      "currency": "KRW",
+      "decimals": 2,
+      "hint": "판매내역 합계",
+      "spark": [
+        789338000,
+        759612000,
+        746488000,
+        644986000,
+        766155000,
+        616847000,
+        653584000,
+        703898000,
+        704124000
+      ]
+    },
+    {
+      "label": "목표 달성률",
+      "value": 97.4,
+      "format": "percent",
+      "hint": "목표 65.54억 원 대비",
+      "spark": [
+        99.9,
+        97.0,
+        97.0,
+        99.8,
+        96.3,
+        98.4,
+        96.3,
+        96.9,
+        95.6
+      ]
+    },
+    {
+      "label": "목표 미달액",
+      "value": 168794749,
+      "format": "currency",
+      "currency": "KRW",
+      "decimals": 2,
+      "good": "down",
+      "hint": "목표매출 − 매출액"
+    },
+    {
+      "label": "판매 수량",
+      "value": 63609,
+      "unit": "개",
+      "hint": "1~9월 누적",
+      "spark": [
+        7408,
+        7517,
+        7442,
+        6320,
+        7505,
+        6232,
+        6714,
+        7305,
+        7166
+      ]
+    }
+  ],
+  "charts": [
+    {
+      "id": "monthly",
+      "title": "월별 매출 vs 목표",
+      "subtitle": "막대: 매출액 · 선: 목표매출 (원)",
+      "type": "bar",
+      "x": [
+        "1월",
+        "2월",
+        "3월",
+        "4월",
+        "5월",
+        "6월",
+        "7월",
+        "8월",
+        "9월"
+      ],
+      "format": "currency",
+      "span": 2,
+      "height": 330,
+      "series": [
+        {
+          "name": "매출액",
+          "data": [
+            789338000,
+            759612000,
+            746488000,
+            644986000,
+            766155000,
+            616847000,
+            653584000,
+            703898000,
+            704124000
+          ]
+        },
+        {
+          "name": "목표매출",
+          "data": [
+            790135060,
+            783500313,
+            769223373,
+            646057049,
+            795962778,
+            626876143,
+            678678158,
+            726788548,
+            736605327
+          ],
+          "type": "line"
+        }
+      ]
+    },
+    {
+      "id": "monthly-rate",
+      "title": "월별 달성률",
+      "subtitle": "단위: %",
+      "type": "line",
+      "x": [
+        "1월",
+        "2월",
+        "3월",
+        "4월",
+        "5월",
+        "6월",
+        "7월",
+        "8월",
+        "9월"
+      ],
+      "format": "percent",
+      "span": 2,
+      "height": 330,
+      "series": [
+        {
+          "name": "달성률",
+          "data": [
+            99.9,
+            97.0,
+            97.0,
+            99.8,
+            96.3,
+            98.4,
+            96.3,
+            96.9,
+            95.6
+          ]
+        }
+      ],
+      "note": "목표선 100%"
+    },
+    {
+      "id": "region-sales",
+      "title": "지역별 매출 vs 목표",
+      "subtitle": "1~9월 누적, 매출액 순 (원)",
+      "type": "bar",
+      "x": [
+        "경기",
+        "대구",
+        "서울",
+        "부산",
+        "광주"
+      ],
+      "format": "currency",
+      "height": 330,
+      "series": [
+        {
+          "name": "매출액",
+          "data": [
+            2167820000,
+            1107377000,
+            1068017000,
+            1041498000,
+            1000320000
+          ]
+        },
+        {
+          "name": "목표매출",
+          "data": [
+            2255646116,
+            1121716502,
+            1100939114,
+            1068178557,
+            1007346460
+          ]
+        }
+      ]
+    },
+    {
+      "id": "region-rate",
+      "title": "지역별 목표 대비 차이",
+      "subtitle": "달성률 − 100, 단위: %p (0 = 목표 달성)",
+      "type": "hbar",
+      "x": [
+        "경기",
+        "서울",
+        "부산",
+        "대구",
+        "광주"
+      ],
+      "format": "decimal",
+      "decimals": 1,
+      "unit": "%p",
+      "height": 330,
+      "series": [
+        {
+          "name": "목표 대비",
+          "data": [
+            -3.9,
+            -3.0,
+            -2.5,
+            -1.3,
+            -0.7
+          ]
+        }
+      ]
+    },
+    {
+      "id": "product-sales",
+      "title": "제품별 매출 vs 목표",
+      "subtitle": "1~9월 누적, 매출액 순 (원)",
+      "type": "bar",
+      "x": [
+        "SSD 2TB",
+        "모바일 AP",
+        "SSD 1TB",
+        "메모리 B",
+        "메모리 A"
+      ],
+      "format": "currency",
+      "height": 330,
+      "series": [
+        {
+          "name": "매출액",
+          "data": [
+            2268149000,
+            1388625000,
+            1245384000,
+            756278000,
+            726596000
+          ]
+        },
+        {
+          "name": "목표매출",
+          "data": [
+            2341885274,
+            1414688722,
+            1268904723,
+            784280525,
+            744067505
+          ]
+        }
+      ]
+    },
+    {
+      "id": "product-rate",
+      "title": "제품별 목표 대비 차이",
+      "subtitle": "달성률 − 100, 단위: %p (0 = 목표 달성)",
+      "type": "hbar",
+      "x": [
+        "메모리 B",
+        "SSD 2TB",
+        "메모리 A",
+        "SSD 1TB",
+        "모바일 AP"
+      ],
+      "format": "decimal",
+      "decimals": 1,
+      "unit": "%p",
+      "height": 330,
+      "series": [
+        {
+          "name": "목표 대비",
+          "data": [
+            -3.6,
+            -3.1,
+            -2.3,
+            -1.9,
+            -1.8
+          ]
+        }
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "id": "region-table",
+      "title": "지역별 실적 요약",
+      "columns": [
+        {
+          "key": "name",
+          "label": "지역"
+        },
+        {
+          "key": "sales",
+          "label": "매출액(백만 원)",
+          "type": "number",
+          "format": "decimal",
+          "decimals": 1
+        },
+        {
+          "key": "target",
+          "label": "목표매출(백만 원)",
+          "type": "number",
+          "format": "decimal",
+          "decimals": 1
+        },
+        {
+          "key": "gap",
+          "label": "미달액(백만 원)",
+          "type": "number",
+          "format": "decimal",
+          "decimals": 1
+        },
+        {
+          "key": "rate",
+          "label": "달성률",
+          "type": "number",
+          "format": "percent",
+          "decimals": 1
+        },
+        {
+          "key": "status",
+          "label": "상태",
+          "type": "badge",
+          "tones": {
+            "달성": "good",
+            "근접": "warn",
+            "미달": "bad"
+          }
+        }
+      ],
+      "rows": [
+        {
+          "name": "경기",
+          "sales": 2167.8,
+          "target": 2255.6,
+          "gap": 87.8,
+          "rate": 96.1,
+          "status": "미달"
+        },
+        {
+          "name": "대구",
+          "sales": 1107.4,
+          "target": 1121.7,
+          "gap": 14.3,
+          "rate": 98.7,
+          "status": "근접"
+        },
+        {
+          "name": "서울",
+          "sales": 1068.0,
+          "target": 1100.9,
+          "gap": 32.9,
+          "rate": 97.0,
+          "status": "근접"
+        },
+        {
+          "name": "부산",
+          "sales": 1041.5,
+          "target": 1068.2,
+          "gap": 26.7,
+          "rate": 97.5,
+          "status": "근접"
+        },
+        {
+          "name": "광주",
+          "sales": 1000.3,
+          "target": 1007.3,
+          "gap": 7.0,
+          "rate": 99.3,
+          "status": "근접"
+        }
+      ]
+    },
+    {
+      "id": "product-table",
+      "title": "제품별 실적 요약",
+      "columns": [
+        {
+          "key": "name",
+          "label": "제품"
+        },
+        {
+          "key": "sales",
+          "label": "매출액(백만 원)",
+          "type": "number",
+          "format": "decimal",
+          "decimals": 1
+        },
+        {
+          "key": "target",
+          "label": "목표매출(백만 원)",
+          "type": "number",
+          "format": "decimal",
+          "decimals": 1
+        },
+        {
+          "key": "gap",
+          "label": "미달액(백만 원)",
+          "type": "number",
+          "format": "decimal",
+          "decimals": 1
+        },
+        {
+          "key": "rate",
+          "label": "달성률",
+          "type": "number",
+          "format": "percent",
+          "decimals": 1
+        },
+        {
+          "key": "status",
+          "label": "상태",
+          "type": "badge",
+          "tones": {
+            "달성": "good",
+            "근접": "warn",
+            "미달": "bad"
+          }
+        }
+      ],
+      "rows": [
+        {
+          "name": "SSD 2TB",
+          "sales": 2268.1,
+          "target": 2341.9,
+          "gap": 73.7,
+          "rate": 96.9,
+          "status": "미달"
+        },
+        {
+          "name": "모바일 AP",
+          "sales": 1388.6,
+          "target": 1414.7,
+          "gap": 26.1,
+          "rate": 98.2,
+          "status": "근접"
+        },
+        {
+          "name": "SSD 1TB",
+          "sales": 1245.4,
+          "target": 1268.9,
+          "gap": 23.5,
+          "rate": 98.1,
+          "status": "근접"
+        },
+        {
+          "name": "메모리 B",
+          "sales": 756.3,
+          "target": 784.3,
+          "gap": 28.0,
+          "rate": 96.4,
+          "status": "미달"
+        },
+        {
+          "name": "메모리 A",
+          "sales": 726.6,
+          "target": 744.1,
+          "gap": 17.5,
+          "rate": 97.7,
+          "status": "근접"
+        }
+      ]
+    },
+    {
+      "id": "gap-top",
+      "title": "미달액 상위 지역×제품",
+      "subtitle": "미달액 큰 순 상위 6개 (25개 조합 중)",
+      "columns": [
+        {
+          "key": "region",
+          "label": "지역"
+        },
+        {
+          "key": "product",
+          "label": "제품"
+        },
+        {
+          "key": "gap",
+          "label": "미달액(백만 원)",
+          "type": "number",
+          "format": "decimal",
+          "decimals": 1
+        },
+        {
+          "key": "rate",
+          "label": "달성률",
+          "type": "number",
+          "format": "percent",
+          "decimals": 1
+        },
+        {
+          "key": "status",
+          "label": "상태",
+          "type": "badge",
+          "tones": {
+            "달성": "good",
+            "근접": "warn",
+            "미달": "bad"
+          }
+        }
+      ],
+      "rows": [
+        {
+          "region": "경기",
+          "product": "SSD 2TB",
+          "gap": 39.9,
+          "rate": 95.0,
+          "status": "미달"
+        },
+        {
+          "region": "부산",
+          "product": "SSD 2TB",
+          "gap": 25.9,
+          "rate": 93.5,
+          "status": "미달"
+        },
+        {
+          "region": "경기",
+          "product": "모바일 AP",
+          "gap": 20.3,
+          "rate": 96.0,
+          "status": "미달"
+        },
+        {
+          "region": "경기",
+          "product": "메모리 B",
+          "gap": 16.3,
+          "rate": 94.0,
+          "status": "미달"
+        },
+        {
+          "region": "서울",
+          "product": "SSD 2TB",
+          "gap": 13.1,
+          "rate": 96.9,
+          "status": "미달"
+        },
+        {
+          "region": "서울",
+          "product": "메모리 B",
+          "gap": 8.3,
+          "rate": 93.8,
+          "status": "미달"
+        }
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "id": "trend",
+      "title": "월별 추이: 9개월 연속 목표 미달",
+      "bullets": [
+        "최고 1월 99.9%, 최저 9월 95.6%",
+        "분기 달성률 Q1 98.0% · Q2 98.0% · Q3 96.2%"
+      ],
+      "charts": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "trend-rate",
+      "title": "3분기 들어 달성률 하락",
+      "bullets": [
+        "상반기 98.0% → 3분기 96.2% (-1.8%p)"
+      ],
+      "charts": [
+        "monthly-rate"
+      ]
+    },
+    {
+      "id": "region",
+      "title": "지역: 경기가 최대 시장이자 최대 미달",
+      "bullets": [
+        "경기 매출 21.68억 원 (비중 34%), 달성률 96.1%",
+        "경기 미달액 0.88억 원 = 전체 미달액의 52%"
+      ],
+      "charts": [
+        "region-sales"
+      ]
+    },
+    {
+      "id": "region-r",
+      "title": "지역별 달성률: 모두 목표 미달",
+      "bullets": [
+        "광주 99.3%로 최고, 모든 지역 100% 미만"
+      ],
+      "charts": [
+        "region-rate"
+      ]
+    },
+    {
+      "id": "region-t",
+      "title": "지역별 실적 요약",
+      "tables": [
+        "region-table"
+      ]
+    },
+    {
+      "id": "product",
+      "title": "제품: SSD 2TB가 매출 1위, 미달액도 1위",
+      "bullets": [
+        "SSD 2TB 매출 22.68억 원 (비중 36%), 미달액 0.74억 원"
+      ],
+      "charts": [
+        "product-sales"
+      ]
+    },
+    {
+      "id": "product-r",
+      "title": "제품별 달성률: 5개 제품 모두 미달",
+      "bullets": [
+        "메모리 B 96.4% 최저 · 모바일 AP 98.2% 최고"
+      ],
+      "charts": [
+        "product-rate"
+      ]
+    },
+    {
+      "id": "product-t",
+      "title": "제품별 실적 요약",
+      "tables": [
+        "product-table"
+      ]
+    },
+    {
+      "id": "cells",
+      "title": "어디를 메워야 하나: 미달액 상위 조합",
+      "bullets": [
+        "달성 조합: 부산 모바일 AP 102.7%, 광주 SSD 2TB 101.2%, 대구 SSD 2TB 100.2%, 서울 메모리 A 100.2%"
+      ],
+      "tables": [
+        "gap-top"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1912 @@
+<!doctype html>
+<html lang="ko" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2026년 1~9월 영업 실적 리뷰</title>
+  <meta name="description" content="지역별·제품별 실적과 목표 대비 달성률">
+  <meta name="color-scheme" content="light dark">
+  <meta name="generator" content="html-convertor · design=revealjs · kit=slides">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/theme/white.css">
+  <style>
+/* 디자인 토큰: revealjs */
+:root {
+  --hc-primary: #2a76dd;
+  --hc-primary-fg: #ffffff;
+  --hc-bg: #ffffff;
+  --hc-surface: #ffffff;
+  --hc-fg: #222222;
+  --hc-muted: #666666;
+  --hc-border: #dddddd;
+  --hc-grid: #eeeeee;
+  --hc-radius: 6px;
+  --hc-shadow: none;
+  --hc-sidebar-bg: #ffffff;
+  --hc-sidebar-fg: #1f2937;
+  --hc-sidebar-muted: #9ca3af;
+  --hc-sidebar-border: #e5e7eb;
+  --hc-sidebar-active-bg: color-mix(in srgb, var(--hc-primary) 10%, transparent);
+  --hc-sidebar-active-fg: var(--hc-primary);
+  --hc-header-bg: color-mix(in srgb, var(--hc-bg) 85%, transparent);
+  --hc-header-border: var(--hc-border);
+  --hc-header-blur: blur(8px);
+  --hc-good: #16a34a;
+  --hc-bad: #dc2626;
+  --hc-warn: #d97706;
+  --hc-c1: #2a76dd;
+  --hc-c2: #e7298a;
+  --hc-c3: #1b9e77;
+  --hc-c4: #d95f02;
+  --hc-c5: #7570b3;
+  --hc-c6: #66a61e;
+  --hc-c7: #e6ab02;
+  --hc-c8: #a6761d;
+  --hc-font: 'Source Sans 3', 'Pretendard Variable', Pretendard, Helvetica, sans-serif;
+}
+:root[data-bs-theme="dark"] {
+  --hc-bg: #191919;
+  --hc-surface: #222222;
+  --hc-fg: #eeeeee;
+  --hc-muted: #aaaaaa;
+  --hc-border: #444444;
+  --hc-grid: #333333;
+  --hc-shadow: none;
+  --hc-sidebar-bg: #12151c;
+  --hc-sidebar-fg: #e5e7eb;
+  --hc-sidebar-muted: #6b7280;
+  --hc-sidebar-border: #2a2f3a;
+  --hc-good: #22c55e;
+  --hc-bad: #f87171;
+  --hc-warn: #fbbf24;
+  --hc-primary: #42affa;
+}
+</style>
+  <style>
+/* html-convertor 공통 컴포넌트 — 모든 키트에 인라인된다. 색·모양은 모두 --hc-* 토큰에서 온다. */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--hc-bg); color: var(--hc-fg); font-family: var(--hc-font); font-size: var(--hc-font-size, 15px); line-height: 1.55; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4 { font-family: var(--hc-font-heading, var(--hc-font)); color: var(--hc-heading, var(--hc-fg)); line-height: 1.3; }
+a { color: var(--hc-link, var(--hc-primary)); }
+:focus-visible { outline: 2px solid var(--hc-primary); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* 카드 */
+.hc-card { background: var(--hc-surface); border: var(--hc-card-border-w, 1px) solid var(--hc-border); border-radius: var(--hc-radius); box-shadow: var(--hc-shadow); color: var(--hc-fg); min-width: 0; }
+.hc-card-head { padding: 16px 20px 0; }
+.hc-card-title { font-size: var(--hc-card-title-size, 1rem); font-weight: var(--hc-card-title-weight, 600); margin: 0; }
+.hc-card-sub { font-size: .8rem; color: var(--hc-muted); margin: 2px 0 0; }
+.hc-card-body { padding: 16px 20px 20px; }
+.hc-card-note { font-size: .75rem; color: var(--hc-muted); margin: 8px 0 0; }
+
+/* KPI */
+.hc-kpi-grid { display: grid; gap: var(--hc-gap, 16px); grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+/* 6개는 3×2, 7·8개는 4열로 — 마지막 줄에 카드 하나만 남지 않게 */
+@media (min-width: 1100px) {
+  .hc-kpi-grid[data-count="6"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .hc-kpi-grid[data-count="7"], .hc-kpi-grid[data-count="8"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+.hc-kpi { padding: 18px 20px; position: relative; overflow: hidden; }
+.hc-kpi-label { font-size: .8rem; font-weight: 600; color: var(--hc-muted); text-transform: var(--hc-kpi-label-transform, none); letter-spacing: var(--hc-kpi-label-spacing, 0); }
+.hc-kpi-value { font-size: var(--hc-kpi-size, 1.75rem); font-weight: var(--hc-kpi-weight, 700); line-height: 1.2; margin: 6px 0 4px; font-variant-numeric: tabular-nums; letter-spacing: -.01em; color: var(--hc-heading, var(--hc-fg)); }
+.hc-kpi-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: .8rem; color: var(--hc-muted); }
+.hc-delta { font-weight: 600; font-size: .8rem; }
+.hc-delta[data-tone="good"] { color: var(--hc-good); }
+.hc-delta[data-tone="bad"] { color: var(--hc-bad); }
+.hc-delta[data-tone="flat"] { color: var(--hc-muted); }
+.hc-spark { color: var(--hc-primary); margin-top: 10px; height: 28px; }
+/* KPI 변형: body 클래스 hc-kpi-<style> */
+.hc-kpi-accent .hc-kpi { border-left: 4px solid var(--hc-primary); }
+.hc-kpi-topline .hc-kpi { border-top: 3px solid var(--hc-primary); }
+/* 색이 꽉 찬 KPI: 글자색은 엔진이 배경 밝기를 보고 --hc-kpi-ink로 정한다(노란 배경엔 어두운 글자) */
+.hc-kpi-solid .hc-kpi { border-color: transparent; color: var(--hc-kpi-ink, #fff); }
+.hc-kpi-solid .hc-kpi > *, .hc-kpi-solid .hc-kpi .hc-delta, .hc-kpi-solid .hc-kpi .hc-kpi-meta { color: var(--hc-kpi-ink, #fff) !important; }
+.hc-kpi-solid .hc-kpi-label { opacity: .9; }
+.hc-kpi-solid .hc-kpi .hc-spark { opacity: .8; }
+.hc-kpi-solid .hc-kpi-grid > :nth-child(4n+1) { background: var(--hc-c1); }
+.hc-kpi-solid .hc-kpi-grid > :nth-child(4n+2) { background: var(--hc-c2); }
+.hc-kpi-solid .hc-kpi-grid > :nth-child(4n+3) { background: var(--hc-c3); }
+.hc-kpi-solid .hc-kpi-grid > :nth-child(4n+4) { background: var(--hc-c4); }
+.hc-kpi-gradient .hc-kpi { background: var(--hc-kpi-gradient, linear-gradient(135deg, var(--hc-primary), var(--hc-c2))); border: 0; color: #fff; }
+.hc-kpi-gradient .hc-kpi > *, .hc-kpi-gradient .hc-kpi .hc-delta, .hc-kpi-gradient .hc-kpi .hc-kpi-meta { color: #fff !important; }
+.hc-kpi-divider .hc-kpi-grid { gap: 0; }
+.hc-kpi-divider .hc-kpi { background: transparent; border: 0; border-top: 1px solid var(--hc-border); border-radius: 0; box-shadow: none; padding: 20px 24px 8px 0; }
+.hc-kpi-divider .hc-kpi-value { font-size: 2rem; font-weight: 600; }
+.hc-kpi-tint .hc-kpi { background: linear-gradient(180deg, color-mix(in srgb, var(--hc-primary) 6%, var(--hc-surface)), var(--hc-surface)); }
+
+/* 요약 */
+.hc-summary { border-left: 4px solid var(--hc-primary); }
+.hc-summary ul { margin: 0; padding-left: 1.1rem; }
+.hc-summary li + li { margin-top: 4px; }
+.hc-summary p { margin: 0; }
+
+/* 본문 */
+.hc-prose p { line-height: 1.75; margin: 0 0 .9em; }
+.hc-prose ul { padding-left: 1.2rem; margin: 0 0 .9em; }
+.hc-prose li + li { margin-top: 4px; }
+.hc-prose > .hc-card, .hc-prose > .hc-figure, .hc-prose > .hc-table-card { margin: 16px 0; }
+
+/* 표 */
+.hc-table-tools { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 16px 20px 12px; }
+:where(.hc-input) { font: inherit; font-size: .85rem; padding: 6px 10px; min-width: 0; width: 220px; max-width: 100%; color: var(--hc-fg); background: var(--hc-surface); border: 1px solid var(--hc-border); border-radius: calc(var(--hc-radius) * .6 + 2px); }
+:where(.hc-input):focus { outline: none; border-color: var(--hc-primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hc-primary) 20%, transparent); }
+.hc-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+:where(.hc-table) { width: 100%; border-collapse: collapse; font-size: .875rem; color: var(--hc-fg); margin: 0; background: transparent; }
+:where(.hc-table) :where(th, td) { padding: 10px 12px; border-bottom: 1px solid var(--hc-border); text-align: left; vertical-align: middle; background: transparent; color: inherit; }
+:where(.hc-table) :where(thead th) { font-size: .72rem; font-weight: 600; text-transform: var(--hc-th-transform, uppercase); letter-spacing: .04em; color: var(--hc-muted); background: var(--hc-table-head-bg, transparent); white-space: nowrap; }
+:where(.hc-table) :where(tbody tr:hover td) { background: color-mix(in srgb, var(--hc-primary) 4%, transparent); }
+.hc-table th:first-child, .hc-table td:first-child { padding-left: 20px; }
+.hc-table th:last-child, .hc-table td:last-child { padding-right: 20px; }
+.hc-table .hc-num { text-align: right; font-variant-numeric: tabular-nums; }
+.hc-sort { all: unset; cursor: pointer; display: inline-flex; gap: 4px; align-items: center; }
+.hc-sort::after { content: '↕'; opacity: .35; font-size: .85em; }
+th[aria-sort="ascending"] .hc-sort::after { content: '↑'; opacity: 1; }
+th[aria-sort="descending"] .hc-sort::after { content: '↓'; opacity: 1; }
+.hc-sort:focus-visible { outline: 2px solid var(--hc-primary); outline-offset: 2px; }
+.hc-table-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 20px 14px; font-size: .8rem; color: var(--hc-muted); }
+.hc-table-foot:empty { display: none; }
+
+/* 배지·콜아웃·버튼 */
+.hc-badge { display: inline-block; padding: .2em .65em; border-radius: var(--hc-badge-radius, 999px); font-size: .75rem; font-weight: 600; white-space: nowrap; }
+.hc-badge-good { background: color-mix(in srgb, var(--hc-good) 15%, transparent); color: var(--hc-good); }
+.hc-badge-warn { background: color-mix(in srgb, var(--hc-warn) 18%, transparent); color: var(--hc-warn); }
+.hc-badge-bad { background: color-mix(in srgb, var(--hc-bad) 15%, transparent); color: var(--hc-bad); }
+.hc-badge-info { background: color-mix(in srgb, var(--hc-primary) 15%, transparent); color: var(--hc-primary); }
+.hc-badge-neutral { background: color-mix(in srgb, var(--hc-muted) 15%, transparent); color: var(--hc-muted); }
+.hc-callout { border-radius: calc(var(--hc-radius) * .75); padding: 12px 16px; margin: 12px 0; border-left: 4px solid; }
+.hc-callout > div > :last-child { margin-bottom: 0; }
+.hc-callout-info { border-color: var(--hc-primary); background: color-mix(in srgb, var(--hc-primary) 8%, transparent); }
+.hc-callout-good { border-color: var(--hc-good); background: color-mix(in srgb, var(--hc-good) 8%, transparent); }
+.hc-callout-warn { border-color: var(--hc-warn); background: color-mix(in srgb, var(--hc-warn) 10%, transparent); }
+.hc-callout-bad { border-color: var(--hc-bad); background: color-mix(in srgb, var(--hc-bad) 8%, transparent); }
+.hc-callout strong { display: block; margin-bottom: 2px; }
+:where(.hc-btn) { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--hc-border); background: var(--hc-surface); color: var(--hc-fg); border-radius: calc(var(--hc-radius) * .6 + 2px); padding: 6px 10px; font: inherit; font-size: .85rem; cursor: pointer; line-height: 1.2; }
+:where(.hc-btn):hover { border-color: var(--hc-primary); }
+
+/* 차트 대체 표(라이브러리를 못 불러온 경우) */
+.hc-fallback { width: 100%; font-size: .85rem; border-collapse: collapse; }
+.hc-fallback th, .hc-fallback td { padding: 4px 8px; border-bottom: 1px solid var(--hc-border); text-align: right; }
+.hc-fallback-note { font-size: .8rem; color: var(--hc-muted); }
+
+@media print {
+  body { background: #fff !important; }
+  .hc-no-print, [data-slot="more"], [data-slot="search"] { display: none !important; }
+  .hc-card { box-shadow: none !important; break-inside: avoid; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+  <style>
+    /* ── 키트: 발표 (reveal.js) — 표지 → 요약 → 핵심 지표 → 섹션 → 차트 → 표 → 끝 ──
+       ←/→ 이동, F 전체 화면, O(Esc) 개요, ?print-pdf 를 주소 끝에 붙여 인쇄하면 PDF */
+    html, body { height: 100%; }
+    .reveal-viewport, body { background: var(--hc-bg); }
+    .reveal { font-family: var(--hc-font); font-size: 30px; color: var(--hc-fg); }
+    .reveal .slides { text-align: var(--hc-slide-align, left); }
+    .reveal h1, .reveal h2, .reveal h3 { font-family: var(--hc-font-heading, var(--hc-font)); color: var(--hc-heading, var(--hc-fg)); text-transform: var(--hc-slide-h-transform, none); letter-spacing: -.01em; font-weight: 700; line-height: 1.2; }
+    .reveal h1 { font-size: 2.1em; margin-bottom: .3em; }
+    .reveal h2 { font-size: 1.35em; margin: 0 0 .7em; }
+    .reveal p, .reveal li { line-height: 1.5; }
+    .reveal a { color: var(--hc-primary); }
+    .reveal .slides section { height: 100%; box-sizing: border-box; padding: 0; }
+    .reveal ul { display: block; margin-left: 1em; }
+    .reveal .hc-slide-title { display: flex !important; flex-direction: column; justify-content: center; height: 100%; }
+    .reveal .hc-slide-title h1 { max-width: 90%; }
+    .reveal .hc-slide-title .hc-sub { font-size: .9em; color: var(--hc-muted); margin: 0 0 1.6em; }
+    .reveal .hc-slide-title .hc-meta { font-size: .55em; color: var(--hc-muted); display: flex; gap: 2em; flex-wrap: wrap; border-top: 3px solid var(--hc-primary); padding-top: .8em; width: fit-content; }
+    .reveal .hc-kicker { font-size: .5em; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--hc-primary); margin-bottom: .4em; }
+    .reveal .hc-summary-list li { margin: .45em 0; }
+    .reveal .hc-summary-list li::marker { color: var(--hc-primary); }
+    .reveal .hc-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: .4em; font-size: 16px; }
+    .reveal .hc-kpi { padding: 24px 28px; text-align: left; }
+    .reveal .hc-kpi-label { font-size: 18px; }
+    .reveal .hc-kpi-value { font-size: 52px; }
+    .reveal .hc-kpi-meta { font-size: 17px; }
+    .reveal .hc-kpi-meta .hc-delta { font-size: 17px; }
+    .reveal .hc-prose { font-size: .82em; }
+    .reveal .hc-prose p { margin: 0 0 .7em; }
+    .reveal .hc-prose .hc-figure, .reveal .hc-prose .hc-card { font-size: 16px; }
+    .reveal .hc-callout { font-size: .8em; }
+    .reveal .hc-chart-slide .hc-sub, .reveal .hc-note { font-size: .55em; color: var(--hc-muted); margin: -.8em 0 .8em; }
+    .reveal .hc-note { margin: .6em 0 0; }
+    .reveal .hc-figure .hc-note { font-size: 15px; margin-top: 6px; }
+    .reveal .hc-table-card { font-size: 18px; box-shadow: none; }
+    .reveal .hc-table-tools { display: none; }
+    .reveal table { margin: 0; }
+    .reveal .hc-table { font-size: 22px; }
+    .reveal .hc-table thead th { font-size: 15px; }
+    .reveal .hc-table th, .reveal .hc-table td { border-bottom: 1px solid var(--hc-border); }
+    .reveal .hc-end { display: flex !important; flex-direction: column; justify-content: center; align-items: flex-start; height: 100%; }
+    .reveal .progress { color: var(--hc-primary); height: 4px; }
+    .reveal .slide-number { background: transparent; color: var(--hc-muted); font-family: var(--hc-font); font-size: 14px; }
+    .reveal .controls { color: var(--hc-primary); }
+    .hc-deck-tools { position: fixed; left: 16px; bottom: 14px; z-index: 30; display: flex; gap: 6px; opacity: .5; }
+    .hc-deck-tools:hover { opacity: 1; }
+    .hc-deck-foot { position: fixed; right: 120px; bottom: 16px; z-index: 30; font-size: 12px; color: var(--hc-muted); }
+  </style>
+  <style>
+/* 섹션 안 차트 캡션이 너무 작게 나오는 것 보정 */
+.reveal .hc-prose .hc-figure .hc-note { font-size: 15px; margin-top: 6px; }
+.reveal .hc-prose ul { margin-bottom: .5em; }
+
+</style>
+</head>
+<body class="hc-kit-slides hc-design-revealjs hc-kpi-plain">
+  <div class="reveal">
+    <div class="slides" data-region="slides"></div>
+  </div>
+  <div class="hc-deck-tools hc-no-print">
+    <button class="hc-btn" type="button" data-action="theme" aria-label="테마 전환"><span data-slot="theme-icon">☾</span></button>
+  </div>
+  <div class="hc-deck-foot hc-no-print"><span class="hc-credit">디자인 참고: reveal.js (MIT)</span></div>
+
+  <template id="tpl-slide-title">
+    <section class="hc-slide-title">
+      <div class="hc-kicker" data-slot="author"></div>
+      <h1 data-slot="title"></h1>
+      <p class="hc-sub" data-slot="subtitle"></p>
+      <div class="hc-meta"><span data-slot="generatedAt"></span><span data-slot="source"></span></div>
+    </section>
+  </template>
+
+  <template id="tpl-slide-summary">
+    <section>
+      <div class="hc-kicker">Summary</div>
+      <h2>핵심 요약</h2>
+      <div class="hc-summary-list" data-slot="body"></div>
+    </section>
+  </template>
+
+  <template id="tpl-slide-kpis">
+    <section>
+      <div class="hc-kicker">Key numbers</div>
+      <h2 data-slot="title"></h2>
+      <div class="hc-kpi-grid" data-slot="kpis"></div>
+    </section>
+  </template>
+
+  <template id="tpl-kpi" data-good="" data-bad="" data-flat="">
+    <div class="hc-card hc-kpi">
+      <div class="hc-kpi-label" data-slot="label"></div>
+      <div class="hc-kpi-value" data-slot="value"></div>
+      <div class="hc-kpi-meta"><span class="hc-delta" data-slot="delta"></span><span data-slot="delta-label"></span><span data-slot="hint"></span></div>
+      <div class="hc-spark" data-slot="spark"></div>
+    </div>
+  </template>
+
+  <template id="tpl-slide-section">
+    <section>
+      <h2 data-slot="title"></h2>
+      <div class="hc-prose" data-slot="body"></div>
+    </section>
+  </template>
+
+  <template id="tpl-figure">
+    <div class="hc-figure">
+      <div data-slot="chart" style="height:380px"></div>
+      <p class="hc-note"><b data-slot="title"></b> <span data-slot="subtitle"></span> <span data-slot="note"></span></p>
+    </div>
+  </template>
+
+  <template id="tpl-slide-chart">
+    <section class="hc-chart-slide">
+      <h2 data-slot="title"></h2>
+      <p class="hc-sub" data-slot="subtitle"></p>
+      <div data-slot="chart"></div>
+      <p class="hc-note" data-slot="note"></p>
+    </section>
+  </template>
+
+  <template id="tpl-slide-table">
+    <section>
+      <h2 data-slot="title"></h2>
+      <div data-slot="body"></div>
+    </section>
+  </template>
+
+  <template id="tpl-table" data-num="hc-num" data-badge-good="hc-badge hc-badge-good" data-badge-warn="hc-badge hc-badge-warn" data-badge-bad="hc-badge hc-badge-bad" data-badge-info="hc-badge hc-badge-info" data-badge-neutral="hc-badge hc-badge-neutral">
+    <div class="hc-card hc-table-card">
+      <div class="hc-table-tools"><span data-slot="title"></span><span data-slot="subtitle"></span><input data-slot="search"></div>
+      <div class="hc-table-wrap"><table class="hc-table" data-slot="table"></table></div>
+      <div class="hc-table-foot"><span data-slot="count"></span><button class="hc-btn" type="button" data-slot="more" hidden></button></div>
+    </div>
+  </template>
+
+  <template id="tpl-callout" data-info="hc-callout-info" data-good="hc-callout-good" data-warn="hc-callout-warn" data-bad="hc-callout-bad">
+    <div class="hc-callout"><strong data-slot="title"></strong><div data-slot="text"></div></div>
+  </template>
+
+  <template id="tpl-slide-end">
+    <section class="hc-end">
+      <div class="hc-kicker">End</div>
+      <h1>감사합니다</h1>
+    </section>
+  </template>
+
+  <script>
+    window.HC_AFTER_RENDER = function () {
+      if (!window.Reveal) { document.body.insertAdjacentHTML('afterbegin', '<p style="padding:16px">reveal.js를 불러오지 못했습니다(인터넷 연결 확인).</p>'); return; }
+      var isStatic = /[?&]static/.test(location.search) || /HeadlessChrome/.test(navigator.userAgent);
+      // 정적 모드(?static): 스크린샷·검토용으로 글머리표를 처음부터 모두 보여 준다
+      if (isStatic) document.querySelectorAll('.reveal .fragment').forEach(function (el) { el.classList.remove('fragment'); });
+      Reveal.initialize({ fragments: !isStatic, hash: true, slideNumber: 'c/t', progress: true, center: false, width: 1280, height: 720, margin: 0.08, transition: 'slide', pdfSeparateFragments: false });
+      var flush = function () { if (window.HC) setTimeout(window.HC.flush, 30); };
+      Reveal.on('ready', flush);
+      Reveal.on('slidechanged', flush);
+      Reveal.on('resize', flush);
+      Reveal.on('overviewshown', flush);
+    };
+  </script>
+  <script type="application/json" id="hc-spec">{
+ "meta": {
+  "title": "2026년 1~9월 영업 실적 리뷰",
+  "subtitle": "지역별·제품별 실적과 목표 대비 달성률",
+  "source": "sales_2026.xlsx (판매내역 225행, 2026-01 ~ 2026-09)",
+  "generatedAt": "2026-10-06",
+  "author": "영업회의"
+ },
+ "summary": [
+  "1~9월 누적 매출 **63.85억 원**, 목표 65.54억 원 대비 달성률 **97.4%** — 1.69억 원 미달",
+  "9개월 모두 목표 미달. 상반기 98.0% → 3분기 96.2%로 하락, 9월이 95.6%로 최저",
+  "**경기**가 매출 비중 34%의 최대 지역이지만 달성률 96.1%로 최하위 — 전체 미달액의 52%",
+  "제품은 **메모리 B** 96.4%가 가장 낮고, 매출 1위 SSD 2TB도 96.9%",
+  "지역×제품 25개 조합 중 목표 달성은 4개뿐"
+ ],
+ "kpis": [
+  {
+   "label": "누적 매출 (1~9월)",
+   "value": 6385032000,
+   "format": "currency",
+   "currency": "KRW",
+   "decimals": 2,
+   "hint": "판매내역 합계",
+   "spark": [
+    789338000,
+    759612000,
+    746488000,
+    644986000,
+    766155000,
+    616847000,
+    653584000,
+    703898000,
+    704124000
+   ]
+  },
+  {
+   "label": "목표 달성률",
+   "value": 97.4,
+   "format": "percent",
+   "hint": "목표 65.54억 원 대비",
+   "spark": [
+    99.9,
+    97.0,
+    97.0,
+    99.8,
+    96.3,
+    98.4,
+    96.3,
+    96.9,
+    95.6
+   ]
+  },
+  {
+   "label": "목표 미달액",
+   "value": 168794749,
+   "format": "currency",
+   "currency": "KRW",
+   "decimals": 2,
+   "good": "down",
+   "hint": "목표매출 − 매출액"
+  },
+  {
+   "label": "판매 수량",
+   "value": 63609,
+   "unit": "개",
+   "hint": "1~9월 누적",
+   "spark": [
+    7408,
+    7517,
+    7442,
+    6320,
+    7505,
+    6232,
+    6714,
+    7305,
+    7166
+   ]
+  }
+ ],
+ "charts": [
+  {
+   "id": "monthly",
+   "title": "월별 매출 vs 목표",
+   "subtitle": "막대: 매출액 · 선: 목표매출 (원)",
+   "type": "bar",
+   "x": [
+    "1월",
+    "2월",
+    "3월",
+    "4월",
+    "5월",
+    "6월",
+    "7월",
+    "8월",
+    "9월"
+   ],
+   "format": "currency",
+   "span": 2,
+   "height": 330,
+   "series": [
+    {
+     "name": "매출액",
+     "data": [
+      789338000,
+      759612000,
+      746488000,
+      644986000,
+      766155000,
+      616847000,
+      653584000,
+      703898000,
+      704124000
+     ]
+    },
+    {
+     "name": "목표매출",
+     "data": [
+      790135060,
+      783500313,
+      769223373,
+      646057049,
+      795962778,
+      626876143,
+      678678158,
+      726788548,
+      736605327
+     ],
+     "type": "line"
+    }
+   ]
+  },
+  {
+   "id": "monthly-rate",
+   "title": "월별 달성률",
+   "subtitle": "단위: %",
+   "type": "line",
+   "x": [
+    "1월",
+    "2월",
+    "3월",
+    "4월",
+    "5월",
+    "6월",
+    "7월",
+    "8월",
+    "9월"
+   ],
+   "format": "percent",
+   "span": 2,
+   "height": 330,
+   "series": [
+    {
+     "name": "달성률",
+     "data": [
+      99.9,
+      97.0,
+      97.0,
+      99.8,
+      96.3,
+      98.4,
+      96.3,
+      96.9,
+      95.6
+     ]
+    }
+   ],
+   "note": "목표선 100%"
+  },
+  {
+   "id": "region-sales",
+   "title": "지역별 매출 vs 목표",
+   "subtitle": "1~9월 누적, 매출액 순 (원)",
+   "type": "bar",
+   "x": [
+    "경기",
+    "대구",
+    "서울",
+    "부산",
+    "광주"
+   ],
+   "format": "currency",
+   "height": 330,
+   "series": [
+    {
+     "name": "매출액",
+     "data": [
+      2167820000,
+      1107377000,
+      1068017000,
+      1041498000,
+      1000320000
+     ]
+    },
+    {
+     "name": "목표매출",
+     "data": [
+      2255646116,
+      1121716502,
+      1100939114,
+      1068178557,
+      1007346460
+     ]
+    }
+   ]
+  },
+  {
+   "id": "region-rate",
+   "title": "지역별 목표 대비 차이",
+   "subtitle": "달성률 − 100, 단위: %p (0 = 목표 달성)",
+   "type": "hbar",
+   "x": [
+    "경기",
+    "서울",
+    "부산",
+    "대구",
+    "광주"
+   ],
+   "format": "decimal",
+   "decimals": 1,
+   "unit": "%p",
+   "height": 330,
+   "series": [
+    {
+     "name": "목표 대비",
+     "data": [
+      -3.9,
+      -3.0,
+      -2.5,
+      -1.3,
+      -0.7
+     ]
+    }
+   ]
+  },
+  {
+   "id": "product-sales",
+   "title": "제품별 매출 vs 목표",
+   "subtitle": "1~9월 누적, 매출액 순 (원)",
+   "type": "bar",
+   "x": [
+    "SSD 2TB",
+    "모바일 AP",
+    "SSD 1TB",
+    "메모리 B",
+    "메모리 A"
+   ],
+   "format": "currency",
+   "height": 330,
+   "series": [
+    {
+     "name": "매출액",
+     "data": [
+      2268149000,
+      1388625000,
+      1245384000,
+      756278000,
+      726596000
+     ]
+    },
+    {
+     "name": "목표매출",
+     "data": [
+      2341885274,
+      1414688722,
+      1268904723,
+      784280525,
+      744067505
+     ]
+    }
+   ]
+  },
+  {
+   "id": "product-rate",
+   "title": "제품별 목표 대비 차이",
+   "subtitle": "달성률 − 100, 단위: %p (0 = 목표 달성)",
+   "type": "hbar",
+   "x": [
+    "메모리 B",
+    "SSD 2TB",
+    "메모리 A",
+    "SSD 1TB",
+    "모바일 AP"
+   ],
+   "format": "decimal",
+   "decimals": 1,
+   "unit": "%p",
+   "height": 330,
+   "series": [
+    {
+     "name": "목표 대비",
+     "data": [
+      -3.6,
+      -3.1,
+      -2.3,
+      -1.9,
+      -1.8
+     ]
+    }
+   ]
+  }
+ ],
+ "tables": [
+  {
+   "id": "region-table",
+   "title": "지역별 실적 요약",
+   "columns": [
+    {
+     "key": "name",
+     "label": "지역"
+    },
+    {
+     "key": "sales",
+     "label": "매출액(백만 원)",
+     "type": "number",
+     "format": "decimal",
+     "decimals": 1
+    },
+    {
+     "key": "target",
+     "label": "목표매출(백만 원)",
+     "type": "number",
+     "format": "decimal",
+     "decimals": 1
+    },
+    {
+     "key": "gap",
+     "label": "미달액(백만 원)",
+     "type": "number",
+     "format": "decimal",
+     "decimals": 1
+    },
+    {
+     "key": "rate",
+     "label": "달성률",
+     "type": "number",
+     "format": "percent",
+     "decimals": 1
+    },
+    {
+     "key": "status",
+     "label": "상태",
+     "type": "badge",
+     "tones": {
+      "달성": "good",
+      "근접": "warn",
+      "미달": "bad"
+     }
+    }
+   ],
+   "rows": [
+    {
+     "name": "경기",
+     "sales": 2167.8,
+     "target": 2255.6,
+     "gap": 87.8,
+     "rate": 96.1,
+     "status": "미달"
+    },
+    {
+     "name": "대구",
+     "sales": 1107.4,
+     "target": 1121.7,
+     "gap": 14.3,
+     "rate": 98.7,
+     "status": "근접"
+    },
+    {
+     "name": "서울",
+     "sales": 1068.0,
+     "target": 1100.9,
+     "gap": 32.9,
+     "rate": 97.0,
+     "status": "근접"
+    },
+    {
+     "name": "부산",
+     "sales": 1041.5,
+     "target": 1068.2,
+     "gap": 26.7,
+     "rate": 97.5,
+     "status": "근접"
+    },
+    {
+     "name": "광주",
+     "sales": 1000.3,
+     "target": 1007.3,
+     "gap": 7.0,
+     "rate": 99.3,
+     "status": "근접"
+    }
+   ]
+  },
+  {
+   "id": "product-table",
+   "title": "제품별 실적 요약",
+   "columns": [
+    {
+     "key": "name",
+     "label": "제품"
+    },
+    {
+     "key": "sales",
+     "label": "매출액(백만 원)",
+     "type": "number",
+     "format": "decimal",
+     "decimals": 1
+    },
+    {
+     "key": "target",
+     "label": "목표매출(백만 원)",
+     "type": "number",
+     "format": "decimal",
+     "decimals": 1
+    },
+    {
+     "key": "gap",
+     "label": "미달액(백만 원)",
+     "type": "number",
+     "format": "decimal",
+     "decimals": 1
+    },
+    {
+     "key": "rate",
+     "label": "달성률",
+     "type": "number",
+     "format": "percent",
+     "decimals": 1
+    },
+    {
+     "key": "status",
+     "label": "상태",
+     "type": "badge",
+     "tones": {
+      "달성": "good",
+      "근접": "warn",
+      "미달": "bad"
+     }
+    }
+   ],
+   "rows": [
+    {
+     "name": "SSD 2TB",
+     "sales": 2268.1,
+     "target": 2341.9,
+     "gap": 73.7,
+     "rate": 96.9,
+     "status": "미달"
+    },
+    {
+     "name": "모바일 AP",
+     "sales": 1388.6,
+     "target": 1414.7,
+     "gap": 26.1,
+     "rate": 98.2,
+     "status": "근접"
+    },
+    {
+     "name": "SSD 1TB",
+     "sales": 1245.4,
+     "target": 1268.9,
+     "gap": 23.5,
+     "rate": 98.1,
+     "status": "근접"
+    },
+    {
+     "name": "메모리 B",
+     "sales": 756.3,
+     "target": 784.3,
+     "gap": 28.0,
+     "rate": 96.4,
+     "status": "미달"
+    },
+    {
+     "name": "메모리 A",
+     "sales": 726.6,
+     "target": 744.1,
+     "gap": 17.5,
+     "rate": 97.7,
+     "status": "근접"
+    }
+   ]
+  },
+  {
+   "id": "gap-top",
+   "title": "미달액 상위 지역×제품",
+   "subtitle": "미달액 큰 순 상위 6개 (25개 조합 중)",
+   "columns": [
+    {
+     "key": "region",
+     "label": "지역"
+    },
+    {
+     "key": "product",
+     "label": "제품"
+    },
+    {
+     "key": "gap",
+     "label": "미달액(백만 원)",
+     "type": "number",
+     "format": "decimal",
+     "decimals": 1
+    },
+    {
+     "key": "rate",
+     "label": "달성률",
+     "type": "number",
+     "format": "percent",
+     "decimals": 1
+    },
+    {
+     "key": "status",
+     "label": "상태",
+     "type": "badge",
+     "tones": {
+      "달성": "good",
+      "근접": "warn",
+      "미달": "bad"
+     }
+    }
+   ],
+   "rows": [
+    {
+     "region": "경기",
+     "product": "SSD 2TB",
+     "gap": 39.9,
+     "rate": 95.0,
+     "status": "미달"
+    },
+    {
+     "region": "부산",
+     "product": "SSD 2TB",
+     "gap": 25.9,
+     "rate": 93.5,
+     "status": "미달"
+    },
+    {
+     "region": "경기",
+     "product": "모바일 AP",
+     "gap": 20.3,
+     "rate": 96.0,
+     "status": "미달"
+    },
+    {
+     "region": "경기",
+     "product": "메모리 B",
+     "gap": 16.3,
+     "rate": 94.0,
+     "status": "미달"
+    },
+    {
+     "region": "서울",
+     "product": "SSD 2TB",
+     "gap": 13.1,
+     "rate": 96.9,
+     "status": "미달"
+    },
+    {
+     "region": "서울",
+     "product": "메모리 B",
+     "gap": 8.3,
+     "rate": 93.8,
+     "status": "미달"
+    }
+   ]
+  }
+ ],
+ "sections": [
+  {
+   "id": "trend",
+   "title": "월별 추이: 9개월 연속 목표 미달",
+   "bullets": [
+    "최고 1월 99.9%, 최저 9월 95.6%",
+    "분기 달성률 Q1 98.0% · Q2 98.0% · Q3 96.2%"
+   ],
+   "charts": [
+    "monthly"
+   ]
+  },
+  {
+   "id": "trend-rate",
+   "title": "3분기 들어 달성률 하락",
+   "bullets": [
+    "상반기 98.0% → 3분기 96.2% (-1.8%p)"
+   ],
+   "charts": [
+    "monthly-rate"
+   ]
+  },
+  {
+   "id": "region",
+   "title": "지역: 경기가 최대 시장이자 최대 미달",
+   "bullets": [
+    "경기 매출 21.68억 원 (비중 34%), 달성률 96.1%",
+    "경기 미달액 0.88억 원 = 전체 미달액의 52%"
+   ],
+   "charts": [
+    "region-sales"
+   ]
+  },
+  {
+   "id": "region-r",
+   "title": "지역별 달성률: 모두 목표 미달",
+   "bullets": [
+    "광주 99.3%로 최고, 모든 지역 100% 미만"
+   ],
+   "charts": [
+    "region-rate"
+   ]
+  },
+  {
+   "id": "region-t",
+   "title": "지역별 실적 요약",
+   "tables": [
+    "region-table"
+   ]
+  },
+  {
+   "id": "product",
+   "title": "제품: SSD 2TB가 매출 1위, 미달액도 1위",
+   "bullets": [
+    "SSD 2TB 매출 22.68억 원 (비중 36%), 미달액 0.74억 원"
+   ],
+   "charts": [
+    "product-sales"
+   ]
+  },
+  {
+   "id": "product-r",
+   "title": "제품별 달성률: 5개 제품 모두 미달",
+   "bullets": [
+    "메모리 B 96.4% 최저 · 모바일 AP 98.2% 최고"
+   ],
+   "charts": [
+    "product-rate"
+   ]
+  },
+  {
+   "id": "product-t",
+   "title": "제품별 실적 요약",
+   "tables": [
+    "product-table"
+   ]
+  },
+  {
+   "id": "cells",
+   "title": "어디를 메워야 하나: 미달액 상위 조합",
+   "bullets": [
+    "달성 조합: 부산 모바일 AP 102.7%, 광주 SSD 2TB 101.2%, 대구 SSD 2TB 100.2%, 서울 메모리 A 100.2%"
+   ],
+   "tables": [
+    "gap-top"
+   ]
+  }
+ ]
+}</script>
+  <script type="application/json" id="hc-config">{
+ "mode": "slides",
+ "chartLib": "echarts",
+ "theme": {
+  "attr": "data-bs-theme",
+  "light": "light",
+  "dark": "dark",
+  "default": "light"
+ },
+ "design": "revealjs",
+ "kit": "slides"
+}</script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
+  <script>
+/* html-convertor 렌더링 엔진 — spec(JSON)을 키트의 <template>에 채워 화면을 만든다.
+ * 키트 계약: [data-region], [data-meta], [data-slot], <template id="tpl-*"> (references/kits.md 참고)
+ * 의존성 없음. 차트 라이브러리는 설정(chartLib)에 따라 전역 객체를 사용한다. */
+(() => {
+  'use strict';
+
+  const readJSON = (id) => {
+    const el = document.getElementById(id);
+    try { return el ? JSON.parse(el.textContent) : {}; } catch (e) { console.error(`${id} JSON 오류`, e); return {}; }
+  };
+  const SPEC = readJSON('hc-spec');
+  const CFG = Object.assign({ mode: 'page', chartLib: 'echarts', theme: { attr: 'data-bs-theme', light: 'light', dark: 'dark', default: 'light' } }, readJSON('hc-config'));
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const arr = (v) => (Array.isArray(v) ? v : v == null ? [] : [v]);
+  const slug = (s, i) => (String(s || '').toLowerCase().replace(/[^\w가-힣]+/g, '-').replace(/^-|-$/g, '') || `item-${i}`);
+
+  // ── 숫자 형식 ──
+  // fixed=true면 끝자리 0도 남긴다(decimals를 명시한 경우: 1.60%가 1.6%로 줄어 표의 자릿수가 어긋나지 않게)
+  const nfBase = (v, d, fixed = false) => v.toLocaleString('ko-KR', { minimumFractionDigits: fixed ? d : 0, maximumFractionDigits: d });
+  const nf = (v, d) => nfBase(v, d);
+  function compactKo(v, d = 1) {
+    const a = Math.abs(v);
+    const units = [[1e12, '조'], [1e8, '억'], [1e4, '만']];
+    for (const [n, u] of units) if (a >= n) return `${nf(v / n, d)}${u}`;
+    return nf(v, Number.isInteger(v) ? 0 : d);
+  }
+  function fmt(v, o = {}) {
+    if (v == null || v === '' || (typeof v === 'number' && !Number.isFinite(v))) return '–';
+    if (typeof v !== 'number') return String(v);
+    const f = o.format || 'number';
+    const d = o.decimals;
+    const fx = d != null;
+    const nf = (x, dd) => nfBase(x, dd, fx);
+    let s;
+    if (f === 'compact') s = compactKo(v, d ?? 1);
+    else if (f === 'percent') s = `${nf(v, d ?? 1)}%`;
+    else if (f === 'currency') {
+      const cur = o.currency || 'KRW';
+      // 원화: 표·툴팁은 전체 자릿수로 통일하고, 축약(12.8억원)은 compact:true일 때만(KPI는 1억 이상이면 자동)
+      const short = o.compact ?? (o._kpi && Math.abs(v) >= 1e8);
+      if (cur === 'KRW') s = short ? `${compactKo(v, d ?? 1)}원` : `${nf(v, d ?? 0)}원`;
+      else s = new Intl.NumberFormat('en-US', { style: 'currency', currency: cur, maximumFractionDigits: d ?? 0, notation: short ? 'compact' : 'standard' }).format(v);
+    } else if (f === 'decimal') s = nf(v, d ?? 1);
+    else s = nf(v, d ?? (Number.isInteger(v) ? 0 : 1));
+    // 영문 단위(ms, kg)만 띄어 쓰고 %·%p·한글 단위는 붙인다
+    return o.unit ? `${s}${/^[a-zA-Z]/.test(o.unit) ? ' ' : ''}${o.unit}` : s;
+  }
+  // 축 눈금: 단위·통화 기호 없이 숫자만(큰 수는 만·억), 퍼센트만 % 유지
+  const axisFmt = (o) => (v) => {
+    if (typeof v !== 'number') return v;
+    if (Math.abs(v) >= 1e4) return compactKo(v, 1);
+    return o.format === 'percent' ? `${nf(v, 1)}%` : nf(v, Number.isInteger(v) ? 0 : 2);
+  };
+
+  const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ESC[c]);
+  const richText = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  const addCls = (el, cls) => { if (el && cls) el.classList.add(...cls.split(/\s+/).filter(Boolean)); };
+
+  // ── 템플릿 ──
+  const tpl = (id) => document.getElementById(id);
+  function clone(id) {
+    const t = tpl(id);
+    if (!t) return null;
+    return t.content.firstElementChild.cloneNode(true);
+  }
+  const slot = (root, name) => root.querySelector(`[data-slot="${name}"]`) || (root.matches && root.matches(`[data-slot="${name}"]`) ? root : null);
+  function setSlot(root, name, value, html) {
+    const el = slot(root, name);
+    if (!el) return null;
+    if (value == null || value === '') { el.remove(); return null; }
+    if (html) el.innerHTML = value; else el.textContent = value;
+    return el;
+  }
+
+  // ── 테마 ──
+  const THEME_KEY = `hc-theme:${location.pathname}`;
+  const store = {
+    get() { try { return localStorage.getItem(THEME_KEY); } catch { return null; } },
+    set(v) { try { localStorage.setItem(THEME_KEY, v); } catch { /* 저장 불가 환경 */ } },
+  };
+  const T = CFG.theme || {};
+  function currentTheme() {
+    const html = document.documentElement;
+    if (T.attr === 'class') return html.classList.contains(T.dark || 'dark') ? 'dark' : 'light';
+    return html.getAttribute(T.attr) === T.dark ? 'dark' : 'light';
+  }
+  function applyTheme(mode) {
+    const html = document.documentElement;
+    if (T.attr === 'class') html.classList.toggle(T.dark || 'dark', mode === 'dark');
+    else html.setAttribute(T.attr, mode === 'dark' ? T.dark : T.light);
+    html.style.colorScheme = mode;
+    $$('[data-action="theme"]').forEach((b) => {
+      b.setAttribute('aria-pressed', String(mode === 'dark'));
+      b.setAttribute('title', mode === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환');
+      const icon = slot(b, 'theme-icon');
+      if (icon) icon.textContent = mode === 'dark' ? '☀' : '☾';
+    });
+  }
+  (function initTheme() {
+    let mode = store.get();
+    if (mode !== 'light' && mode !== 'dark') {
+      mode = T.default === 'system'
+        ? (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : (T.default || 'light');
+    }
+    applyTheme(mode);
+  }());
+
+  // ── 팔레트: 키트/디자인이 정한 CSS 변수(--hc-*)를 읽는다 ──
+  // 토큰 값(var(), oklch(), color-mix() 등 무엇이든)을 차트 라이브러리가 읽을 수 있는 rgb()로 바꾼다
+  let ctx2d = null;
+  function cssColor(name, fallback) {
+    const probe = document.createElement('span');
+    probe.style.color = `var(${name}, ${fallback})`;
+    probe.style.display = 'none';
+    document.body.appendChild(probe);
+    const computed = getComputedStyle(probe).color;
+    probe.remove();
+    if (/^rgba?\(/.test(computed)) return computed;
+    try {
+      ctx2d = ctx2d || Object.assign(document.createElement('canvas'), { width: 1, height: 1 }).getContext('2d', { willReadFrequently: true });
+      ctx2d.clearRect(0, 0, 1, 1);
+      ctx2d.fillStyle = computed;
+      ctx2d.fillRect(0, 0, 1, 1);
+      const [r, g, b, a] = ctx2d.getImageData(0, 0, 1, 1).data;
+      return a === 255 ? `rgb(${r}, ${g}, ${b})` : `rgba(${r}, ${g}, ${b}, ${(a / 255).toFixed(2)})`;
+    } catch { return fallback; }
+  }
+  function palette() {
+    const series = [];
+    for (let i = 1; i <= 8; i += 1) series.push(cssColor(`--hc-c${i}`, ['#2563eb', '#16a34a', '#f59e0b', '#dc2626', '#7c3aed', '#0891b2', '#db2777', '#65a30d'][i - 1]));
+    const font = getComputedStyle(document.documentElement).getPropertyValue('--hc-font').trim() || getComputedStyle(document.body).fontFamily;
+    return {
+      series,
+      fg: cssColor('--hc-fg', '#1f2937'),
+      muted: cssColor('--hc-muted', '#6b7280'),
+      grid: cssColor('--hc-grid', '#e5e7eb'),
+      surface: cssColor('--hc-surface', '#ffffff'),
+      font,
+      dark: currentTheme() === 'dark',
+    };
+  }
+  function alpha(color, a) {
+    const m = String(color).match(/rgba?\(([^)]+)\)/);
+    if (!m) return color;
+    const [r, g, b] = m[1].split(/[\s,/]+/).map(Number);
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+  }
+
+  // ── 차트 어댑터 ──
+  const isPie = (t) => t === 'pie' || t === 'donut';
+  // 값 축 범위: spec의 min/max(달성률 95~100%처럼 차이가 작을 때). 한쪽만 주면 나머지는 데이터로 채운다
+  const valueRange = (c) => {
+    if (c.min == null && c.max == null) return null;
+    const all = c.series.flatMap((s) => s.data).filter((v) => typeof v === 'number');
+    const hi = Math.max(...all);
+    const lo = Math.min(...all);
+    return [c.min ?? Math.min(0, lo), c.max ?? hi + (hi - (c.min ?? 0)) * 0.05];
+  };
+  const seriesType = (c, s) => s.type || ({ area: 'line', stacked: 'bar', hbar: 'bar' }[c.type] || c.type || 'line');
+
+  const ADAPTERS = {
+    echarts(el, c, p) {
+      const t = c.type || 'line';
+      const vf = (v) => fmt(v, c);
+      const multi = c.series.length > 1;
+      const tooltipBase = { backgroundColor: p.surface, borderColor: p.grid, textStyle: { color: p.fg, fontFamily: p.font }, valueFormatter: vf };
+      const legend = { show: multi || isPie(t), top: isPie(t) ? 'bottom' : 0, left: isPie(t) ? 'center' : 0, icon: 'circle', itemWidth: 8, itemHeight: 8, textStyle: { color: p.muted, fontFamily: p.font } };
+      const axis = { axisLine: { lineStyle: { color: p.grid } }, axisTick: { show: false }, axisLabel: { color: p.muted, fontFamily: p.font }, splitLine: { lineStyle: { color: p.grid } } };
+      let opt;
+      if (isPie(t)) {
+        opt = {
+          color: p.series, tooltip: { ...tooltipBase, trigger: 'item' }, legend,
+          series: [{
+            type: 'pie', radius: t === 'donut' ? ['44%', '66%'] : '64%', center: ['50%', '45%'], avoidLabelOverlap: true,
+            itemStyle: { borderColor: p.surface, borderWidth: 2, borderRadius: t === 'donut' ? 4 : 0 },
+            label: { color: p.fg, fontFamily: p.font, overflow: 'none', formatter: (q) => `${nf(q.percent, 1)}%` }, labelLine: { length: 8, length2: 6 },
+            data: c.x.map((name, i) => ({ name, value: c.series[0].data[i] })),
+          }],
+        };
+      } else if (t === 'scatter') {
+        opt = {
+          color: p.series, legend, tooltip: { ...tooltipBase, trigger: 'item', valueFormatter: undefined },
+          grid: { left: 8, right: 16, top: multi ? 32 : 16, bottom: 8, containLabel: true },
+          xAxis: { type: 'value', name: c.xLabel, nameLocation: 'middle', nameGap: 28, nameTextStyle: { color: p.muted }, ...axis, scale: true },
+          yAxis: { type: 'value', name: c.yLabel, nameTextStyle: { color: p.muted }, ...axis, scale: true },
+          series: c.series.map((s) => ({ name: s.name, type: 'scatter', symbolSize: 8, data: s.data })),
+        };
+      } else {
+        const hbar = t === 'hbar';
+        const cat = { type: 'category', data: c.x, ...axis, splitLine: { show: false }, inverse: hbar, axisLabel: { ...axis.axisLabel, hideOverlap: true } };
+        // 선 그래프는 값 범위에 맞춰 축을 잡고(scale), 면적·막대는 0부터 시작해 크기 비교가 왜곡되지 않게 한다
+        const val = { type: 'value', min: c.min, max: c.max, ...axis, scale: t === 'line' && !c.series.some((s) => s.type === 'bar'), axisLabel: { ...axis.axisLabel, formatter: axisFmt(c) } };
+        opt = {
+          color: p.series, legend, tooltip: { ...tooltipBase, trigger: 'axis' },
+          grid: { left: 8, right: 16, top: multi ? 32 : 12, bottom: 8, containLabel: true },
+          xAxis: hbar ? val : { ...cat, boundaryGap: t !== 'line' && t !== 'area' ? true : c.series.some((s) => s.type === 'bar') },
+          yAxis: hbar ? cat : val,
+          series: c.series.map((s, i) => {
+            const st = seriesType(c, s);
+            const col = p.series[i % 8];
+            return {
+              name: s.name, type: st, data: s.data, smooth: st === 'line' ? 0.3 : undefined, smoothMonotone: 'x', showSymbol: false,  // monotone: 곡선이 실제 값 위아래로 튀지 않게
+              areaStyle: t === 'area' && st === 'line' ? { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: alpha(col, 0.28) }, { offset: 1, color: alpha(col, 0.02) }]) } : undefined,
+              stack: t === 'stacked' ? 'total' : undefined, barMaxWidth: 36,
+              itemStyle: st === 'bar' && t !== 'stacked' ? { borderRadius: hbar ? [0, 4, 4, 0] : [4, 4, 0, 0] } : undefined,
+              lineStyle: st === 'line' ? { width: 2 } : undefined, emphasis: { focus: 'series' },
+            };
+          }),
+        };
+      }
+      const inst = echarts.init(el, null, { renderer: 'svg' });
+      inst.setOption(opt);
+      return { resize: () => inst.resize(), destroy: () => inst.dispose() };
+    },
+
+    chartjs(el, c, p) {
+      const t = c.type || 'line';
+      const canvas = document.createElement('canvas');
+      el.appendChild(canvas);
+      Chart.defaults.font.family = p.font;
+      Chart.defaults.color = p.muted;
+      const bar = ['bar', 'stacked', 'hbar'].includes(t);
+      const type = { line: 'line', area: 'line', bar: 'bar', stacked: 'bar', hbar: 'bar', pie: 'pie', donut: 'doughnut', scatter: 'scatter' }[t] || 'line';
+      let datasets;
+      if (isPie(t)) {
+        datasets = [{ label: c.series[0].name, data: c.series[0].data, backgroundColor: c.x.map((_, i) => p.series[i % 8]), borderColor: p.surface, borderWidth: 2 }];
+      } else if (t === 'scatter') {
+        datasets = c.series.map((s, i) => ({ label: s.name, data: s.data.map(([x, y]) => ({ x, y })), backgroundColor: p.series[i % 8], pointRadius: 4 }));
+      } else {
+        datasets = c.series.map((s, i) => {
+          const col = p.series[i % 8];
+          const st = s.type ? (s.type === 'bar' ? 'bar' : 'line') : undefined;
+          const isBar = st ? st === 'bar' : bar;
+          return {
+            label: s.name, data: s.data, type: st, borderColor: col,
+            backgroundColor: t === 'area' ? alpha(col, 0.15) : col, fill: t === 'area' && !isBar,
+            tension: 0.3, cubicInterpolationMode: 'monotone', pointRadius: 0, pointHoverRadius: 4, borderWidth: isBar ? 0 : 2, borderRadius: 4, maxBarThickness: 36,
+          };
+        });
+      }
+      const valFmt = axisFmt(c);
+      const chart = new Chart(canvas, {
+        type,
+        data: { labels: t === 'scatter' ? undefined : c.x, datasets },
+        options: {
+          responsive: true, maintainAspectRatio: false, indexAxis: t === 'hbar' ? 'y' : 'x',
+          interaction: { mode: isPie(t) || t === 'scatter' ? 'nearest' : 'index', intersect: false },
+          plugins: {
+            legend: { display: c.series.length > 1 || isPie(t), position: isPie(t) ? 'bottom' : 'top', align: isPie(t) ? 'center' : 'start', labels: { boxWidth: 8, boxHeight: 8, usePointStyle: true } },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const r = ctx.raw;
+                  const v = typeof r === 'object' && r ? `(${fmt(r.x)}, ${fmt(r.y)})` : fmt(r, c);
+                  return `${isPie(t) ? ctx.label : ctx.dataset.label}: ${v}`;
+                },
+              },
+            },
+          },
+          scales: isPie(t) ? {} : {
+            x: { min: t === 'hbar' ? c.min : undefined, max: t === 'hbar' ? c.max : undefined, stacked: t === 'stacked', grid: { color: p.grid, display: t === 'hbar' || t === 'scatter' }, ticks: t === 'hbar' ? { callback: valFmt } : { maxRotation: 0, autoSkip: true }, title: { display: !!c.xLabel, text: c.xLabel } },
+            y: { min: t === 'hbar' ? undefined : c.min, max: t === 'hbar' ? undefined : c.max, stacked: t === 'stacked', grid: { color: p.grid, display: t !== 'hbar' }, ticks: t === 'hbar' ? {} : { callback: valFmt }, title: { display: !!c.yLabel, text: c.yLabel } },
+          },
+        },
+      });
+      return { resize: () => chart.resize(), destroy: () => chart.destroy() };
+    },
+
+    apexcharts(el, c, p) {
+      const t = c.type || 'line';
+      const type = { line: 'line', area: 'area', bar: 'bar', stacked: 'bar', hbar: 'bar', pie: 'pie', donut: 'donut', scatter: 'scatter' }[t] || 'line';
+      const bar = type === 'bar';
+      const o = {
+        chart: { type, height: el.clientHeight || c.height || 300, fontFamily: p.font, foreColor: p.muted, toolbar: { show: false }, stacked: t === 'stacked', background: 'transparent', zoom: { enabled: false } },
+        colors: p.series, theme: { mode: p.dark ? 'dark' : 'light' },
+        grid: { borderColor: p.grid, strokeDashArray: 3 }, dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: bar ? 0 : 2 },
+        legend: { show: c.series.length > 1 || isPie(t), position: isPie(t) ? 'bottom' : 'top', horizontalAlign: isPie(t) ? 'center' : 'left' },
+        tooltip: { theme: p.dark ? 'dark' : 'light', y: { formatter: (v) => fmt(v, c) } },
+        plotOptions: { bar: { horizontal: t === 'hbar', borderRadius: 4, columnWidth: '55%', barHeight: '60%' } },
+        fill: type === 'area' ? { type: 'gradient', gradient: { opacityFrom: 0.35, opacityTo: 0.02 } } : {},
+      };
+      if (isPie(t)) {
+        o.series = c.series[0].data;
+        o.labels = c.x;
+        o.stroke = { colors: [p.surface], width: 2 };
+        o.dataLabels = { enabled: true, dropShadow: { enabled: false } };
+        o.plotOptions.pie = { donut: { size: '62%', labels: { show: t === 'donut', total: { show: true, label: '합계', formatter: (w) => fmt(w.globals.seriesTotals.reduce((a, b) => a + b, 0), c) } } } };
+      } else if (t === 'scatter') {
+        o.series = c.series.map((s) => ({ name: s.name, data: s.data }));
+        o.xaxis = { type: 'numeric', title: { text: c.xLabel }, tickAmount: 8 };
+        o.yaxis = { title: { text: c.yLabel } };
+        o.tooltip.y = { formatter: (v) => fmt(v) };
+      } else {
+        // 시리즈별 type이 섞이면 ApexCharts 콤보(chart.type=line + series.type) 방식으로 그린다
+        const mixed = t !== 'hbar' && c.series.some((s) => s.type && s.type !== seriesType(c, {}));
+        if (mixed) {
+          const apexType = (st) => (st === 'bar' ? 'column' : st === 'area' ? 'area' : 'line');
+          o.chart.type = 'line';
+          o.series = c.series.map((s) => ({ name: s.name, data: s.data, type: apexType(s.type || seriesType(c, {})) }));
+          o.stroke = { curve: 'smooth', width: o.series.map((s) => (s.type === 'column' ? 0 : 2.5)) };
+        } else {
+          o.series = c.series.map((s) => ({ name: s.name, data: s.data }));
+        }
+        o.xaxis = { categories: c.x, labels: t === 'hbar' ? { formatter: axisFmt(c) } : { rotate: 0, hideOverlappingLabels: true }, ...(t === 'hbar' ? { min: c.min, max: c.max } : {}) };
+        o.yaxis = t === 'hbar' ? {} : { min: c.min, max: c.max, labels: { formatter: axisFmt(c) } };
+      }
+      const ch = new ApexCharts(el, o);
+      ch.render();
+      return { resize: () => {}, destroy: () => ch.destroy() };
+    },
+
+    plotly(el, c, p) {
+      const t = c.type || 'line';
+      const hbar = t === 'hbar';
+      const hover = (s) => s.data.map((v) => fmt(v, c));
+      let traces;
+      if (isPie(t)) {
+        traces = [{ type: 'pie', labels: c.x, values: c.series[0].data, hole: t === 'donut' ? 0.55 : 0, sort: false, marker: { colors: p.series, line: { color: p.surface, width: 2 } }, texttemplate: '%{percent:.1%}', textposition: 'inside', insidetextorientation: 'horizontal', customdata: hover(c.series[0]), hovertemplate: '%{label}: %{customdata}<extra></extra>' }];
+      } else if (t === 'scatter') {
+        traces = c.series.map((s) => ({ type: 'scatter', mode: 'markers', name: s.name, x: s.data.map((d) => d[0]), y: s.data.map((d) => d[1]), marker: { size: 8 } }));
+      } else {
+        traces = c.series.map((s) => {
+          const st = seriesType(c, s);
+          const base = { name: s.name, customdata: hover(s), hovertemplate: `${esc(s.name)}: %{customdata}<extra></extra>` };
+          if (st === 'bar') return { ...base, type: 'bar', orientation: hbar ? 'h' : 'v', x: hbar ? s.data : c.x, y: hbar ? c.x : s.data };
+          const i = c.series.indexOf(s);
+          return { ...base, type: 'scatter', mode: 'lines', x: c.x, y: s.data, line: { shape: 'spline', smoothing: 0.6, width: 2, color: p.series[i % 8] }, fill: t === 'area' ? 'tozeroy' : undefined, fillcolor: t === 'area' ? alpha(p.series[i % 8], 0.12) : undefined };
+        });
+      }
+      const ax = { gridcolor: p.grid, zeroline: false, linecolor: p.grid, automargin: true };
+      const layout = {
+        barmode: t === 'stacked' ? 'stack' : 'group', paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+        font: { family: p.font, color: p.muted, size: 12 }, colorway: p.series,
+        margin: { l: 8, r: 16, t: c.series.length > 1 ? 32 : 12, b: 8 },
+        // '09-01' 같은 범주를 날짜로 오인하지 않도록 범주 축을 명시한다
+        xaxis: { ...ax, ...(hbar && valueRange(c) ? { range: valueRange(c) } : {}), title: { text: c.xLabel || '' }, showgrid: hbar || t === 'scatter', type: t === 'scatter' || hbar ? undefined : 'category' },
+        yaxis: { ...ax, title: { text: c.yLabel || '' }, autorange: hbar ? 'reversed' : !valueRange(c), range: hbar ? undefined : valueRange(c) || undefined, type: hbar ? 'category' : undefined },
+        showlegend: c.series.length > 1 || isPie(t), legend: { orientation: 'h', x: 0, y: isPie(t) ? -0.1 : 1.12 },
+        hoverlabel: { bgcolor: p.surface, bordercolor: p.grid, font: { color: p.fg, family: p.font } },
+      };
+      Plotly.newPlot(el, traces, layout, { displayModeBar: false, responsive: true });
+      return { resize: () => Plotly.Plots.resize(el), destroy: () => Plotly.purge(el) };
+    },
+
+    plot(el, c, p) {
+      const t = c.type || 'line';
+      const names = c.series.map((s) => s.name);
+      const draw = () => {
+        const W = Math.max(280, el.clientWidth || 640);
+        const H = el.clientHeight || c.height || 300;
+        if (isPie(t)) return pieSVG(c, p, W, H);
+        const rows = t === 'scatter'
+          ? c.series.flatMap((s) => s.data.map(([x, y]) => ({ x, y, s: s.name })))
+          : c.series.flatMap((s) => s.data.map((y, i) => ({ x: c.x[i], y, s: s.name })));
+        const title = (d) => `${d.s}\n${d.x}: ${fmt(d.y, c)}`;
+        let marks;
+        let xOpt = { label: c.xLabel || null };
+        let yOpt = { grid: true, label: c.yLabel || null, tickFormat: axisFmt(c), ...(valueRange(c) ? { domain: valueRange(c), clamp: true } : {}) };
+        const extra = {};
+        if (t === 'scatter') {
+          marks = [Plot.dot(rows, { x: 'x', y: 'y', fill: 's', r: 4, tip: true })];
+        } else if (t === 'hbar') {
+          marks = [Plot.barX(rows, { y: 'x', x: 'y', fill: 's', title, tip: true }), Plot.ruleX([0])];
+          xOpt = { grid: true, label: null, tickFormat: axisFmt(c), ...(valueRange(c) ? { domain: valueRange(c), clamp: true } : {}) };
+          yOpt = { label: null, domain: c.x };
+          extra.marginLeft = 96;
+        } else if (t === 'bar' && c.series.length > 1) {
+          marks = [Plot.barY(rows, { fx: 'x', x: 's', y: 'y', fill: 's', title, tip: true }), Plot.ruleY([0])];
+          xOpt = { axis: null, domain: names };
+          extra.fx = { domain: c.x, label: null };
+        } else if (t === 'bar' || t === 'stacked') {
+          marks = [Plot.barY(rows, { x: 'x', y: 'y', fill: 's', title, tip: true }), Plot.ruleY([0])];
+          xOpt = { label: null, domain: c.x };
+        } else {
+          xOpt = { label: null, type: 'point', domain: c.x };
+          marks = [
+            ...(t === 'area' ? [Plot.areaY(rows, { x: 'x', y1: 0, y2: 'y', fill: 's', fillOpacity: 0.12, curve: 'monotone-x' })] : []),  // y1/y2로 누적(stack) 방지
+            Plot.lineY(rows, { x: 'x', y: 'y', stroke: 's', strokeWidth: 2, curve: 'monotone-x' }),
+            Plot.ruleY([0]),
+            Plot.tip(rows, Plot.pointerX({ x: 'x', y: 'y', title })),
+          ];
+        }
+        return Plot.plot({
+          width: W, height: H, marginLeft: 56, ...extra,
+          style: { fontFamily: p.font, color: p.muted, background: 'transparent', fontSize: '12px' },
+          color: { domain: names, range: p.series, legend: names.length > 1 },
+          x: xOpt, y: yOpt, marks,
+        });
+      };
+      el.replaceChildren(draw());
+      let lastW = el.clientWidth;
+      return {
+        resize: () => { if (el.clientWidth !== lastW) { lastW = el.clientWidth; el.replaceChildren(draw()); } },
+        destroy: () => el.replaceChildren(),
+      };
+    },
+  };
+
+  // Observable Plot에는 원형 차트가 없어 d3로 직접 그린다
+  function pieSVG(c, p, W, H) {
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.setAttribute('width', W);
+    svg.setAttribute('height', H);
+    const r = Math.min(W, H - 40) / 2 - 8;
+    const g = document.createElementNS(NS, 'g');
+    g.setAttribute('transform', `translate(${W / 2},${(H - 40) / 2 + 4})`);
+    const data = c.series[0].data;
+    const total = data.reduce((a, b) => a + b, 0) || 1;
+    const arcs = d3.pie().sort(null)(data);
+    const arc = d3.arc().innerRadius(c.type === 'donut' ? r * 0.62 : 0).outerRadius(r).padAngle(0.01);
+    arcs.forEach((a, i) => {
+      const path = document.createElementNS(NS, 'path');
+      path.setAttribute('d', arc(a));
+      path.setAttribute('fill', p.series[i % 8]);
+      const tt = document.createElementNS(NS, 'title');
+      tt.textContent = `${c.x[i]}: ${fmt(data[i], c)} (${nf((data[i] / total) * 100, 1)}%)`;
+      path.appendChild(tt);
+      g.appendChild(path);
+    });
+    svg.appendChild(g);
+    const legend = document.createElementNS(NS, 'text');
+    legend.setAttribute('x', W / 2);
+    legend.setAttribute('y', H - 8);
+    legend.setAttribute('text-anchor', 'middle');
+    legend.setAttribute('fill', p.muted);
+    legend.setAttribute('font-size', '12');
+    c.x.forEach((n, i) => {
+      const s = document.createElementNS(NS, 'tspan');
+      s.setAttribute('fill', p.series[i % 8]);
+      s.textContent = `● `;
+      const l = document.createElementNS(NS, 'tspan');
+      l.textContent = `${n}  `;
+      legend.append(s, l);
+    });
+    svg.appendChild(legend);
+    return svg;
+  }
+
+  const LIB_GLOBAL = { echarts: 'echarts', chartjs: 'Chart', apexcharts: 'ApexCharts', plotly: 'Plotly', plot: 'Plot' };
+  function pickAdapter() {
+    const want = CFG.chartLib in ADAPTERS ? CFG.chartLib : 'echarts';
+    if (window[LIB_GLOBAL[want]]) return want;
+    return Object.keys(ADAPTERS).find((k) => window[LIB_GLOBAL[k]]) || null;
+  }
+
+  // 라이브러리를 못 불러온 환경(오프라인 등)에서도 데이터는 보이도록 값을 표로 대신 보여 준다
+  function fallbackTable(el, c) {
+    const head = isPie(c.type) || c.type === 'scatter' ? '' : `<tr><th></th>${c.series.map((s) => `<th>${esc(s.name)}</th>`).join('')}</tr>`;
+    const rows = c.type === 'scatter'
+      ? c.series.flatMap((s) => s.data.map((d) => `<tr><td>${esc(s.name)}</td><td>${fmt(d[0])}</td><td>${fmt(d[1])}</td></tr>`))
+      : (c.x || []).map((x, i) => `<tr><th>${esc(x)}</th>${c.series.map((s) => `<td>${fmt(s.data[i], c)}</td>`).join('')}</tr>`);
+    el.innerHTML = `<p class="hc-fallback-note">차트 라이브러리를 불러오지 못해 값을 표로 표시합니다.</p><table class="hc-fallback">${head}${rows.join('')}</table>`;
+    el.style.height = 'auto';
+  }
+
+  const charts = [];
+  const pending = [];
+  function normalizeChart(c) {
+    const out = { ...c };
+    out.series = arr(c.series).map((s, i) => (Array.isArray(s) ? { name: `시리즈 ${i + 1}`, data: s } : { name: s.name || `시리즈 ${i + 1}`, ...s }));
+    out.x = arr(c.x || c.labels);
+    return out;
+  }
+  function mountChart(el, c) {
+    if (el.offsetWidth === 0) { pending.push([el, c]); return; }
+    const lib = pickAdapter();
+    if (!lib) { fallbackTable(el, c); return; }
+    try {
+      const inst = ADAPTERS[lib](el, c, palette());
+      charts.push({ el, c, inst });
+    } catch (e) {
+      console.error('차트 렌더링 실패', c.id, e);
+      fallbackTable(el, c);
+    }
+  }
+  function flushPending() {
+    const list = pending.splice(0);
+    list.forEach(([el, c]) => mountChart(el, c));
+    charts.forEach((ch) => ch.inst.resize());
+  }
+  function rerenderCharts() {
+    const list = charts.splice(0);
+    list.forEach(({ el, c, inst }) => { inst.destroy(); el.replaceChildren(); mountChart(el, c); });
+  }
+
+  // ── 영역별 렌더링 ──
+  const CHARTS = arr(SPEC.charts).map((c, i) => ({ ...normalizeChart(c), id: c.id || `chart-${i + 1}` }));
+  const TABLES = arr(SPEC.tables).map((t, i) => ({ ...t, id: t.id || `table-${i + 1}` }));
+  const SECTIONS = arr(SPEC.sections).map((s, i) => ({ ...s, id: s.id || slug(s.title, i) }));
+  const embedded = { charts: new Set(), tables: new Set() };
+  SECTIONS.forEach((s) => { arr(s.charts).forEach((id) => embedded.charts.add(id)); arr(s.tables).forEach((id) => embedded.tables.add(id)); });
+
+  function sparkSVG(values) {
+    const v = arr(values).filter((n) => typeof n === 'number');
+    if (v.length < 2) return '';
+    const min = Math.min(...v);
+    const max = Math.max(...v);
+    const pts = v.map((n, i) => `${(i / (v.length - 1)) * 100},${28 - ((n - min) / (max - min || 1)) * 24 - 2}`).join(' ');
+    return `<svg viewBox="0 0 100 28" preserveAspectRatio="none" width="100%" height="28" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+  }
+
+  function kpiEl(k) {
+    const t = tpl('tpl-kpi');
+    const el = clone('tpl-kpi');
+    if (!el) return null;
+    setSlot(el, 'label', k.label);
+    setSlot(el, 'value', fmt(k.value, { ...k, _kpi: true }));
+    setSlot(el, 'hint', k.hint);
+    if (typeof k.delta === 'number') {
+      const good = (k.good || 'up') === 'up' ? k.delta > 0 : k.delta < 0;
+      const tone = k.delta === 0 ? 'flat' : good ? 'good' : 'bad';
+      const arrow = k.delta > 0 ? '▲' : k.delta < 0 ? '▼' : '—';
+      const d = setSlot(el, 'delta', `${arrow} ${nf(Math.abs(k.delta), k.deltaDecimals ?? 1)}${k.deltaSuffix ?? '%'}`);
+      if (d) { addCls(d, t.dataset[tone]); d.dataset.tone = tone; }
+      setSlot(el, 'delta-label', k.deltaLabel);
+    } else {
+      setSlot(el, 'delta', null);
+      setSlot(el, 'delta-label', null);
+    }
+    const sp = slot(el, 'spark');
+    if (sp) { if (k.spark) sp.innerHTML = sparkSVG(k.spark); else sp.remove(); }
+    return el;
+  }
+
+  function chartEl(c, tplId = 'tpl-chart') {
+    const el = clone(tplId) || clone('tpl-chart');
+    if (!el) return null;
+    el.id = `chart-${c.id}`;
+    setSlot(el, 'title', c.title);
+    setSlot(el, 'subtitle', c.subtitle);
+    setSlot(el, 'note', c.note);
+    const box = slot(el, 'chart');
+    box.style.height = `${c.height || (isPie(c.type) ? 280 : 300)}px`;
+    box.setAttribute('role', 'img');
+    box.setAttribute('aria-label', c.title || '차트');
+    return { el, box };
+  }
+
+  function tableEl(tb, opts = {}) {
+    const t = tpl('tpl-table');
+    const el = clone('tpl-table');
+    if (!el) return null;
+    el.id = `table-${tb.id}`;
+    setSlot(el, 'title', tb.title);
+    setSlot(el, 'subtitle', tb.subtitle);
+    const cols = arr(tb.columns).length ? tb.columns : Object.keys(arr(tb.rows)[0] || {}).map((key) => ({ key, label: key }));
+    let rows = arr(tb.rows).slice();
+    if (opts.limit) rows = rows.slice(0, opts.limit);
+    const table = slot(el, 'table');
+    const numCls = t.dataset.num || '';
+    const pageSize = opts.limit || tb.pageSize || 15;
+    let shown = pageSize;
+    let sortKey = null;
+    let sortDir = 1;
+    let q = '';
+
+    const thead = document.createElement('thead');
+    const tr = document.createElement('tr');
+    cols.forEach((col) => {
+      const th = document.createElement('th');
+      th.scope = 'col';
+      if (col.type === 'number') addCls(th, numCls);
+      if (opts.limit) th.textContent = col.label || col.key;
+      else {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'hc-sort';
+        b.textContent = col.label || col.key;
+        b.addEventListener('click', () => {
+          sortDir = sortKey === col.key ? -sortDir : 1;
+          sortKey = col.key;
+          $$('th', thead).forEach((x) => x.removeAttribute('aria-sort'));
+          th.setAttribute('aria-sort', sortDir === 1 ? 'ascending' : 'descending');
+          draw();
+        });
+        th.appendChild(b);
+      }
+      tr.appendChild(th);
+    });
+    thead.appendChild(tr);
+    const tbody = document.createElement('tbody');
+    table.replaceChildren(thead, tbody);
+
+    const cell = (col, v) => {
+      const td = document.createElement('td');
+      if (col.type === 'number') { addCls(td, numCls); td.textContent = fmt(v, col); td.style.fontVariantNumeric = 'tabular-nums'; }
+      else if (col.type === 'badge') {
+        const tone = (col.tones && col.tones[v]) || 'neutral';
+        const span = document.createElement('span');
+        addCls(span, t.dataset[`badge${tone[0].toUpperCase()}${tone.slice(1)}`] || t.dataset.badgeNeutral);
+        span.textContent = v == null ? '–' : v;
+        td.appendChild(span);
+      } else td.textContent = v == null || v === '' ? '–' : v;
+      return td;
+    };
+
+    const more = slot(el, 'more');
+    const count = slot(el, 'count');
+    function draw() {
+      let list = rows;
+      if (q) list = list.filter((r) => cols.some((c) => String(r[c.key] ?? '').toLowerCase().includes(q)));
+      if (sortKey) {
+        list = list.slice().sort((a, b) => {
+          const x = a[sortKey];
+          const y = b[sortKey];
+          if (typeof x === 'number' && typeof y === 'number') return (x - y) * sortDir;
+          return String(x ?? '').localeCompare(String(y ?? ''), 'ko', { numeric: true }) * sortDir;
+        });
+      }
+      tbody.replaceChildren(...list.slice(0, shown).map((r) => {
+        const row = document.createElement('tr');
+        cols.forEach((c) => row.appendChild(cell(c, r[c.key])));
+        return row;
+      }));
+      if (count) count.textContent = q ? `${list.length} / ${rows.length}행` : `총 ${rows.length.toLocaleString('ko-KR')}행`;
+      if (more) {
+        const left = list.length - shown;
+        more.hidden = left <= 0;
+        more.textContent = `더 보기 (${left.toLocaleString('ko-KR')}행 남음)`;
+      }
+    }
+    if (more) more.addEventListener('click', () => { shown += pageSize * 2; draw(); });
+    const search = slot(el, 'search');
+    const wantSearch = !opts.limit && (tb.search ?? rows.length > 10);
+    if (search) {
+      if (!wantSearch) search.remove();
+      else {
+        const input = search.matches('input') ? search : $('input', search);
+        input.addEventListener('input', () => { q = input.value.trim().toLowerCase(); shown = pageSize; draw(); });
+      }
+    }
+    if (opts.limit && count) count.textContent = arr(tb.rows).length > opts.limit ? `상위 ${opts.limit}행 / 총 ${arr(tb.rows).length.toLocaleString('ko-KR')}행` : '';
+    draw();
+    return el;
+  }
+
+  function calloutEl(c) {
+    const t = tpl('tpl-callout');
+    const el = clone('tpl-callout');
+    if (!el) return null;
+    addCls(el, t.dataset[c.tone || 'info']);
+    setSlot(el, 'title', c.title);
+    setSlot(el, 'text', richText(c.text), true);
+    return el;
+  }
+
+  function sectionBody(s, body, figure) {
+    String(s.text || '').split(/\n{2,}/).filter((x) => x.trim()).forEach((para) => {
+      const p = document.createElement('p');
+      p.innerHTML = richText(para).replace(/\n/g, '<br>');
+      body.appendChild(p);
+    });
+    if (arr(s.bullets).length) {
+      const ul = document.createElement('ul');
+      s.bullets.forEach((b) => { const li = document.createElement('li'); li.innerHTML = richText(b); ul.appendChild(li); });
+      body.appendChild(ul);
+    }
+    if (s.callout) { const co = calloutEl(s.callout); if (co) body.appendChild(co); }
+    arr(s.charts).forEach((id) => {
+      const c = CHARTS.find((x) => x.id === id);
+      if (!c) return;
+      const r = chartEl(c.height || !figure.height ? c : { ...c, height: figure.height }, figure.chart);
+      if (r) { body.appendChild(r.el); figure.queue.push([r.box, c]); }
+    });
+    arr(s.tables).forEach((id) => {
+      const tb = TABLES.find((x) => x.id === id);
+      const el = tb && tableEl(tb, figure.tableOpts);
+      if (el) body.appendChild(el);
+    });
+  }
+
+  function renderMeta() {
+    const m = SPEC.meta || {};
+    if (m.title) document.title = m.title;
+    $$('[data-meta]').forEach((el) => {
+      const key = el.dataset.meta;
+      if (key === 'summary') {
+        const s = SPEC.summary;
+        if (!s || (Array.isArray(s) && !s.length)) { (el.closest('[data-requires="summary"]') || el).remove(); return; }
+        if (Array.isArray(s)) {
+          const ul = document.createElement('ul');
+          addCls(ul, el.dataset.listClass);
+          s.forEach((x) => { const li = document.createElement('li'); li.innerHTML = richText(x); ul.appendChild(li); });
+          el.replaceChildren(ul);
+        } else el.innerHTML = String(s).split(/\n{2,}/).map((p) => `<p>${richText(p)}</p>`).join('');
+        return;
+      }
+      const v = m[key];
+      if (v == null || v === '') { if (el.hasAttribute('data-optional')) el.remove(); return; }
+      el.textContent = v;
+    });
+  }
+
+  function renderNav(items) {
+    const region = $('[data-region="nav"]');
+    if (!region || !tpl('tpl-nav')) return;
+    const t = tpl('tpl-nav');
+    const links = [];
+    items.forEach((it) => {
+      const el = clone('tpl-nav');
+      const a = slot(el, 'link') || el.querySelector('a') || el;
+      a.href = `#${it.id}`;
+      const label = slot(el, 'label');
+      (label || a).textContent = it.label;
+      region.appendChild(el);
+      links.push([a, it.id]);
+    });
+    const active = t.dataset.active;
+    if (!active || !('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver((ents) => {
+      ents.forEach((e) => {
+        if (!e.isIntersecting) return;
+        links.forEach(([a, id]) => {
+          const on = id === e.target.id;
+          active.split(/\s+/).filter(Boolean).forEach((c) => a.classList.toggle(c, on));
+          if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+        });
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    items.forEach((it) => { const target = document.getElementById(it.id); if (target) io.observe(target); });
+  }
+
+  // 내비게이션이 가리킬 요소: 키트가 [data-anchor]로 감싼 영역이 있으면 그것, 없으면 영역 자체
+  function anchorFor(name, region) {
+    const el = $(`[data-anchor="${name}"]`) || region;
+    if (!el.id) el.id = `hc-${name}`;
+    return el.id;
+  }
+
+  function renderPage() {
+    const queue = [];
+    const navItems = [];
+    const kpiRegion = $('[data-region="kpis"]');
+    const kpis = arr(SPEC.kpis);
+    if (kpiRegion && kpis.length) {
+      kpiRegion.dataset.count = String(kpis.length);
+      kpis.forEach((k) => { const el = kpiEl(k); if (el) kpiRegion.appendChild(el); });
+      navItems.push({ id: anchorFor('kpis', kpiRegion), label: '핵심 지표' });
+    }
+
+    const chartRegion = $('[data-region="charts"]');
+    const sectionRegion = $('[data-region="sections"]');
+    const tableRegion = $('[data-region="tables"]');
+    const freeCharts = CHARTS.filter((c) => !embedded.charts.has(c.id));
+    const freeTables = TABLES.filter((t) => !embedded.tables.has(t.id));
+
+    if (chartRegion && freeCharts.length) {
+      freeCharts.forEach((c) => {
+        const r = chartEl(c);
+        if (!r) return;
+        addCls(r.el, chartRegion.dataset[`span${Math.min(3, Math.max(1, c.span || 1))}`]);
+        chartRegion.appendChild(r.el);
+        queue.push([r.box, c]);
+      });
+      navItems.push({ id: anchorFor('charts', chartRegion), label: '차트' });
+    }
+
+    const figure = { chart: tpl('tpl-figure') ? 'tpl-figure' : 'tpl-chart', queue, tableOpts: {} };
+    if (sectionRegion) {
+      SECTIONS.forEach((s) => {
+        const el = clone('tpl-section');
+        if (!el) return;
+        el.id = s.id;
+        setSlot(el, 'title', s.title);
+        sectionBody(s, slot(el, 'body') || el, figure);
+        sectionRegion.appendChild(el);
+        if (s.title) navItems.push({ id: s.id, label: s.title });
+      });
+    }
+    if (freeCharts.length && !chartRegion && sectionRegion) {
+      freeCharts.forEach((c) => { const r = chartEl(c, figure.chart); if (r) { sectionRegion.appendChild(r.el); queue.push([r.box, c]); } });
+    }
+
+    const tableHost = tableRegion || sectionRegion;
+    if (tableHost) {
+      freeTables.forEach((tb) => {
+        const el = tableEl(tb);
+        if (!el) return;
+        tableHost.appendChild(el);
+        if (tb.title) navItems.push({ id: el.id, label: tb.title });
+      });
+    }
+
+    // 내용이 없는 영역은 감춘다
+    $$('[data-requires]').forEach((el) => {
+      const need = el.dataset.requires;
+      const has = {
+        kpis: kpis.length > 0, charts: freeCharts.length > 0, tables: freeTables.length > 0,
+        sections: SECTIONS.length > 0, summary: !!(SPEC.summary && arr(SPEC.summary).length),
+        nav: SPEC.nav !== false && navItems.length > 1,
+      }[need];
+      if (has === false) el.remove();
+    });
+    if (SPEC.nav !== false) renderNav(navItems);
+    return queue;
+  }
+
+  function renderSlides() {
+    const deck = $('[data-region="slides"]');
+    const queue = [];
+    const add = (id) => { const el = clone(id); if (el) deck.appendChild(el); return el; };
+    const titleSlide = add('tpl-slide-title');
+    if (titleSlide) {
+      const m = SPEC.meta || {};
+      ['title', 'subtitle', 'source', 'generatedAt', 'author'].forEach((k) => setSlot(titleSlide, k, m[k]));
+    }
+    if (SPEC.summary && arr(SPEC.summary).length) {
+      const el = add('tpl-slide-summary');
+      if (el) {
+        const box = slot(el, 'body');
+        const ul = document.createElement('ul');
+        arr(SPEC.summary).forEach((x) => { const li = document.createElement('li'); li.innerHTML = richText(x); addCls(li, 'fragment'); ul.appendChild(li); });
+        box.replaceChildren(ul);
+      }
+    }
+    const kpis = arr(SPEC.kpis);
+    for (let i = 0; i < kpis.length; i += 4) {
+      const el = add('tpl-slide-kpis');
+      if (!el) break;
+      setSlot(el, 'title', i === 0 ? '핵심 지표' : '핵심 지표 (계속)');
+      const box = slot(el, 'kpis');
+      kpis.slice(i, i + 4).forEach((k) => { const ke = kpiEl(k); if (ke) box.appendChild(ke); });
+    }
+    const figure = { chart: tpl('tpl-figure') ? 'tpl-figure' : 'tpl-chart', queue, tableOpts: { limit: 8 }, height: 380 };
+    SECTIONS.forEach((s) => {
+      const el = add('tpl-slide-section');
+      if (!el) return;
+      setSlot(el, 'title', s.title);
+      sectionBody(s, slot(el, 'body'), figure);
+    });
+    CHARTS.filter((c) => !embedded.charts.has(c.id)).forEach((c) => {
+      const el = add('tpl-slide-chart');
+      if (!el) return;
+      setSlot(el, 'title', c.title);
+      setSlot(el, 'subtitle', c.subtitle);
+      setSlot(el, 'note', c.note);
+      const box = slot(el, 'chart');
+      box.style.height = `${c.height || 440}px`;
+      queue.push([box, c]);
+    });
+    TABLES.filter((t) => !embedded.tables.has(t.id)).forEach((tb) => {
+      const el = add('tpl-slide-table');
+      if (!el) return;
+      setSlot(el, 'title', tb.title);
+      const te = tableEl({ ...tb, title: null, subtitle: tb.subtitle }, { limit: 8 });
+      if (te) slot(el, 'body').appendChild(te);
+    });
+    add('tpl-slide-end');
+    return queue;
+  }
+
+  // ── 실행 ──
+  renderMeta();
+  const queue = CFG.mode === 'slides' ? renderSlides() : renderPage();
+  $$('[data-meta="year"]').forEach((el) => { el.textContent = new Date().getFullYear(); });
+
+  // 색이 꽉 찬 KPI 카드는 배경 밝기에 따라 글자색을 정한다
+  function inkForSolidKpis() {
+    if (!document.body.classList.contains('hc-kpi-solid')) return;
+    $$('.hc-kpi').forEach((el) => {
+      el.style.removeProperty('--hc-kpi-ink');
+      const m = getComputedStyle(el).backgroundColor.match(/\d+(\.\d+)?/g);
+      if (!m) return;
+      const [r, g, b] = m.map(Number);
+      const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+      el.style.setProperty('--hc-kpi-ink', lum > 0.62 ? '#1f2328' : '#ffffff');
+    });
+  }
+
+  const start = () => {
+    inkForSolidKpis();
+    queue.forEach(([el, c]) => mountChart(el, c));
+    if (typeof window.HC_AFTER_RENDER === 'function') window.HC_AFTER_RENDER();
+  };
+  if (document.readyState === 'complete') start(); else window.addEventListener('load', start);
+
+  $$('[data-action="theme"]').forEach((b) => b.addEventListener('click', () => {
+    const next = currentTheme() === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    store.set(next);
+    requestAnimationFrame(() => { inkForSolidKpis(); rerenderCharts(); });
+  }));
+  $$('[data-action="print"]').forEach((b) => b.addEventListener('click', () => window.print()));
+  let rT = 0;
+  window.addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(() => charts.forEach((ch) => ch.inst.resize()), 120); });
+  window.addEventListener('beforeprint', () => charts.forEach((ch) => ch.inst.resize()));
+
+  // 키트(발표 등)가 숨겨진 영역을 보여 줄 때 호출: 지연된 차트를 그리고 크기를 맞춘다
+  window.HC = { flush: flushPending, rerender: rerenderCharts, fmt, spec: SPEC };
+})();
+
+</script>
+</body>
+</html>

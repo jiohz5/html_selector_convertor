@@ -1,0 +1,2300 @@
+{
+  "_about": "디자인 레시피. designs.<id>는 HTML Previewer(catalog.json)의 id와 같다. render.py가 읽는다. 원본 CSS/JS를 CDN으로 쓸 수 있으면 libs에 넣고, 그렇지 않은 디자인(React·유료 등)은 tokens로 모양만 재현한다.",
+  "_checkedAt": "2026-10-06",
+  "libs": {
+    "bootstrap": {
+      "css": [
+        "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      ]
+    },
+    "tabler": {
+      "css": [
+        "https://cdn.jsdelivr.net/npm/@tabler/core@1.6.1/dist/css/tabler.min.css"
+      ]
+    },
+    "adminlte": {
+      "css": [
+        "https://cdn.jsdelivr.net/npm/admin-lte@4.10.0/dist/css/adminlte.min.css"
+      ]
+    },
+    "coreui": {
+      "css": [
+        "https://cdn.jsdelivr.net/npm/@coreui/coreui@5.9.1/dist/css/coreui.min.css"
+      ]
+    },
+    "tailwind": {
+      "js": [
+        "https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3/dist/index.global.js"
+      ]
+    },
+    "daisyui": {
+      "css": [
+        "https://cdn.jsdelivr.net/npm/daisyui@5.7.47/daisyui.css",
+        "https://cdn.jsdelivr.net/npm/daisyui@5.7.47/themes.css"
+      ]
+    },
+    "flowbite": {
+      "css": [
+        "https://cdn.jsdelivr.net/npm/flowbite@4.0.2/dist/flowbite.min.css"
+      ]
+    },
+    "tufte": {
+      "css": [
+        "https://cdn.jsdelivr.net/npm/tufte-css@1.9.0/tufte.min.css"
+      ]
+    },
+    "reveal": {
+      "css": [
+        "https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.css"
+      ],
+      "js": [
+        "https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.js"
+      ]
+    },
+    "reveal-white": {
+      "css": [
+        "https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/theme/white.css"
+      ]
+    },
+    "impress": {
+      "js": [
+        "https://cdn.jsdelivr.net/npm/impress.js@1.1.0/js/impress.js"
+      ]
+    }
+  },
+  "chartLibs": {
+    "echarts": {
+      "js": [
+        "https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"
+      ]
+    },
+    "chartjs": {
+      "js": [
+        "https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"
+      ]
+    },
+    "apexcharts": {
+      "js": [
+        "https://cdn.jsdelivr.net/npm/apexcharts@4.7.0/dist/apexcharts.min.js"
+      ]
+    },
+    "plotly": {
+      "js": [
+        "https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"
+      ]
+    },
+    "plot": {
+      "js": [
+        "https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js",
+        "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6.17/dist/plot.umd.min.js"
+      ]
+    }
+  },
+  "kits": {
+    "dashboard": {
+      "file": "kits/dashboard.html",
+      "mode": "page",
+      "use": "KPI·차트·표를 한 화면에. 사이드바/상단 내비게이션"
+    },
+    "report": {
+      "file": "kits/report.html",
+      "mode": "page",
+      "use": "긴 분석 보고서·문서. 목차(TOC)와 본문 흐름 중심"
+    },
+    "article": {
+      "file": "kits/article.html",
+      "mode": "page",
+      "use": "단일 칼럼 에세이형 보고서(Tufte·Distill). 여백·타이포 중심"
+    },
+    "landing": {
+      "file": "kits/landing.html",
+      "mode": "page",
+      "use": "프로젝트·결과를 한 페이지로 소개. 히어로·수치·특징"
+    },
+    "slides": {
+      "file": "kits/slides.html",
+      "mode": "slides",
+      "use": "reveal.js 발표 자료. 섹션·KPI·차트가 각각 슬라이드"
+    },
+    "impress": {
+      "file": "kits/impress.html",
+      "mode": "slides",
+      "use": "impress.js 캔버스형 발표(이동·확대 전환)"
+    }
+  },
+  "defaults": {
+    "fonts": [],
+    "tokens": {
+      "primary": "#2563eb",
+      "primary-fg": "#ffffff",
+      "bg": "#f6f8fb",
+      "surface": "#ffffff",
+      "fg": "#1f2937",
+      "muted": "#6b7280",
+      "border": "#e5e7eb",
+      "grid": "#eef0f3",
+      "radius": "8px",
+      "shadow": "0 1px 2px rgba(16,24,40,.06)",
+      "sidebar-bg": "#ffffff",
+      "sidebar-fg": "#1f2937",
+      "sidebar-muted": "#9ca3af",
+      "sidebar-border": "#e5e7eb",
+      "sidebar-active-bg": "color-mix(in srgb, var(--hc-primary) 10%, transparent)",
+      "sidebar-active-fg": "var(--hc-primary)",
+      "header-bg": "color-mix(in srgb, var(--hc-bg) 85%, transparent)",
+      "header-border": "var(--hc-border)",
+      "header-blur": "blur(8px)",
+      "good": "#16a34a",
+      "bad": "#dc2626",
+      "warn": "#d97706",
+      "palette": [
+        "#2563eb",
+        "#16a34a",
+        "#f59e0b",
+        "#dc2626",
+        "#7c3aed",
+        "#0891b2",
+        "#db2777",
+        "#65a30d"
+      ]
+    },
+    "dark": {
+      "bg": "#0f1117",
+      "surface": "#171a21",
+      "fg": "#e5e7eb",
+      "muted": "#9ca3af",
+      "border": "#2a2f3a",
+      "grid": "#262b35",
+      "shadow": "none",
+      "sidebar-bg": "#12151c",
+      "sidebar-fg": "#e5e7eb",
+      "sidebar-muted": "#6b7280",
+      "sidebar-border": "#2a2f3a",
+      "good": "#22c55e",
+      "bad": "#f87171",
+      "warn": "#fbbf24"
+    },
+    "theme": {
+      "attr": "data-bs-theme",
+      "light": "light",
+      "dark": "dark",
+      "default": "light"
+    }
+  },
+  "designs": {
+    "tabler": {
+      "kit": "dashboard",
+      "libs": [
+        "tabler"
+      ],
+      "chartLib": "apexcharts",
+      "fonts": [
+        "Inter"
+      ],
+      "layout": "topnav",
+      "kpiStyle": "plain",
+      "classMap": {
+        "hc-table": "table table-vcenter card-table"
+      },
+      "tokens": {
+        "primary": "#066fd1",
+        "bg": "#f6f8fb",
+        "fg": "#182433",
+        "muted": "#6b7a8f",
+        "border": "#e6e8ec",
+        "grid": "#eef0f3",
+        "radius": "6px",
+        "shadow": "rgba(24,36,51,.04) 0 2px 4px 0",
+        "header-bg": "#ffffff",
+        "header-blur": "none",
+        "kpi-label-transform": "uppercase",
+        "kpi-label-spacing": ".04em",
+        "kpi-size": "1.6rem",
+        "th-transform": "uppercase",
+        "palette": [
+          "#066fd1",
+          "#2fb344",
+          "#f76707",
+          "#d63939",
+          "#ae3ec9",
+          "#17a2b8",
+          "#f59f00",
+          "#74b816"
+        ]
+      },
+      "dark": {
+        "bg": "#151f2c",
+        "surface": "#182433",
+        "fg": "#dce1e7",
+        "muted": "#8a97ab",
+        "border": "#25384f",
+        "grid": "#25384f",
+        "header-bg": "#182433"
+      },
+      "signature": "밝은 회색 배경에 흰 카드, 얇은 테두리와 아주 옅은 그림자. 상단 가로 내비게이션. KPI 라벨은 작은 대문자(subheader), 숫자는 크고 굵게. 카드 머리글은 card-header 구분선 스타일. 표는 card-table로 카드에 꽉 차게."
+    },
+    "shadcn-dashboard": {
+      "kit": "dashboard",
+      "chartLib": "echarts",
+      "fonts": [
+        "Geist"
+      ],
+      "layout": "sidebar",
+      "kpiStyle": "tint",
+      "tokens": {
+        "primary": "#171717",
+        "primary-fg": "#fafafa",
+        "bg": "#fafafa",
+        "surface": "#ffffff",
+        "fg": "#0a0a0a",
+        "muted": "#737373",
+        "border": "#e5e5e5",
+        "grid": "#f0f0f0",
+        "radius": "12px",
+        "shadow": "0 1px 2px rgba(0,0,0,.05)",
+        "sidebar-bg": "#fafafa",
+        "sidebar-border": "transparent",
+        "sidebar-active-bg": "#f0f0f0",
+        "sidebar-active-fg": "#171717",
+        "header-bg": "#ffffff",
+        "kpi-size": "1.85rem",
+        "kpi-weight": "600",
+        "th-transform": "none",
+        "palette": [
+          "#262626",
+          "#737373",
+          "#a3a3a3",
+          "#e76e50",
+          "#2a9d90",
+          "#274754",
+          "#e8c468",
+          "#f4a462"
+        ]
+      },
+      "dark": {
+        "primary": "#e5e5e5",
+        "primary-fg": "#171717",
+        "bg": "#0a0a0a",
+        "surface": "#171717",
+        "fg": "#fafafa",
+        "muted": "#a3a3a3",
+        "border": "#262626",
+        "grid": "#262626",
+        "sidebar-bg": "#0a0a0a",
+        "sidebar-active-bg": "#262626",
+        "sidebar-active-fg": "#fafafa",
+        "header-bg": "#0a0a0a",
+        "palette": [
+          "#e5e5e5",
+          "#a3a3a3",
+          "#737373",
+          "#e76e50",
+          "#2a9d90",
+          "#5ab3c9",
+          "#e8c468",
+          "#f4a462"
+        ]
+      },
+      "signature": "무채색(neutral) 중심, 카드 radius 12px, 아주 얇은 테두리. KPI 카드는 위에서 아래로 옅은 그라데이션, 변화율은 테두리만 있는 작은 배지(outline badge). 차트는 회색 계열 면적 그래프. 사이드바는 배경과 같은 색으로 경계 없이 이어지고 본문은 흰 inset 패널."
+    },
+    "tremor-dashboard": {
+      "kit": "dashboard",
+      "chartLib": "echarts",
+      "fonts": [
+        "Inter"
+      ],
+      "layout": "sidebar",
+      "kpiStyle": "plain",
+      "tokens": {
+        "primary": "#3b82f6",
+        "bg": "#ffffff",
+        "surface": "#ffffff",
+        "fg": "#111827",
+        "muted": "#6b7280",
+        "border": "#e5e7eb",
+        "grid": "#f3f4f6",
+        "radius": "6px",
+        "shadow": "0 1px 2px rgba(0,0,0,.05)",
+        "sidebar-bg": "#f9fafb",
+        "sidebar-active-bg": "#ffffff",
+        "sidebar-active-fg": "#3b82f6",
+        "sidebar-active-shadow": "0 1px 2px rgba(0,0,0,.06)",
+        "th-transform": "none",
+        "palette": [
+          "#3b82f6",
+          "#10b981",
+          "#8b5cf6",
+          "#f59e0b",
+          "#6b7280",
+          "#06b6d4",
+          "#ec4899",
+          "#84cc16"
+        ]
+      },
+      "dark": {
+        "bg": "#030712",
+        "surface": "#030712",
+        "border": "#1f2937",
+        "grid": "#111827",
+        "sidebar-bg": "#030712",
+        "sidebar-active-bg": "#111827"
+      },
+      "signature": "흰 배경에 테두리만 있는 평평한 카드. KPI는 숫자 옆에 작은 색 배지(▲ 12.1%). 차트는 격자선 거의 없이 부드러운 선, 범례는 차트 위 오른쪽. 탭으로 기간 전환하는 구성이 특징."
+    },
+    "adminlte": {
+      "kit": "dashboard",
+      "libs": [
+        "adminlte"
+      ],
+      "chartLib": "apexcharts",
+      "fonts": [
+        "Source Sans 3"
+      ],
+      "layout": "sidebar",
+      "kpiStyle": "solid",
+      "classMap": {
+        "hc-table": "table table-striped"
+      },
+      "tokens": {
+        "primary": "#0d6efd",
+        "bg": "#f4f6f9",
+        "fg": "#212529",
+        "muted": "#6c757d",
+        "border": "#dee2e6",
+        "radius": "6px",
+        "shadow": "0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2)",
+        "sidebar-bg": "#343a40",
+        "sidebar-fg": "#c2c7d0",
+        "sidebar-muted": "#8a9097",
+        "sidebar-border": "transparent",
+        "sidebar-active-bg": "#0d6efd",
+        "sidebar-active-fg": "#ffffff",
+        "sidebar-hover": "rgba(255,255,255,.1)",
+        "header-bg": "#ffffff",
+        "header-blur": "none",
+        "brand-bg": "#0d6efd",
+        "palette": [
+          "#0d6efd",
+          "#198754",
+          "#ffc107",
+          "#dc3545",
+          "#0dcaf0",
+          "#6f42c1",
+          "#fd7e14",
+          "#20c997"
+        ]
+      },
+      "dark": {
+        "bg": "#1a1d20",
+        "surface": "#212529",
+        "header-bg": "#212529"
+      },
+      "signature": "어두운 회색 사이드바(#343a40) + 흰 상단바. KPI는 색이 꽉 찬 small-box(파랑·초록·노랑·빨강)에 큰 숫자와 '더 보기' 링크. 카드 그림자가 뚜렷하고 카드 머리글에 구분선."
+    },
+    "adminkit": {
+      "kit": "dashboard",
+      "chartLib": "chartjs",
+      "fonts": [
+        "Inter"
+      ],
+      "layout": "sidebar",
+      "kpiStyle": "plain",
+      "tokens": {
+        "primary": "#3b7ddd",
+        "bg": "#f5f7fb",
+        "fg": "#495057",
+        "muted": "#6c757d",
+        "border": "transparent",
+        "grid": "#eef0f3",
+        "radius": "4px",
+        "shadow": "0 0 .875rem 0 rgba(33,37,41,.05)",
+        "sidebar-bg": "#222e3c",
+        "sidebar-fg": "#e9ecef",
+        "sidebar-muted": "#8a95a3",
+        "sidebar-border": "transparent",
+        "sidebar-active-bg": "linear-gradient(90deg, rgba(59,125,221,.1), rgba(59,125,221,.0875) 50%, transparent)",
+        "sidebar-active-fg": "#e9ecef",
+        "nav-indicator-w": "3px",
+        "nav-radius": "0",
+        "header-bg": "#ffffff",
+        "header-blur": "none",
+        "heading": "#212529",
+        "palette": [
+          "#3b7ddd",
+          "#1cbb8c",
+          "#fcb92c",
+          "#dc3545",
+          "#17a2b8",
+          "#6f42c1",
+          "#adb5bd",
+          "#e83e8c"
+        ]
+      },
+      "dark": {
+        "bg": "#19222c",
+        "surface": "#222e3c",
+        "fg": "#bdc0c5",
+        "heading": "#e9ecef",
+        "header-bg": "#222e3c"
+      },
+      "signature": "남색 사이드바(#222e3c), 활성 메뉴는 왼쪽 파란 막대. 카드는 테두리 없이 아주 옅은 그림자. KPI 카드 오른쪽 위에 원형 아이콘 배지, 아래에 '전주 대비' 작은 글씨."
+    },
+    "coreui": {
+      "kit": "dashboard",
+      "libs": [
+        "coreui"
+      ],
+      "chartLib": "chartjs",
+      "fonts": [],
+      "layout": "sidebar",
+      "kpiStyle": "solid",
+      "classMap": {
+        "hc-table": "table table-hover"
+      },
+      "theme": {
+        "attr": "data-coreui-theme",
+        "light": "light",
+        "dark": "dark",
+        "default": "light"
+      },
+      "tokens": {
+        "primary": "#5856d6",
+        "bg": "#f3f4f7",
+        "fg": "#252b36",
+        "muted": "#6b7785",
+        "border": "#dbdfe6",
+        "radius": "6px",
+        "shadow": "none",
+        "sidebar-bg": "#212631",
+        "sidebar-fg": "rgba(255,255,255,.87)",
+        "sidebar-muted": "rgba(255,255,255,.38)",
+        "sidebar-border": "transparent",
+        "sidebar-active-bg": "rgba(255,255,255,.05)",
+        "sidebar-active-fg": "#ffffff",
+        "sidebar-hover": "rgba(255,255,255,.05)",
+        "header-bg": "#ffffff",
+        "header-blur": "none",
+        "palette": [
+          "#5856d6",
+          "#3399ff",
+          "#f9b115",
+          "#e55353",
+          "#1b9e3e",
+          "#6b7785",
+          "#7c3aed",
+          "#0dcaf0"
+        ]
+      },
+      "dark": {
+        "bg": "#1d222b",
+        "surface": "#212631",
+        "header-bg": "#212631"
+      },
+      "signature": "짙은 남색 사이드바(#212631). KPI는 보라·파랑·노랑·빨강 단색 위젯에 흰 글씨와 작은 추세선. 메인 차트는 큰 선 그래프 카드, 아래 진행률 막대 요약."
+    },
+    "sneat": {
+      "kit": "dashboard",
+      "chartLib": "apexcharts",
+      "fonts": [
+        "Public Sans"
+      ],
+      "layout": "sidebar",
+      "kpiStyle": "plain",
+      "tokens": {
+        "primary": "#696cff",
+        "bg": "#f5f5f9",
+        "fg": "#646e78",
+        "heading": "#384551",
+        "muted": "#a7acb2",
+        "border": "transparent",
+        "grid": "#eceef1",
+        "radius": "8px",
+        "shadow": "0 .1875rem .5rem 0 rgba(34,48,62,.1)",
+        "sidebar-bg": "#ffffff",
+        "sidebar-fg": "#384551",
+        "sidebar-border": "transparent",
+        "sidebar-active-bg": "#e7e7ff",
+        "sidebar-active-fg": "#696cff",
+        "header-bg": "#ffffff",
+        "header-blur": "none",
+        "palette": [
+          "#696cff",
+          "#71dd37",
+          "#ffab00",
+          "#ff3e1d",
+          "#03c3ec",
+          "#8592a3",
+          "#e83e8c",
+          "#20c997"
+        ]
+      },
+      "dark": {
+        "bg": "#232333",
+        "surface": "#2b2c40",
+        "fg": "#b2b2c4",
+        "heading": "#d5d5e2",
+        "muted": "#7c7d92",
+        "border": "#444564",
+        "grid": "#444564",
+        "sidebar-bg": "#2b2c40",
+        "sidebar-fg": "#d5d5e2",
+        "sidebar-active-bg": "rgba(105,108,255,.16)",
+        "header-bg": "#2b2c40"
+      },
+      "signature": "연보라(#696cff) 포인트, 연회색 배경과 그림자 있는 흰 카드. 활성 메뉴는 연보라 배경의 둥근 알약. KPI 카드 위쪽에 둥근 사각형 아이콘. 상단바도 떠 있는 흰 카드처럼."
+    },
+    "tailadmin": {
+      "kit": "dashboard",
+      "chartLib": "apexcharts",
+      "fonts": [
+        "Outfit"
+      ],
+      "layout": "sidebar",
+      "kpiStyle": "plain",
+      "tokens": {
+        "primary": "#465fff",
+        "bg": "#f9fafb",
+        "fg": "#1d2939",
+        "muted": "#667085",
+        "border": "#e4e7ec",
+        "grid": "#f2f4f7",
+        "radius": "16px",
+        "shadow": "none",
+        "sidebar-bg": "#ffffff",
+        "sidebar-fg": "#344054",
+        "sidebar-active-bg": "#ecf3ff",
+        "sidebar-active-fg": "#465fff",
+        "nav-radius": "8px",
+        "header-bg": "#ffffff",
+        "header-blur": "none",
+        "kpi-size": "1.9rem",
+        "palette": [
+          "#465fff",
+          "#9cb9ff",
+          "#12b76a",
+          "#f79009",
+          "#f04438",
+          "#7a5af8",
+          "#0ba5ec",
+          "#ee46bc"
+        ]
+      },
+      "dark": {
+        "bg": "#101828",
+        "surface": "#141c2c",
+        "fg": "#e4e7ec",
+        "muted": "#98a2b3",
+        "border": "#1d2939",
+        "grid": "#1d2939",
+        "sidebar-bg": "#101828",
+        "sidebar-fg": "#d0d5dd",
+        "sidebar-active-bg": "rgba(70,95,255,.12)",
+        "sidebar-active-fg": "#7592ff",
+        "header-bg": "#101828"
+      },
+      "signature": "크게 둥근(16px) 카드에 그림자 없이 테두리만. 파란(#465fff) 포인트. KPI 카드 왼쪽 위 회색 원형 아이콘, 숫자 옆 초록/빨강 배지. 막대 차트는 둥근 막대."
+    },
+    "flowbite-admin": {
+      "kit": "dashboard",
+      "libs": [
+        "flowbite"
+      ],
+      "chartLib": "apexcharts",
+      "fonts": [
+        "Inter"
+      ],
+      "layout": "sidebar",
+      "kpiStyle": "plain",
+      "tokens": {
+        "primary": "#1a56db",
+        "bg": "#f9fafb",
+        "fg": "#111827",
+        "muted": "#6b7280",
+        "border": "#e5e7eb",
+        "grid": "#f3f4f6",
+        "radius": "8px",
+        "shadow": "0 1px 2px rgba(0,0,0,.05)",
+        "sidebar-bg": "#ffffff",
+        "sidebar-active-bg": "#f3f4f6",
+        "sidebar-active-fg": "#111827",
+        "header-bg": "#ffffff",
+        "header-blur": "none",
+        "th-transform": "uppercase",
+        "palette": [
+          "#1a56db",
+          "#fdba8c",
+          "#16bdca",
+          "#7e3bf2",
+          "#e74694",
+          "#31c48d",
+          "#f05252",
+          "#facc15"
+        ]
+      },
+      "dark": {
+        "bg": "#111827",
+        "surface": "#1f2937",
+        "fg": "#f9fafb",
+        "muted": "#9ca3af",
+        "border": "#374151",
+        "grid": "#374151",
+        "sidebar-bg": "#1f2937",
+        "sidebar-active-bg": "#374151",
+        "sidebar-active-fg": "#ffffff",
+        "header-bg": "#1f2937"
+      },
+      "signature": "상단 고정 흰 내비바 + 왼쪽 흰 사이드바. 카드 radius 8px, 작은 그림자. 메인 영역 첫 카드에 큰 숫자 + 변화율 + 면적 차트, 오른쪽에 '최근 거래' 표."
+    },
+    "volt": {
+      "kit": "dashboard",
+      "chartLib": "chartjs",
+      "fonts": [
+        "Inter"
+      ],
+      "layout": "sidebar",
+      "kpiStyle": "plain",
+      "tokens": {
+        "primary": "#1f2937",
+        "bg": "#f2f4f6",
+        "fg": "#1f2937",
+        "muted": "#6b7280",
+        "border": "#e5e7eb",
+        "radius": "8px",
+        "shadow": "0 2px 18px rgba(0,0,0,.02)",
+        "sidebar-bg": "#1f2937",
+        "sidebar-fg": "#d1d5db",
+        "sidebar-muted": "#9ca3af",
+        "sidebar-border": "transparent",
+        "sidebar-active-bg": "#374151",
+        "sidebar-active-fg": "#ffffff",
+        "brand-bg": "#fb503b",
+        "header-bg": "transparent",
+        "header-border": "transparent",
+        "palette": [
+          "#1f2937",
+          "#fb503b",
+          "#31316a",
+          "#10b981",
+          "#f0bc74",
+          "#6366f1",
+          "#9ca3af",
+          "#ef4444"
+        ]
+      },
+      "dark": {
+        "primary": "#e5e7eb",
+        "bg": "#111827",
+        "surface": "#1f2937",
+        "sidebar-bg": "#0b1220",
+        "palette": [
+          "#e5e7eb",
+          "#fb503b",
+          "#8b8be0",
+          "#10b981",
+          "#f0bc74",
+          "#6366f1",
+          "#9ca3af",
+          "#ef4444"
+        ]
+      },
+      "signature": "짙은 남회색 사이드바(#1f2937)와 주황 포인트(#fb503b). 첫 줄에 넓은 판매 추이 카드(짙은 배경 위 흰 선 그래프), 그 아래 아이콘이 든 KPI 카드들."
+    },
+    "mazer": {
+      "kit": "dashboard",
+      "chartLib": "apexcharts",
+      "fonts": [
+        "Nunito"
+      ],
+      "layout": "sidebar",
+      "kpiStyle": "plain",
+      "tokens": {
+        "primary": "#435ebe",
+        "bg": "#f2f7ff",
+        "fg": "#607080",
+        "heading": "#25396f",
+        "muted": "#7c8db5",
+        "border": "transparent",
+        "grid": "#e6ecf5",
+        "radius": "11px",
+        "shadow": "none",
+        "sidebar-bg": "#ffffff",
+        "sidebar-fg": "#25396f",
+        "sidebar-border": "transparent",
+        "sidebar-active-bg": "#435ebe",
+        "sidebar-active-fg": "#ffffff",
+        "nav-radius": "8px",
+        "header-bg": "transparent",
+        "header-border": "transparent",
+        "card-title-weight": "700",
+        "palette": [
+          "#435ebe",
+          "#57caeb",
+          "#5ddab4",
+          "#ff7976",
+          "#9694ff",
+          "#ffc107",
+          "#6c757d",
+          "#20c997"
+        ]
+      },
+      "dark": {
+        "bg": "#151521",
+        "surface": "#1e1e2d",
+        "fg": "#c2c2d9",
+        "heading": "#e5e5f0",
+        "grid": "#2b2b40",
+        "sidebar-bg": "#1e1e2d",
+        "sidebar-fg": "#c2c2d9"
+      },
+      "signature": "연한 하늘색 배경(#f2f7ff), 그림자 없는 흰 카드. KPI 카드 왼쪽에 보라·파랑·초록·빨강 둥근 사각 아이콘. 활성 메뉴는 진한 파랑 채움. 제목은 Nunito 굵게."
+    },
+    "windmill": {
+      "kit": "dashboard",
+      "chartLib": "chartjs",
+      "fonts": [
+        "Inter"
+      ],
+      "layout": "sidebar",
+      "kpiStyle": "plain",
+      "tokens": {
+        "primary": "#7e3af2",
+        "bg": "#f9fafb",
+        "fg": "#4c4f52",
+        "heading": "#24262d",
+        "muted": "#707275",
+        "border": "#f4f5f7",
+        "radius": "8px",
+        "shadow": "0 0 0 1px rgba(0,0,0,.05)",
+        "sidebar-bg": "#ffffff",
+        "sidebar-fg": "#4c4f52",
+        "sidebar-border": "#f4f5f7",
+        "sidebar-active-bg": "transparent",
+        "sidebar-active-fg": "#24262d",
+        "nav-indicator-w": "4px",
+        "nav-radius": "0 8px 8px 0",
+        "header-bg": "#ffffff",
+        "header-blur": "none",
+        "palette": [
+          "#7e3af2",
+          "#0694a2",
+          "#ff5a1f",
+          "#0e9f6e",
+          "#3f83f8",
+          "#e74694",
+          "#c27803",
+          "#9061f9"
+        ]
+      },
+      "dark": {
+        "bg": "#121317",
+        "surface": "#1a1c23",
+        "fg": "#d5d6d7",
+        "heading": "#f4f5f7",
+        "muted": "#9e9e9e",
+        "border": "#24262d",
+        "grid": "#24262d",
+        "sidebar-bg": "#1a1c23",
+        "sidebar-fg": "#d5d6d7",
+        "sidebar-active-fg": "#f4f5f7",
+        "header-bg": "#1a1c23"
+      },
+      "signature": "보라(#7e3af2) 포인트, 활성 메뉴 왼쪽 보라 막대. KPI 카드 왼쪽에 주황·초록·파랑·청록 원형 아이콘. 표는 회색 머리글에 상태 배지. 다크 모드가 잘 어울림."
+    },
+    "material-dashboard": {
+      "kit": "dashboard",
+      "chartLib": "chartjs",
+      "fonts": [
+        "Roboto"
+      ],
+      "layout": "sidebar",
+      "kpiStyle": "accent",
+      "tokens": {
+        "primary": "#e91e63",
+        "bg": "#f0f2f5",
+        "fg": "#344767",
+        "muted": "#7b809a",
+        "border": "transparent",
+        "grid": "#e9ecef",
+        "radius": "12px",
+        "shadow": "0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06)",
+        "sidebar-bg": "linear-gradient(195deg, #42424a, #191919)",
+        "sidebar-fg": "#ffffff",
+        "sidebar-muted": "rgba(255,255,255,.6)",
+        "sidebar-border": "transparent",
+        "sidebar-active-bg": "linear-gradient(195deg, #ec407a, #d81b60)",
+        "sidebar-active-fg": "#ffffff",
+        "sidebar-active-shadow": "0 4px 20px 0 rgba(0,0,0,.14), 0 7px 10px -5px rgba(233,30,99,.4)",
+        "header-bg": "transparent",
+        "header-border": "transparent",
+        "palette": [
+          "#e91e63",
+          "#1a73e8",
+          "#4caf50",
+          "#fb8c00",
+          "#344767",
+          "#7b809a",
+          "#f44335",
+          "#00bcd4"
+        ]
+      },
+      "dark": {
+        "bg": "#1a2035",
+        "surface": "#202940",
+        "fg": "#ffffffcc",
+        "muted": "#a0a4b8",
+        "grid": "#2c3550"
+      },
+      "signature": "머티리얼 디자인. 짙은 그라데이션 사이드바, 활성 메뉴는 분홍 그라데이션 알약과 그림자. KPI 카드 왼쪽 위로 튀어나온 그라데이션 아이콘 박스, 차트 카드 상단에 색 그라데이션 차트 영역."
+    },
+    "soft-ui": {
+      "kit": "dashboard",
+      "chartLib": "chartjs",
+      "fonts": [
+        "Open Sans"
+      ],
+      "layout": "sidebar",
+      "kpiStyle": "plain",
+      "tokens": {
+        "primary": "#cb0c9f",
+        "bg": "#f8f9fa",
+        "fg": "#67748e",
+        "heading": "#344767",
+        "muted": "#8392ab",
+        "border": "transparent",
+        "grid": "#e9ecef",
+        "radius": "16px",
+        "shadow": "0 20px 27px 0 rgba(0,0,0,.05)",
+        "sidebar-bg": "#f8f9fa",
+        "sidebar-fg": "#67748e",
+        "sidebar-border": "transparent",
+        "sidebar-active-bg": "#ffffff",
+        "sidebar-active-fg": "#344767",
+        "sidebar-active-shadow": "0 20px 27px 0 rgba(0,0,0,.05)",
+        "nav-radius": "8px",
+        "brand-bg": "linear-gradient(310deg, #7928ca, #ff0080)",
+        "header-bg": "transparent",
+        "header-border": "transparent",
+        "palette": [
+          "#cb0c9f",
+          "#17c1e8",
+          "#82d616",
+          "#fbcf33",
+          "#ea0606",
+          "#3a416f",
+          "#7928ca",
+          "#627594"
+        ]
+      },
+      "dark": {
+        "bg": "#111322",
+        "surface": "#1a1d33",
+        "fg": "#a8b3c7",
+        "heading": "#e9ecef",
+        "sidebar-bg": "#111322",
+        "sidebar-active-bg": "#1a1d33",
+        "sidebar-active-fg": "#ffffff"
+      },
+      "signature": "부드러운 큰 그림자와 16px 둥근 모서리. 보라-분홍 그라데이션(#7928ca→#ff0080) 아이콘 상자. 활성 메뉴는 흰 카드처럼 떠 있음. 첫 줄 KPI 오른쪽에 그라데이션 아이콘."
+    },
+    "ant-design-pro": {
+      "kit": "dashboard",
+      "chartLib": "echarts",
+      "fonts": [],
+      "layout": "sidebar",
+      "kpiStyle": "plain",
+      "tokens": {
+        "primary": "#1677ff",
+        "bg": "#f5f5f5",
+        "fg": "rgba(0,0,0,.88)",
+        "muted": "rgba(0,0,0,.45)",
+        "border": "#f0f0f0",
+        "grid": "#f0f0f0",
+        "radius": "8px",
+        "shadow": "none",
+        "sidebar-bg": "#001529",
+        "sidebar-fg": "rgba(255,255,255,.75)",
+        "sidebar-muted": "rgba(255,255,255,.45)",
+        "sidebar-border": "transparent",
+        "sidebar-active-bg": "#1677ff",
+        "sidebar-active-fg": "#ffffff",
+        "nav-radius": "8px",
+        "header-bg": "#ffffff",
+        "header-blur": "none",
+        "kpi-size": "1.9rem",
+        "kpi-weight": "500",
+        "th-transform": "none",
+        "table-head-bg": "#fafafa",
+        "palette": [
+          "#5b8ff9",
+          "#5ad8a6",
+          "#5d7092",
+          "#f6bd16",
+          "#e8684a",
+          "#6dc8ec",
+          "#9270ca",
+          "#ff9d4d"
+        ]
+      },
+      "dark": {
+        "bg": "#000000",
+        "surface": "#141414",
+        "fg": "rgba(255,255,255,.85)",
+        "muted": "rgba(255,255,255,.45)",
+        "border": "#303030",
+        "grid": "#303030",
+        "header-bg": "#141414",
+        "table-head-bg": "#1d1d1d"
+      },
+      "signature": "Ant Design. 짙은 남색 사이드(#001529), 흰 헤더. 분석 페이지: 첫 줄 4개 지표 카드(제목·큰 숫자·작은 미니차트·하단 구분선 아래 '일 평균'), 그 아래 탭이 있는 큰 막대 차트 + 오른쪽 순위 목록. 표 머리글은 연회색 배경."
+    },
+    "shadcn-admin": {
+      "kit": "dashboard",
+      "chartLib": "echarts",
+      "fonts": [
+        "Inter"
+      ],
+      "layout": "sidebar",
+      "kpiStyle": "plain",
+      "tokens": {
+        "primary": "#18181b",
+        "primary-fg": "#fafafa",
+        "bg": "#ffffff",
+        "surface": "#ffffff",
+        "fg": "#09090b",
+        "muted": "#71717a",
+        "border": "#e4e4e7",
+        "grid": "#f4f4f5",
+        "radius": "12px",
+        "shadow": "0 1px 2px rgba(0,0,0,.05)",
+        "sidebar-bg": "#fafafa",
+        "sidebar-border": "#e4e4e7",
+        "sidebar-active-bg": "#f4f4f5",
+        "sidebar-active-fg": "#18181b",
+        "th-transform": "none",
+        "palette": [
+          "#18181b",
+          "#3b82f6",
+          "#22c55e",
+          "#f59e0b",
+          "#ef4444",
+          "#a855f7",
+          "#14b8a6",
+          "#71717a"
+        ]
+      },
+      "dark": {
+        "primary": "#fafafa",
+        "primary-fg": "#18181b",
+        "bg": "#09090b",
+        "surface": "#09090b",
+        "fg": "#fafafa",
+        "muted": "#a1a1aa",
+        "border": "#27272a",
+        "grid": "#27272a",
+        "sidebar-bg": "#09090b",
+        "sidebar-border": "#27272a",
+        "sidebar-active-bg": "#27272a",
+        "sidebar-active-fg": "#fafafa",
+        "palette": [
+          "#fafafa",
+          "#60a5fa",
+          "#4ade80",
+          "#fbbf24",
+          "#f87171",
+          "#c084fc",
+          "#2dd4bf",
+          "#a1a1aa"
+        ]
+      },
+      "signature": "shadcn/ui 관리자. 접히는 사이드바, 무채색(zinc), 개요 탭에 4개 KPI 카드(오른쪽 위 작은 아이콘) + 큰 막대 차트 + '최근 판매' 목록."
+    },
+    "catalyst": {
+      "kit": "dashboard",
+      "chartLib": "echarts",
+      "fonts": [
+        "Inter"
+      ],
+      "layout": "sidebar",
+      "kpiStyle": "divider",
+      "paid": true,
+      "tokens": {
+        "primary": "#18181b",
+        "primary-fg": "#ffffff",
+        "bg": "#ffffff",
+        "surface": "#ffffff",
+        "fg": "#09090b",
+        "muted": "#71717a",
+        "border": "rgba(9,9,11,.08)",
+        "grid": "#f4f4f5",
+        "radius": "8px",
+        "shadow": "none",
+        "sidebar-bg": "#f4f4f5",
+        "sidebar-border": "transparent",
+        "sidebar-active-bg": "#ffffff",
+        "sidebar-active-fg": "#09090b",
+        "sidebar-active-shadow": "0 1px 2px rgba(0,0,0,.06)",
+        "th-transform": "none",
+        "palette": [
+          "#18181b",
+          "#3b82f6",
+          "#10b981",
+          "#f59e0b",
+          "#ef4444",
+          "#8b5cf6",
+          "#71717a",
+          "#06b6d4"
+        ]
+      },
+      "dark": {
+        "primary": "#fafafa",
+        "primary-fg": "#18181b",
+        "bg": "#18181b",
+        "surface": "#18181b",
+        "fg": "#fafafa",
+        "muted": "#a1a1aa",
+        "border": "rgba(255,255,255,.1)",
+        "grid": "#27272a",
+        "sidebar-bg": "#09090b",
+        "sidebar-active-bg": "#27272a",
+        "sidebar-active-fg": "#ffffff",
+        "palette": [
+          "#fafafa",
+          "#60a5fa",
+          "#34d399",
+          "#fbbf24",
+          "#f87171",
+          "#a78bfa",
+          "#a1a1aa",
+          "#22d3ee"
+        ]
+      },
+      "signature": "Tailwind UI 공식 키트(유료). 카드 없이 구분선으로 나뉜 큰 숫자 KPI, 넉넉한 여백, zinc 무채색. 표도 테두리 없이 행 구분선만."
+    },
+    "metronic": {
+      "kit": "dashboard",
+      "chartLib": "apexcharts",
+      "fonts": [
+        "Inter"
+      ],
+      "layout": "sidebar",
+      "kpiStyle": "plain",
+      "paid": true,
+      "tokens": {
+        "primary": "#1b84ff",
+        "bg": "#fcfcfc",
+        "surface": "#ffffff",
+        "fg": "#071437",
+        "muted": "#78829d",
+        "border": "#f1f1f4",
+        "grid": "#f1f1f4",
+        "radius": "12px",
+        "shadow": "0 3px 4px 0 rgba(0,0,0,.03)",
+        "sidebar-bg": "#fcfcfc",
+        "sidebar-border": "#f1f1f4",
+        "sidebar-active-bg": "#f1f1f4",
+        "sidebar-active-fg": "#1b84ff",
+        "header-bg": "#ffffff",
+        "header-blur": "none",
+        "palette": [
+          "#1b84ff",
+          "#17c653",
+          "#f6b100",
+          "#f8285a",
+          "#7239ea",
+          "#99a1b7",
+          "#00b2ff",
+          "#ff6f1e"
+        ]
+      },
+      "dark": {
+        "bg": "#0d0e12",
+        "surface": "#111217",
+        "fg": "#f5f5f5",
+        "muted": "#808290",
+        "border": "#26272f",
+        "grid": "#26272f",
+        "sidebar-bg": "#0d0e12",
+        "sidebar-border": "#26272f",
+        "sidebar-active-bg": "#1b1c22",
+        "header-bg": "#0d0e12"
+      },
+      "signature": "상용 프리미엄 관리자(유료). 아주 옅은 테두리의 큰 카드, 남색 계열 굵은 제목, 파란 포인트. 정돈된 표와 진행률 막대, 아바타 목록."
+    },
+    "observable-framework": {
+      "kit": "dashboard",
+      "chartLib": "plot",
+      "fonts": [],
+      "layout": "sidebar",
+      "kpiStyle": "plain",
+      "tokens": {
+        "primary": "#4269d0",
+        "bg": "#ffffff",
+        "surface": "#fafafa",
+        "fg": "#1b1e23",
+        "muted": "#6b6b6b",
+        "border": "#ebebeb",
+        "grid": "#ebebeb",
+        "radius": "8px",
+        "shadow": "none",
+        "sidebar-bg": "#fafafa",
+        "sidebar-border": "#ebebeb",
+        "sidebar-active-bg": "transparent",
+        "sidebar-active-fg": "#4269d0",
+        "kpi-size": "2.4rem",
+        "kpi-weight": "500",
+        "th-transform": "none",
+        "header-bg": "#ffffff",
+        "palette": [
+          "#4269d0",
+          "#efb118",
+          "#ff725c",
+          "#6cc5b0",
+          "#3ca951",
+          "#ff8ab7",
+          "#a463f2",
+          "#97bbf5"
+        ]
+      },
+      "dark": {
+        "bg": "#161616",
+        "surface": "#1f1f1f",
+        "fg": "#dedede",
+        "muted": "#9a9a9a",
+        "border": "#333333",
+        "grid": "#333333",
+        "sidebar-bg": "#1a1a1a",
+        "sidebar-border": "#333333",
+        "header-bg": "#161616"
+      },
+      "signature": "Observable 데이터 앱. 회색 배경 카드 grid(grid-cols-4) 안에 큰 숫자(얇은 굵기)와 Plot 차트. 장식 최소, 차트가 주인공. 차트 제목은 h2, 부제는 h3 회색."
+    },
+    "quarto": {
+      "kit": "report",
+      "chartLib": "plotly",
+      "fonts": [],
+      "layout": "toc-right",
+      "tokens": {
+        "primary": "#2780e3",
+        "bg": "#ffffff",
+        "surface": "#ffffff",
+        "fg": "#343a40",
+        "muted": "#6c757d",
+        "border": "#dee2e6",
+        "grid": "#e9ecef",
+        "radius": "4px",
+        "shadow": "none",
+        "container": "1100px",
+        "palette": [
+          "#2780e3",
+          "#ff7518",
+          "#3fb618",
+          "#ff0039",
+          "#9954bb",
+          "#373a3c",
+          "#17a2b8",
+          "#e83e8c"
+        ]
+      },
+      "dark": {
+        "bg": "#222222",
+        "surface": "#222222",
+        "fg": "#dee2e6",
+        "border": "#434343",
+        "grid": "#434343"
+      },
+      "signature": "Quarto HTML 보고서. 제목 블록(제목·부제·저자·날짜 메타 그리드), 오른쪽 '목차' 고정 TOC, 본문 폭 약 750px. 콜아웃은 왼쪽 굵은 색 막대 + 머리글 줄. 그림 아래 캡션."
+    },
+    "tufte-css": {
+      "kit": "article",
+      "chartLib": "plot",
+      "fonts": [],
+      "fontKind": "serif",
+      "tokens": {
+        "font": "et-book, Palatino, 'Palatino Linotype', 'Book Antiqua', Georgia, 'Noto Serif KR', serif",
+        "primary": "#111111",
+        "bg": "#fffff8",
+        "surface": "#fffff8",
+        "fg": "#111111",
+        "muted": "#555555",
+        "border": "#cccccc",
+        "grid": "#e6e6dc",
+        "radius": "0",
+        "shadow": "none",
+        "palette": [
+          "#4e79a7",
+          "#e15759",
+          "#76b7b2",
+          "#f28e2b",
+          "#59a14f",
+          "#9c755f",
+          "#b07aa1",
+          "#bab0ac"
+        ],
+        "measure": "640px",
+        "wide": "960px",
+        "font-size": "18px"
+      },
+      "dark": {
+        "bg": "#151515",
+        "surface": "#151515",
+        "fg": "#dddddd",
+        "muted": "#aaaaaa",
+        "border": "#444444",
+        "grid": "#333333",
+        "primary": "#dddddd"
+      },
+      "signature": "에드워드 터프티 스타일. 크림색 종이(#fffff8), 세리프 본문, 본문 폭 55%와 넓은 오른쪽 여백(사이드노트·주석). 장식 없는 작은 차트, 격자선 최소. 제목은 이탤릭이 아닌 얇은 세리프.",
+      "css": "@font-face{font-family:et-book;src:url('https://cdn.jsdelivr.net/npm/tufte-css@1.9.0/et-book/et-book-roman-line-figures/et-book-roman-line-figures.woff') format('woff');font-weight:400;font-style:normal;font-display:swap}@font-face{font-family:et-book;src:url('https://cdn.jsdelivr.net/npm/tufte-css@1.9.0/et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.woff') format('woff');font-weight:400;font-style:italic;font-display:swap}@font-face{font-family:et-book;src:url('https://cdn.jsdelivr.net/npm/tufte-css@1.9.0/et-book/et-book-bold-line-figures/et-book-bold-line-figures.woff') format('woff');font-weight:700;font-style:normal;font-display:swap}.hc-article-head h1{font-weight:400;font-size:3.2rem;letter-spacing:0}.hc-article h2{font-weight:400;font-style:italic;font-size:2rem}.hc-subtitle{font-style:italic}.hc-numbers{border:0;padding:8px 0}.hc-number-value{font-size:2.4rem}.hc-byline{border-top:0}.hc-lede{font-size:1.3rem}.hc-prose p{font-size:1.2rem;line-height:1.75}",
+      "libsNote": "원본 tufte.css는 키트 레이아웃과 충돌해 쓰지 않고, 원본 서체(et-book)만 CDN에서 불러온다"
+    },
+    "mkdocs-material": {
+      "kit": "report",
+      "chartLib": "echarts",
+      "fonts": [
+        "Roboto"
+      ],
+      "layout": "docs",
+      "tokens": {
+        "primary": "#4051b5",
+        "bg": "#ffffff",
+        "surface": "#ffffff",
+        "fg": "rgba(0,0,0,.87)",
+        "muted": "rgba(0,0,0,.54)",
+        "border": "rgba(0,0,0,.07)",
+        "grid": "#eeeeee",
+        "radius": "4px",
+        "shadow": "none",
+        "header-bg": "#4051b5",
+        "header-fg": "#ffffff",
+        "header-border": "transparent",
+        "header-blur": "none",
+        "header-btn-border": "rgba(255,255,255,.4)",
+        "link": "#4051b5",
+        "container": "1220px",
+        "palette": [
+          "#4051b5",
+          "#526cfe",
+          "#00bfa5",
+          "#ff9100",
+          "#ff5252",
+          "#7c4dff",
+          "#00b0ff",
+          "#64dd17"
+        ]
+      },
+      "dark": {
+        "bg": "#1e2129",
+        "surface": "#1e2129",
+        "fg": "#e2e4e9",
+        "muted": "#a0a4b0",
+        "border": "#2e303e",
+        "grid": "#2e303e",
+        "header-bg": "#2e303e",
+        "link": "#8a9cf7"
+      },
+      "signature": "Material for MkDocs. 남색(indigo) 상단 헤더 바, 왼쪽 문서 내비, 오른쪽 '목차', 본문 0.8rem 대 문서체. 콜아웃은 admonition(왼쪽 색 막대 + 아이콘 제목줄)."
+    },
+    "starlight": {
+      "kit": "report",
+      "chartLib": "echarts",
+      "fonts": [],
+      "layout": "docs",
+      "theme": {
+        "attr": "data-bs-theme",
+        "light": "light",
+        "dark": "dark",
+        "default": "dark"
+      },
+      "tokens": {
+        "primary": "#3d5af1",
+        "bg": "#ffffff",
+        "surface": "#f6f6f6",
+        "fg": "#23262f",
+        "muted": "#545861",
+        "border": "#e0e0e0",
+        "grid": "#e8e8e8",
+        "radius": "6px",
+        "shadow": "none",
+        "header-bg": "#ffffff",
+        "header-blur": "none",
+        "link": "#3d5af1",
+        "container": "1300px",
+        "palette": [
+          "#3d5af1",
+          "#2bb673",
+          "#e8a33d",
+          "#e35252",
+          "#9b5de5",
+          "#00a6c0",
+          "#e85d9e",
+          "#8ab33f"
+        ]
+      },
+      "dark": {
+        "primary": "#9fb1ff",
+        "bg": "#17181c",
+        "surface": "#23262f",
+        "fg": "#dee1e6",
+        "muted": "#9aa0ab",
+        "border": "#353841",
+        "grid": "#2c2f37",
+        "header-bg": "#17181c",
+        "link": "#9fb1ff",
+        "palette": [
+          "#9fb1ff",
+          "#5fd39a",
+          "#f2c06b",
+          "#f08080",
+          "#c3a1f3",
+          "#5fd0e3",
+          "#f29bc4",
+          "#b5d67a"
+        ]
+      },
+      "signature": "Astro Starlight 문서. 기본 다크, 왼쪽 사이드바 + 오른쪽 '이 페이지' TOC, 얇은 경계선, 차분한 남보라 강조색. 콜아웃은 aside(note/tip/caution/danger)."
+    },
+    "distill": {
+      "kit": "article",
+      "chartLib": "plot",
+      "fonts": [],
+      "layout": "distill",
+      "tokens": {
+        "font": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Pretendard Variable', Pretendard, 'Helvetica Neue', Arial, sans-serif",
+        "primary": "#1a73e8",
+        "bg": "#ffffff",
+        "surface": "#ffffff",
+        "fg": "rgba(0,0,0,.85)",
+        "muted": "rgba(0,0,0,.55)",
+        "border": "rgba(0,0,0,.1)",
+        "grid": "#eeeeee",
+        "radius": "0",
+        "shadow": "none",
+        "palette": [
+          "#3366cc",
+          "#dc3912",
+          "#ff9900",
+          "#109618",
+          "#990099",
+          "#0099c6",
+          "#dd4477",
+          "#66aa00"
+        ],
+        "measure": "648px",
+        "wide": "984px",
+        "font-size": "18px"
+      },
+      "dark": {
+        "bg": "#121212",
+        "surface": "#121212",
+        "fg": "rgba(255,255,255,.88)",
+        "muted": "rgba(255,255,255,.6)",
+        "border": "rgba(255,255,255,.14)",
+        "grid": "#2a2a2a",
+        "primary": "#8ab4f8"
+      },
+      "signature": "Distill 학술 아티클. 큰 굵은 제목, 저자·소속·날짜 바이라인 그리드, 본문 폭 약 650px에 그림은 더 넓게(l-page). 각주와 인용, 인터랙티브 그림.",
+      "css": ".hc-article-head h1{font-size:3.1rem;font-weight:700;letter-spacing:-.02em}.hc-byline{grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--hc-border);border-bottom:1px solid var(--hc-border);padding:14px 0}.hc-article h2{font-size:1.75rem;font-weight:700}.hc-figcap{font-size:.8rem}"
+    },
+    "astrowind": {
+      "kit": "landing",
+      "chartLib": "echarts",
+      "fonts": [
+        "Inter"
+      ],
+      "tokens": {
+        "primary": "#0161ef",
+        "accent": "#6d28d9",
+        "bg": "#ffffff",
+        "surface": "#ffffff",
+        "fg": "#111827",
+        "muted": "#4b5563",
+        "border": "#e5e7eb",
+        "grid": "#f3f4f6",
+        "radius": "8px",
+        "shadow": "0 4px 30px rgba(0,0,0,.06)",
+        "hero-bg": "linear-gradient(180deg, #f8fafc, #ffffff)",
+        "hero-accent": "linear-gradient(90deg, #0161ef, #6d28d9)",
+        "palette": [
+          "#0161ef",
+          "#6d28d9",
+          "#10b981",
+          "#f59e0b",
+          "#ef4444",
+          "#06b6d4",
+          "#ec4899",
+          "#84cc16"
+        ]
+      },
+      "dark": {
+        "bg": "#030620",
+        "surface": "#0b1033",
+        "fg": "#e5e7eb",
+        "muted": "#9ca3af",
+        "border": "#1e2547",
+        "grid": "#1e2547",
+        "hero-bg": "linear-gradient(180deg, #030620, #0b1033)"
+      },
+      "signature": "Astro 랜딩. 큰 굵은 제목에 그라데이션 강조 단어, 가운데 정렬 히어로와 두 개의 버튼. 아래로 숫자 통계 줄, 아이콘 특징 그리드(2~3열), 단계(Steps), FAQ."
+    },
+    "cruip-open-pro": {
+      "kit": "landing",
+      "chartLib": "echarts",
+      "fonts": [
+        "Inter"
+      ],
+      "theme": {
+        "attr": "data-bs-theme",
+        "light": "light",
+        "dark": "dark",
+        "default": "dark"
+      },
+      "tokens": {
+        "primary": "#6366f1",
+        "accent": "#a5b4fc",
+        "bg": "#ffffff",
+        "surface": "#f9fafb",
+        "fg": "#111827",
+        "muted": "#4b5563",
+        "border": "#e5e7eb",
+        "grid": "#f3f4f6",
+        "radius": "12px",
+        "shadow": "none",
+        "hero-bg": "radial-gradient(60% 50% at 50% 0%, rgba(99,102,241,.18), transparent)",
+        "hero-accent": "linear-gradient(90deg, #6366f1, #a5b4fc, #e5e7eb)",
+        "palette": [
+          "#6366f1",
+          "#a5b4fc",
+          "#22d3ee",
+          "#f472b6",
+          "#facc15",
+          "#34d399",
+          "#fb923c",
+          "#94a3b8"
+        ]
+      },
+      "dark": {
+        "bg": "#030712",
+        "surface": "#0b1120",
+        "fg": "#e5e7eb",
+        "muted": "#9ca3af",
+        "border": "#1f2937",
+        "grid": "#1f2937",
+        "hero-bg": "radial-gradient(60% 50% at 50% 0%, rgba(99,102,241,.28), transparent)"
+      },
+      "signature": "어두운 배경(#030712)의 SaaS 랜딩. 제목은 인디고→회색 그라데이션 글자, 히어로 뒤에 은은한 인디고 빛 번짐. 카드에 얇은 그라데이션 테두리."
+    },
+    "cruip-simple": {
+      "kit": "landing",
+      "chartLib": "echarts",
+      "fonts": [
+        "Inter"
+      ],
+      "tokens": {
+        "primary": "#2563eb",
+        "accent": "#60a5fa",
+        "bg": "#ffffff",
+        "surface": "#f9fafb",
+        "fg": "#111827",
+        "muted": "#4b5563",
+        "border": "#e5e7eb",
+        "grid": "#f3f4f6",
+        "radius": "12px",
+        "shadow": "0 1px 3px rgba(0,0,0,.06)",
+        "hero-bg": "radial-gradient(50% 60% at 50% 0%, rgba(37,99,235,.12), transparent)",
+        "hero-accent": "linear-gradient(90deg, #2563eb, #60a5fa)",
+        "palette": [
+          "#2563eb",
+          "#60a5fa",
+          "#10b981",
+          "#f59e0b",
+          "#ef4444",
+          "#8b5cf6",
+          "#06b6d4",
+          "#94a3b8"
+        ]
+      },
+      "dark": {
+        "bg": "#0b1120",
+        "surface": "#111827",
+        "fg": "#e5e7eb",
+        "muted": "#9ca3af",
+        "border": "#1f2937",
+        "grid": "#1f2937"
+      },
+      "signature": "밝고 단정한 Tailwind 랜딩. 흰 배경, 파란 강조, 둥근 카드와 은은한 파란 배경 번짐. 섹션마다 작은 라벨(eyebrow) + 큰 제목 + 회색 설명."
+    },
+    "html5up-massively": {
+      "kit": "landing",
+      "chartLib": "chartjs",
+      "fonts": [
+        "Merriweather",
+        "Source Sans 3"
+      ],
+      "credit": "Design: HTML5 UP (CC BY 3.0)",
+      "tokens": {
+        "font": "'Source Sans 3', 'Pretendard Variable', Pretendard, sans-serif",
+        "font-heading": "'Merriweather', 'Noto Serif KR', Georgia, serif",
+        "primary": "#18bfef",
+        "accent": "#18bfef",
+        "bg": "#ffffff",
+        "surface": "#ffffff",
+        "fg": "#212931",
+        "muted": "#909498",
+        "border": "#eeeeee",
+        "grid": "#eeeeee",
+        "radius": "0",
+        "shadow": "none",
+        "hero-bg": "linear-gradient(rgba(33,41,49,.75), rgba(33,41,49,.92)), repeating-linear-gradient(45deg, #2b3640 0 2px, #212931 2px 14px)",
+        "hero-fg": "#ffffff",
+        "hero-accent": "linear-gradient(90deg, #ffffff, #ffffff)",
+        "heading-transform": "uppercase",
+        "palette": [
+          "#18bfef",
+          "#212931",
+          "#909498",
+          "#ff6b6b",
+          "#f6c344",
+          "#5dc19b",
+          "#9b7fd4",
+          "#c8ccd0"
+        ]
+      },
+      "dark": {
+        "bg": "#1b2127",
+        "surface": "#212931",
+        "fg": "#e6e6e6",
+        "muted": "#a0a4a8",
+        "border": "#333d47",
+        "grid": "#333d47"
+      },
+      "signature": "HTML5 UP Massively. 어두운 사진 배경 위 거대한 세리프(Merriweather) 대문자 제목, 흰 테두리 박스 내비. 본문은 흰 종이 위 2열 글 카드, 굵은 대문자 소제목. CC BY 3.0 출처 표기 필요."
+    },
+    "sb-agency": {
+      "kit": "landing",
+      "chartLib": "chartjs",
+      "fonts": [
+        "Montserrat",
+        "Roboto Slab"
+      ],
+      "tokens": {
+        "font": "'Roboto Slab', 'Pretendard Variable', Pretendard, serif",
+        "font-heading": "'Montserrat', 'Pretendard Variable', Pretendard, sans-serif",
+        "primary": "#ffc800",
+        "primary-fg": "#212529",
+        "accent": "#ffc800",
+        "bg": "#ffffff",
+        "surface": "#f8f9fa",
+        "fg": "#212529",
+        "muted": "#6c757d",
+        "border": "#dee2e6",
+        "grid": "#eeeeee",
+        "radius": "4px",
+        "shadow": "none",
+        "hero-bg": "linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.75)), linear-gradient(135deg, #343a40, #212529)",
+        "hero-fg": "#ffffff",
+        "hero-accent": "linear-gradient(90deg, #ffc800, #ffc800)",
+        "heading-transform": "uppercase",
+        "palette": [
+          "#ffc800",
+          "#212529",
+          "#6c757d",
+          "#17a2b8",
+          "#dc3545",
+          "#28a745",
+          "#6610f2",
+          "#fd7e14"
+        ]
+      },
+      "dark": {
+        "bg": "#16191c",
+        "surface": "#212529",
+        "fg": "#e9ecef",
+        "muted": "#adb5bd",
+        "border": "#343a40",
+        "grid": "#343a40"
+      },
+      "signature": "Start Bootstrap Agency. 사진 마스트헤드 위 '환영합니다' 이탤릭 + 거대한 대문자 제목, 노란(#ffc800) 대문자 버튼. 섹션 제목은 Montserrat 대문자 + 회색 이탤릭 부제. 원형 아이콘 서비스 3열."
+    },
+    "salient": {
+      "kit": "landing",
+      "chartLib": "echarts",
+      "fonts": [
+        "Lexend",
+        "Inter"
+      ],
+      "paid": true,
+      "tokens": {
+        "font": "'Inter', 'Pretendard Variable', Pretendard, sans-serif",
+        "font-heading": "'Lexend', 'Pretendard Variable', Pretendard, sans-serif",
+        "primary": "#2563eb",
+        "accent": "#2563eb",
+        "bg": "#ffffff",
+        "surface": "#f8fafc",
+        "fg": "#0f172a",
+        "muted": "#475569",
+        "border": "#e2e8f0",
+        "grid": "#f1f5f9",
+        "radius": "16px",
+        "shadow": "0 1px 3px rgba(15,23,42,.08)",
+        "hero-bg": "#ffffff",
+        "hero-accent": "linear-gradient(90deg, #2563eb, #2563eb)",
+        "palette": [
+          "#2563eb",
+          "#0f172a",
+          "#38bdf8",
+          "#f59e0b",
+          "#10b981",
+          "#ef4444",
+          "#8b5cf6",
+          "#94a3b8"
+        ]
+      },
+      "dark": {
+        "bg": "#0f172a",
+        "surface": "#1e293b",
+        "fg": "#e2e8f0",
+        "muted": "#94a3b8",
+        "border": "#334155",
+        "grid": "#334155",
+        "hero-bg": "#0f172a"
+      },
+      "signature": "Tailwind UI Salient(유료). 흰 배경 큰 Lexend 제목, 강조 단어에 파란 손글씨 밑줄. 파란 배경 기능 탭 섹션, 둥근 알약 버튼."
+    },
+    "radiant": {
+      "kit": "landing",
+      "chartLib": "echarts",
+      "fonts": [
+        "Inter"
+      ],
+      "paid": true,
+      "tokens": {
+        "primary": "#030712",
+        "primary-fg": "#ffffff",
+        "accent": "#b060ff",
+        "bg": "#ffffff",
+        "surface": "#ffffff",
+        "fg": "#030712",
+        "muted": "#4b5563",
+        "border": "rgba(3,7,18,.08)",
+        "grid": "#f3f4f6",
+        "radius": "16px",
+        "shadow": "0 1px 2px rgba(0,0,0,.05), 0 0 0 1px rgba(3,7,18,.05)",
+        "hero-bg": "linear-gradient(115deg, #fff1be 28%, #ee87cb 70%, #b060ff)",
+        "hero-accent": "linear-gradient(90deg, #030712, #030712)",
+        "palette": [
+          "#030712",
+          "#b060ff",
+          "#ee87cb",
+          "#f5b400",
+          "#4b5563",
+          "#22c55e",
+          "#3b82f6",
+          "#d1d5db"
+        ]
+      },
+      "dark": {
+        "bg": "#030712",
+        "surface": "#0b0f1a",
+        "fg": "#f3f4f6",
+        "muted": "#9ca3af",
+        "border": "rgba(255,255,255,.1)",
+        "grid": "#1f2937",
+        "primary": "#f3f4f6",
+        "primary-fg": "#030712",
+        "palette": [
+          "#f3f4f6",
+          "#b060ff",
+          "#ee87cb",
+          "#f5b400",
+          "#9ca3af",
+          "#22c55e",
+          "#60a5fa",
+          "#4b5563"
+        ]
+      },
+      "signature": "Tailwind UI Radiant(유료). 노랑→분홍→보라 파스텔 그라데이션 히어로 위 아주 큰 검정 제목, 흰 둥근 카드(bento grid), 검정 알약 버튼."
+    },
+    "revealjs": {
+      "kit": "slides",
+      "libs": [
+        "reveal",
+        "reveal-white"
+      ],
+      "chartLib": "echarts",
+      "fonts": [
+        "Source Sans 3"
+      ],
+      "tokens": {
+        "font": "'Source Sans 3', 'Pretendard Variable', Pretendard, Helvetica, sans-serif",
+        "primary": "#2a76dd",
+        "bg": "#ffffff",
+        "surface": "#ffffff",
+        "fg": "#222222",
+        "muted": "#666666",
+        "border": "#dddddd",
+        "grid": "#eeeeee",
+        "radius": "6px",
+        "shadow": "none",
+        "palette": [
+          "#2a76dd",
+          "#e7298a",
+          "#1b9e77",
+          "#d95f02",
+          "#7570b3",
+          "#66a61e",
+          "#e6ab02",
+          "#a6761d"
+        ]
+      },
+      "dark": {
+        "bg": "#191919",
+        "surface": "#222222",
+        "fg": "#eeeeee",
+        "muted": "#aaaaaa",
+        "border": "#444444",
+        "grid": "#333333",
+        "primary": "#42affa"
+      },
+      "signature": "reveal.js 기본 white 테마. 흰 배경, 대문자 굵은 제목, 가운데 정렬, 진행 막대와 슬라이드 번호. 글머리표는 하나씩 등장(fragment)."
+    },
+    "slidev": {
+      "kit": "slides",
+      "libs": [
+        "reveal"
+      ],
+      "chartLib": "echarts",
+      "fonts": [
+        "Nunito Sans"
+      ],
+      "tokens": {
+        "font": "'Nunito Sans', 'Pretendard Variable', Pretendard, sans-serif",
+        "primary": "#3ab9d4",
+        "bg": "#ffffff",
+        "surface": "#ffffff",
+        "fg": "#181818",
+        "muted": "#6b7280",
+        "border": "#e5e7eb",
+        "grid": "#f0f0f0",
+        "radius": "6px",
+        "shadow": "none",
+        "slide-align": "left",
+        "slide-h-transform": "none",
+        "palette": [
+          "#3ab9d4",
+          "#2b90b6",
+          "#f59e0b",
+          "#ef4444",
+          "#10b981",
+          "#8b5cf6",
+          "#ec4899",
+          "#64748b"
+        ]
+      },
+      "dark": {
+        "bg": "#121212",
+        "surface": "#1b1b1b",
+        "fg": "#e5e7eb",
+        "muted": "#9ca3af",
+        "border": "#2e2e2e",
+        "grid": "#2a2a2a"
+      },
+      "signature": "Slidev 기본 테마. 왼쪽 정렬 제목(대문자 아님), 넉넉한 여백, 청록 포인트, 코드·도표 중심의 개발자 발표 느낌."
+    },
+    "impressjs": {
+      "kit": "impress",
+      "libs": [
+        "impress"
+      ],
+      "chartLib": "echarts",
+      "fonts": [
+        "Open Sans"
+      ],
+      "tokens": {
+        "font": "'Open Sans', 'Pretendard Variable', Pretendard, sans-serif",
+        "primary": "#2563eb",
+        "bg": "radial-gradient(#f0f0f0, #bebebe)",
+        "surface": "#ffffff",
+        "fg": "#303030",
+        "muted": "#666666",
+        "border": "#dddddd",
+        "grid": "#eeeeee",
+        "radius": "10px",
+        "shadow": "0 2px 6px rgba(0,0,0,.1)",
+        "palette": [
+          "#2563eb",
+          "#e11d48",
+          "#16a34a",
+          "#f59e0b",
+          "#7c3aed",
+          "#0891b2",
+          "#db2777",
+          "#65a30d"
+        ]
+      },
+      "dark": {
+        "bg": "radial-gradient(#2a2a2a, #111111)",
+        "surface": "#1e1e1e",
+        "fg": "#e5e5e5",
+        "muted": "#a3a3a3",
+        "border": "#333333",
+        "grid": "#333333"
+      },
+      "signature": "impress.js 데모. 회색 방사형 배경 위에 흰 카드 슬라이드가 3D 공간에 배치되고 이동·회전·확대로 전환. 개요 슬라이드에서 전체를 한눈에."
+    },
+    "echarts": {
+      "kit": "dashboard",
+      "chartLib": "echarts",
+      "chartOnly": true,
+      "tokens": {
+        "palette": [
+          "#5470c6",
+          "#91cc75",
+          "#fac858",
+          "#ee6666",
+          "#73c0de",
+          "#3ba272",
+          "#fc8452",
+          "#9a60b4"
+        ],
+        "primary": "#5470c6"
+      },
+      "signature": "Apache ECharts 기본 팔레트. 많은 데이터·복합 차트·확대(dataZoom)에 강함."
+    },
+    "chartjs": {
+      "kit": "dashboard",
+      "chartLib": "chartjs",
+      "chartOnly": true,
+      "tokens": {
+        "palette": [
+          "#36a2eb",
+          "#ff6384",
+          "#4bc0c0",
+          "#ff9f40",
+          "#9966ff",
+          "#ffcd56",
+          "#c9cbcf",
+          "#2f7ed8"
+        ],
+        "primary": "#36a2eb"
+      },
+      "signature": "Chart.js 기본 팔레트. 가볍고 단순한 캔버스 차트."
+    },
+    "plotly": {
+      "kit": "dashboard",
+      "chartLib": "plotly",
+      "chartOnly": true,
+      "tokens": {
+        "palette": [
+          "#636efa",
+          "#ef553b",
+          "#00cc96",
+          "#ab63fa",
+          "#ffa15a",
+          "#19d3f3",
+          "#ff6692",
+          "#b6e880"
+        ],
+        "primary": "#636efa"
+      },
+      "signature": "Plotly 기본(plotly) 팔레트. 과학·통계 차트, 확대·호버가 풍부함."
+    },
+    "observable-plot": {
+      "kit": "dashboard",
+      "chartLib": "plot",
+      "chartOnly": true,
+      "tokens": {
+        "palette": [
+          "#4269d0",
+          "#efb118",
+          "#ff725c",
+          "#6cc5b0",
+          "#3ca951",
+          "#ff8ab7",
+          "#a463f2",
+          "#97bbf5"
+        ],
+        "primary": "#4269d0"
+      },
+      "signature": "Observable Plot의 observable10 팔레트. 문법 기반의 간결한 탐색 차트."
+    },
+    "apexcharts": {
+      "kit": "dashboard",
+      "chartLib": "apexcharts",
+      "chartOnly": true,
+      "tokens": {
+        "palette": [
+          "#008ffb",
+          "#00e396",
+          "#feb019",
+          "#ff4560",
+          "#775dd0",
+          "#3f51b5",
+          "#03a9f4",
+          "#4caf50"
+        ],
+        "primary": "#008ffb"
+      },
+      "signature": "ApexCharts 기본 팔레트. 대시보드용 애니메이션 차트. 상업적 사용은 라이선스 조건 확인."
+    },
+    "bootstrap-examples": {
+      "kit": "dashboard",
+      "libs": [
+        "bootstrap"
+      ],
+      "chartLib": "chartjs",
+      "fonts": [],
+      "layout": "sidebar",
+      "kpiStyle": "plain",
+      "classMap": {
+        "hc-table": "table table-striped table-sm"
+      },
+      "tokens": {
+        "primary": "#0d6efd",
+        "bg": "#ffffff",
+        "surface": "#ffffff",
+        "fg": "#212529",
+        "muted": "#6c757d",
+        "border": "#dee2e6",
+        "grid": "#e9ecef",
+        "radius": "6px",
+        "shadow": "none",
+        "sidebar-bg": "#f8f9fa",
+        "sidebar-border": "#dee2e6",
+        "sidebar-active-bg": "transparent",
+        "sidebar-active-fg": "#0d6efd",
+        "header-bg": "#212529",
+        "header-fg": "#ffffff",
+        "header-border": "transparent",
+        "header-blur": "none",
+        "header-btn-border": "rgba(255,255,255,.3)",
+        "palette": [
+          "#0d6efd",
+          "#6c757d",
+          "#198754",
+          "#dc3545",
+          "#ffc107",
+          "#0dcaf0",
+          "#6f42c1",
+          "#fd7e14"
+        ]
+      },
+      "dark": {
+        "bg": "#212529",
+        "surface": "#2b3035",
+        "sidebar-bg": "#2b3035",
+        "header-bg": "#151719"
+      },
+      "signature": "Bootstrap 공식 Dashboard 예제. 검은 상단 내비바, 연회색 사이드바, 흰 본문에 큰 선 차트 하나와 줄무늬 표. 꾸밈 최소의 기본기."
+    },
+    "shadcn-blocks": {
+      "kit": "dashboard",
+      "chartLib": "echarts",
+      "fonts": [
+        "Geist"
+      ],
+      "layout": "sidebar",
+      "kpiStyle": "plain",
+      "tokens": {
+        "primary": "#171717",
+        "primary-fg": "#fafafa",
+        "bg": "#ffffff",
+        "surface": "#ffffff",
+        "fg": "#0a0a0a",
+        "muted": "#737373",
+        "border": "#e5e5e5",
+        "grid": "#f0f0f0",
+        "radius": "12px",
+        "shadow": "0 1px 2px rgba(0,0,0,.05)",
+        "sidebar-bg": "#fafafa",
+        "sidebar-border": "#e5e5e5",
+        "sidebar-active-bg": "#f0f0f0",
+        "sidebar-active-fg": "#171717",
+        "th-transform": "none",
+        "palette": [
+          "#e76e50",
+          "#2a9d90",
+          "#274754",
+          "#e8c468",
+          "#f4a462",
+          "#737373",
+          "#171717",
+          "#a3a3a3"
+        ]
+      },
+      "dark": {
+        "primary": "#e5e5e5",
+        "primary-fg": "#171717",
+        "bg": "#0a0a0a",
+        "surface": "#0a0a0a",
+        "fg": "#fafafa",
+        "muted": "#a3a3a3",
+        "border": "#262626",
+        "grid": "#262626",
+        "sidebar-bg": "#0a0a0a",
+        "sidebar-border": "#262626",
+        "sidebar-active-bg": "#262626",
+        "sidebar-active-fg": "#fafafa",
+        "palette": [
+          "#2662d9",
+          "#2eb88a",
+          "#e88c30",
+          "#af57db",
+          "#e23670",
+          "#a3a3a3",
+          "#fafafa",
+          "#737373"
+        ]
+      },
+      "signature": "shadcn/ui 블록·차트 모음. 무채색 UI 위에 shadcn 차트 팔레트(주황·청록·남색·노랑). 카드 하단에 '추세 ↑ 5.2% 이번 달' 같은 각주 줄."
+    },
+    "daisyui": {
+      "kit": "dashboard",
+      "libs": [
+        "tailwind",
+        "daisyui"
+      ],
+      "chartLib": "echarts",
+      "fonts": [],
+      "layout": "sidebar",
+      "kpiStyle": "plain",
+      "classMap": {
+        "hc-table": "table table-zebra",
+        "hc-btn": "btn btn-sm btn-ghost",
+        "hc-input": "input input-sm"
+      },
+      "theme": {
+        "attr": "data-theme",
+        "light": "light",
+        "dark": "dark",
+        "default": "light"
+      },
+      "tokens": {
+        "primary": "var(--color-primary)",
+        "primary-fg": "var(--color-primary-content)",
+        "bg": "var(--color-base-200)",
+        "surface": "var(--color-base-100)",
+        "fg": "var(--color-base-content)",
+        "muted": "color-mix(in oklab, var(--color-base-content) 60%, transparent)",
+        "border": "color-mix(in oklab, var(--color-base-content) 10%, transparent)",
+        "grid": "color-mix(in oklab, var(--color-base-content) 8%, transparent)",
+        "radius": "var(--radius-box)",
+        "shadow": "0 1px 2px rgba(0,0,0,.05)",
+        "sidebar-bg": "var(--color-base-100)",
+        "sidebar-fg": "var(--color-base-content)",
+        "sidebar-active-bg": "var(--color-neutral)",
+        "sidebar-active-fg": "var(--color-neutral-content)",
+        "header-bg": "var(--color-base-100)",
+        "header-blur": "none",
+        "good": "var(--color-success)",
+        "bad": "var(--color-error)",
+        "warn": "var(--color-warning)",
+        "palette": [
+          "var(--color-primary)",
+          "var(--color-secondary)",
+          "var(--color-accent)",
+          "var(--color-info)",
+          "var(--color-success)",
+          "var(--color-warning)",
+          "var(--color-error)",
+          "var(--color-neutral)"
+        ]
+      },
+      "dark": {
+        "bg": "var(--color-base-200)",
+        "surface": "var(--color-base-100)",
+        "fg": "var(--color-base-content)",
+        "border": "color-mix(in oklab, var(--color-base-content) 10%, transparent)",
+        "grid": "color-mix(in oklab, var(--color-base-content) 8%, transparent)",
+        "sidebar-bg": "var(--color-base-100)",
+        "sidebar-fg": "var(--color-base-content)",
+        "shadow": "none",
+        "good": "var(--color-success)",
+        "bad": "var(--color-error)",
+        "warn": "var(--color-warning)"
+      },
+      "themes": "daisyUI 테마 이름을 theme.light/theme.dark에 넣으면 전체 색이 바뀐다: light, dark, corporate, business, cupcake, emerald, nord, winter, dim, night 등",
+      "signature": "daisyUI 컴포넌트 테마. 테마 하나로 모든 색이 바뀜(corporate·business·nord 등). stat 컴포넌트(제목·큰 숫자·설명), 줄무늬 표, 둥근 버튼."
+    },
+    "flowbite": {
+      "kit": "dashboard",
+      "libs": [
+        "flowbite"
+      ],
+      "chartLib": "apexcharts",
+      "fonts": [
+        "Inter"
+      ],
+      "layout": "topnav",
+      "kpiStyle": "plain",
+      "tokens": {
+        "primary": "#1a56db",
+        "bg": "#f9fafb",
+        "fg": "#111827",
+        "muted": "#6b7280",
+        "border": "#e5e7eb",
+        "grid": "#f3f4f6",
+        "radius": "8px",
+        "shadow": "0 1px 2px rgba(0,0,0,.05)",
+        "header-bg": "#ffffff",
+        "header-blur": "none",
+        "th-transform": "uppercase",
+        "table-head-bg": "#f9fafb",
+        "palette": [
+          "#1a56db",
+          "#16bdca",
+          "#fdba8c",
+          "#7e3bf2",
+          "#e74694",
+          "#31c48d",
+          "#f05252",
+          "#facc15"
+        ]
+      },
+      "dark": {
+        "bg": "#111827",
+        "surface": "#1f2937",
+        "fg": "#f9fafb",
+        "muted": "#9ca3af",
+        "border": "#374151",
+        "grid": "#374151",
+        "header-bg": "#1f2937",
+        "table-head-bg": "#374151"
+      },
+      "signature": "Flowbite 컴포넌트. 회색 머리글 표(대문자 작은 글씨), 파란 기본 버튼, ApexCharts 차트 카드(큰 숫자 + 변화율 + 차트 + 하단 드롭다운/링크)."
+    },
+    "preline": {
+      "kit": "dashboard",
+      "chartLib": "apexcharts",
+      "fonts": [
+        "Inter"
+      ],
+      "layout": "sidebar",
+      "kpiStyle": "plain",
+      "tokens": {
+        "primary": "#2563eb",
+        "bg": "#f9fafb",
+        "surface": "#ffffff",
+        "fg": "#1f2937",
+        "muted": "#6b7280",
+        "border": "#e5e7eb",
+        "grid": "#f3f4f6",
+        "radius": "12px",
+        "shadow": "0 1px 2px rgba(0,0,0,.05)",
+        "sidebar-bg": "#ffffff",
+        "sidebar-active-bg": "#f3f4f6",
+        "sidebar-active-fg": "#1f2937",
+        "header-bg": "#ffffff",
+        "header-blur": "none",
+        "th-transform": "uppercase",
+        "table-head-bg": "#f9fafb",
+        "palette": [
+          "#2563eb",
+          "#22d3ee",
+          "#a855f7",
+          "#f59e0b",
+          "#10b981",
+          "#f43f5e",
+          "#6366f1",
+          "#94a3b8"
+        ]
+      },
+      "dark": {
+        "bg": "#171717",
+        "surface": "#262626",
+        "fg": "#e5e5e5",
+        "muted": "#a3a3a3",
+        "border": "#404040",
+        "grid": "#404040",
+        "sidebar-bg": "#262626",
+        "sidebar-active-bg": "#404040",
+        "sidebar-active-fg": "#ffffff",
+        "header-bg": "#262626",
+        "table-head-bg": "#262626"
+      },
+      "signature": "Preline UI. 12px 둥근 흰 카드, 얇은 테두리, 파란 포인트. KPI 카드에 작은 대문자 라벨과 물음표 툴팁, 큰 숫자 옆 초록 변화율."
+    },
+    "carbon": {
+      "kit": "dashboard",
+      "chartLib": "echarts",
+      "fonts": [
+        "IBM Plex Sans",
+        "IBM Plex Sans KR"
+      ],
+      "layout": "sidebar",
+      "kpiStyle": "topline",
+      "tokens": {
+        "font": "'IBM Plex Sans', 'IBM Plex Sans KR', 'Pretendard Variable', sans-serif",
+        "primary": "#0f62fe",
+        "bg": "#f4f4f4",
+        "surface": "#ffffff",
+        "fg": "#161616",
+        "muted": "#525252",
+        "border": "#e0e0e0",
+        "grid": "#e0e0e0",
+        "radius": "0",
+        "shadow": "none",
+        "sidebar-bg": "#ffffff",
+        "sidebar-fg": "#161616",
+        "sidebar-border": "#e0e0e0",
+        "sidebar-active-bg": "#e0e0e0",
+        "sidebar-active-fg": "#161616",
+        "nav-indicator-w": "3px",
+        "nav-radius": "0",
+        "header-bg": "#161616",
+        "header-fg": "#f4f4f4",
+        "header-border": "#393939",
+        "header-blur": "none",
+        "header-btn-border": "#525252",
+        "kpi-weight": "400",
+        "kpi-size": "2rem",
+        "th-transform": "none",
+        "table-head-bg": "#e0e0e0",
+        "badge-radius": "24px",
+        "palette": [
+          "#6929c4",
+          "#1192e8",
+          "#005d5d",
+          "#9f1853",
+          "#fa4d56",
+          "#570408",
+          "#198038",
+          "#002d9c"
+        ]
+      },
+      "dark": {
+        "bg": "#161616",
+        "surface": "#262626",
+        "fg": "#f4f4f4",
+        "muted": "#c6c6c6",
+        "border": "#393939",
+        "grid": "#393939",
+        "sidebar-bg": "#161616",
+        "sidebar-fg": "#f4f4f4",
+        "sidebar-border": "#393939",
+        "sidebar-active-bg": "#393939",
+        "sidebar-active-fg": "#f4f4f4",
+        "table-head-bg": "#393939",
+        "primary": "#78a9ff",
+        "palette": [
+          "#8a3ffc",
+          "#33b1ff",
+          "#007d79",
+          "#ff7eb6",
+          "#fa4d56",
+          "#fff1f1",
+          "#6fdc8c",
+          "#4589ff"
+        ]
+      },
+      "signature": "IBM Carbon. 각진 모서리(0), 검은 UI 셸 헤더, 회색 계층(g10/g100), IBM Plex 서체, 가벼운 굵기의 큰 숫자. 표 머리글은 회색 채움, 데이터 시각화는 Carbon 범주 팔레트."
+    }
+  },
+  "fallbackByCategory": {
+    "dashboard": "tabler",
+    "report": "quarto",
+    "landing": "cruip-simple",
+    "slides": "revealjs",
+    "charts": "tabler",
+    "uikit": "bootstrap-examples"
+  }
+}

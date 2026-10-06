@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ko" %%HTML_ATTRS%%>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>%%TITLE%%</title>
+  <!--HC:HEAD-->
+  <style>
+    /* ── 키트: 소개·랜딩 (히어로 → 핵심 수치 → 요약 카드 → 차트 → 본문 → 표) ── */
+    body { font-size: var(--hc-font-size, 16px); }
+    .hc-wrap { max-width: var(--hc-container, 1180px); margin: 0 auto; padding: 0 24px; }
+    .hc-nav { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--hc-bg) 80%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid color-mix(in srgb, var(--hc-border) 70%, transparent); }
+    .hc-nav-inner { display: flex; align-items: center; gap: 16px; min-height: 60px; }
+    .hc-logo { font-family: var(--hc-font-heading, var(--hc-font)); font-weight: 800; font-size: 1rem; display: flex; align-items: center; gap: 10px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .hc-logo-mark { width: 28px; height: 28px; border-radius: calc(var(--hc-radius) * .5 + 2px); background: var(--hc-primary); color: var(--hc-primary-fg, #fff); display: grid; place-items: center; font-size: .8rem; flex: none; }
+    .hc-links { display: flex; gap: 4px; margin-left: auto; overflow-x: auto; scrollbar-width: none; }
+    .hc-links a { color: var(--hc-muted); text-decoration: none; font-size: .875rem; padding: 6px 10px; border-radius: 8px; white-space: nowrap; }
+    .hc-links a:hover, .hc-links a.is-active { color: var(--hc-fg); background: color-mix(in srgb, var(--hc-fg) 6%, transparent); }
+    .hc-hero { background: var(--hc-hero-bg, var(--hc-bg)); color: var(--hc-hero-fg, var(--hc-fg)); padding: 104px 0 88px; text-align: center; position: relative; overflow: hidden; }
+    .hc-eyebrow { display: inline-block; font-size: .8rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--hc-hero-fg, var(--hc-primary)); padding: 6px 14px; border-radius: 999px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); margin-bottom: 24px; }
+    .hc-hero h1 { font-size: clamp(2.2rem, 5.5vw, 4rem); font-weight: 800; line-height: 1.1; letter-spacing: -.03em; margin: 0 auto 20px; max-width: 900px; text-transform: var(--hc-heading-transform, none); background: var(--hc-hero-accent, none); -webkit-background-clip: text; background-clip: text; color: var(--hc-hero-title, transparent); }
+    .hc-hero .hc-lead { font-size: 1.2rem; color: var(--hc-hero-fg, var(--hc-muted)); opacity: .85; max-width: 680px; margin: 0 auto 36px; }
+    .hc-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .hc-cta a { text-decoration: none; font-weight: 600; padding: 12px 22px; border-radius: var(--hc-cta-radius, 999px); font-size: .95rem; text-transform: var(--hc-heading-transform, none); }
+    .hc-cta .hc-cta-primary { background: var(--hc-primary); color: var(--hc-primary-fg, #fff); }
+    .hc-cta .hc-cta-ghost { border: 1px solid color-mix(in srgb, currentColor 30%, transparent); color: inherit; }
+    .hc-band { padding: 72px 0; }
+    .hc-band + .hc-band { border-top: 1px solid var(--hc-border); }
+    .hc-band-alt { background: var(--hc-surface); }
+    .hc-band-head { text-align: center; max-width: 720px; margin: 0 auto 40px; }
+    .hc-band-head .hc-kicker { font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--hc-primary); }
+    .hc-band-head h2 { font-size: clamp(1.6rem, 3vw, 2.3rem); font-weight: 800; letter-spacing: -.02em; margin: 8px 0 0; text-transform: var(--hc-heading-transform, none); }
+    .hc-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; text-align: center; }
+    .hc-stat-value { font-family: var(--hc-font-heading, var(--hc-font)); font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; color: var(--hc-primary); }
+    .hc-stat-label { font-weight: 600; margin-top: 4px; }
+    .hc-stat-meta { font-size: .85rem; color: var(--hc-muted); display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 4px; }
+    .hc-stat .hc-spark { max-width: 160px; margin: 10px auto 0; }
+    .hc-features ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; counter-reset: feat; }
+    .hc-features li { counter-increment: feat; background: var(--hc-surface); border: 1px solid var(--hc-border); border-radius: var(--hc-radius); box-shadow: var(--hc-shadow); padding: 28px 24px 24px; font-size: 1.02rem; line-height: 1.6; }
+    .hc-band-alt .hc-features li { background: var(--hc-bg); }
+    .hc-features li::before { content: counter(feat, decimal-leading-zero); display: grid; place-items: center; width: 40px; height: 40px; border-radius: calc(var(--hc-radius) * .6 + 4px); background: color-mix(in srgb, var(--hc-primary) 14%, transparent); color: var(--hc-primary); font-weight: 800; font-size: .85rem; margin-bottom: 16px; }
+    .hc-features p { max-width: 760px; margin: 0 auto; text-align: center; font-size: 1.1rem; }
+    .hc-chart-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+    .hc-chart-grid .hc-span-2, .hc-chart-grid .hc-span-3 { grid-column: 1 / -1; }
+    .hc-story { display: grid; gap: 56px; }
+    .hc-story > section { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 40px; align-items: start; }
+    .hc-story > section:nth-child(even) .hc-story-title { order: 2; }
+    .hc-story-title h2 { font-size: 1.8rem; font-weight: 800; letter-spacing: -.02em; margin: 0; text-transform: var(--hc-heading-transform, none); }
+    .hc-story-title::before { content: ''; display: block; width: 48px; height: 4px; border-radius: 2px; background: var(--hc-primary); margin-bottom: 16px; }
+    .hc-story .hc-prose { font-size: 1.05rem; }
+    .hc-tables { display: grid; gap: 20px; }
+    .hc-footer { padding: 40px 0 48px; color: var(--hc-muted); font-size: .85rem; border-top: 1px solid var(--hc-border); }
+    .hc-footer .hc-wrap { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+    @media (max-width: 860px) { .hc-chart-grid { grid-template-columns: 1fr; } .hc-story > section { grid-template-columns: 1fr; gap: 16px; } .hc-story > section:nth-child(even) .hc-story-title { order: 0; } .hc-hero { padding: 72px 0 64px; } .hc-band { padding: 56px 0; } .hc-wrap { padding: 0 16px; } }
+    @media print { .hc-nav { display: none !important; } .hc-hero { padding: 32px 0; } }
+  </style>
+  <!--HC:STYLE-->
+</head>
+<body class="%%BODY_CLASS%%">
+  <header class="hc-nav hc-no-print">
+    <div class="hc-wrap hc-nav-inner">
+      <a class="hc-logo" href="#top" style="color:inherit;text-decoration:none"><span class="hc-logo-mark" aria-hidden="true">%%BRAND_MARK%%</span><span data-meta="title"></span></a>
+      <nav class="hc-links" data-region="nav" aria-label="페이지 내비게이션"></nav>
+      <button class="hc-btn" type="button" data-action="theme" aria-label="테마 전환"><span data-slot="theme-icon">☾</span></button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hc-hero" id="top">
+      <div class="hc-wrap">
+        <span class="hc-eyebrow" data-meta="author" data-optional></span>
+        <h1 data-meta="title"></h1>
+        <p class="hc-lead" data-meta="subtitle" data-optional></p>
+        <div class="hc-cta">
+          <a class="hc-cta-primary" href="#hc-kpis" data-requires="kpis">핵심 수치 보기</a>
+          <a class="hc-cta-ghost" href="#hc-charts" data-requires="charts">데이터 살펴보기</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="hc-band" id="hc-kpis" data-anchor="kpis" data-requires="kpis">
+      <div class="hc-wrap">
+        <div class="hc-band-head"><div class="hc-kicker">Key numbers</div><h2>숫자로 보는 결과</h2></div>
+        <div class="hc-stats" data-region="kpis"></div>
+      </div>
+    </section>
+
+    <section class="hc-band hc-band-alt" data-requires="summary">
+      <div class="hc-wrap">
+        <div class="hc-band-head"><div class="hc-kicker">Highlights</div><h2>핵심 요약</h2></div>
+        <div class="hc-features" data-meta="summary"></div>
+      </div>
+    </section>
+
+    <section class="hc-band" id="hc-charts" data-anchor="charts" data-requires="charts">
+      <div class="hc-wrap">
+        <div class="hc-band-head"><div class="hc-kicker">Data</div><h2>데이터로 보기</h2></div>
+        <div class="hc-chart-grid" data-region="charts" data-span1="hc-span-1" data-span2="hc-span-2" data-span3="hc-span-3"></div>
+      </div>
+    </section>
+
+    <section class="hc-band hc-band-alt" data-requires="sections">
+      <div class="hc-wrap"><div class="hc-story" data-region="sections"></div></div>
+    </section>
+
+    <section class="hc-band" data-anchor="tables" data-requires="tables">
+      <div class="hc-wrap">
+        <div class="hc-band-head"><div class="hc-kicker">Details</div><h2>세부 데이터</h2></div>
+        <div class="hc-tables" data-region="tables"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="hc-footer">
+    <div class="hc-wrap">
+      <span data-meta="source" data-optional></span>
+      <span data-meta="generatedAt" data-optional></span>
+      %%CREDIT%%
+    </div>
+  </footer>
+
+  <template id="tpl-nav" data-active="is-active"><a data-slot="link"></a></template>
+
+  <template id="tpl-kpi" data-good="" data-bad="" data-flat="">
+    <div class="hc-stat">
+      <div class="hc-stat-value" data-slot="value"></div>
+      <div class="hc-stat-label" data-slot="label"></div>
+      <div class="hc-stat-meta"><span class="hc-delta" data-slot="delta"></span><span data-slot="delta-label"></span><span data-slot="hint"></span></div>
+      <div class="hc-spark" data-slot="spark"></div>
+    </div>
+  </template>
+
+  <template id="tpl-chart">
+    <div class="hc-card">
+      <div class="hc-card-head"><h3 class="hc-card-title" data-slot="title"></h3><p class="hc-card-sub" data-slot="subtitle"></p></div>
+      <div class="hc-card-body"><div data-slot="chart"></div><p class="hc-card-note" data-slot="note"></p></div>
+    </div>
+  </template>
+
+  <template id="tpl-table" data-num="hc-num" data-badge-good="hc-badge hc-badge-good" data-badge-warn="hc-badge hc-badge-warn" data-badge-bad="hc-badge hc-badge-bad" data-badge-info="hc-badge hc-badge-info" data-badge-neutral="hc-badge hc-badge-neutral">
+    <div class="hc-card hc-table-card">
+      <div class="hc-table-tools">
+        <div><h3 class="hc-card-title" data-slot="title"></h3><p class="hc-card-sub" data-slot="subtitle"></p></div>
+        <input class="hc-input" type="search" placeholder="표에서 검색" aria-label="표에서 검색" data-slot="search">
+      </div>
+      <div class="hc-table-wrap"><table class="hc-table" data-slot="table"></table></div>
+      <div class="hc-table-foot"><span data-slot="count"></span><button class="hc-btn" type="button" data-slot="more" hidden></button></div>
+    </div>
+  </template>
+
+  <template id="tpl-section">
+    <section>
+      <div class="hc-story-title"><h2 data-slot="title"></h2></div>
+      <div class="hc-prose" data-slot="body"></div>
+    </section>
+  </template>
+
+  <template id="tpl-callout" data-info="hc-callout-info" data-good="hc-callout-good" data-warn="hc-callout-warn" data-bad="hc-callout-bad">
+    <div class="hc-callout"><strong data-slot="title"></strong><div data-slot="text"></div></div>
+  </template>
+
+  <script>
+    window.HC_AFTER_RENDER = function () {
+      // 히어로 제목은 글자색을 그라데이션으로 칠한다. 그라데이션이 없으면 일반 글자색
+      var h1 = document.querySelector('.hc-hero h1');
+      var accent = getComputedStyle(document.documentElement).getPropertyValue('--hc-hero-accent').trim();
+      if (h1 && !accent) h1.style.color = 'inherit';
+    };
+  </script>
+  <!--HC:BODY_END-->
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ko" %%HTML_ATTRS%%>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>%%TITLE%%</title>
+  <!--HC:HEAD-->
+  <style>
+    /* ── 키트: 대시보드 (사이드바 또는 상단 내비게이션 + KPI·차트·표) ── */
+    .hc-shell { display: flex; min-height: 100vh; }
+    .hc-sidebar { width: 248px; flex: 0 0 248px; background: var(--hc-sidebar-bg); color: var(--hc-sidebar-fg); border-right: 1px solid var(--hc-sidebar-border, transparent); position: sticky; top: 0; height: 100vh; overflow-y: auto; padding: 20px 14px; display: flex; flex-direction: column; gap: 2px; }
+    .hc-brand { display: flex; align-items: center; gap: 10px; padding: 4px 10px 18px; font-weight: 700; font-size: .95rem; color: var(--hc-sidebar-fg); }
+    .hc-brand-mark { width: 30px; height: 30px; border-radius: calc(var(--hc-radius) * .6 + 2px); background: var(--hc-brand-bg, var(--hc-primary)); color: var(--hc-primary-fg, #fff); display: grid; place-items: center; font-size: .85rem; flex: none; }
+    .hc-brand > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hc-nav-title { font-size: .7rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--hc-sidebar-muted); padding: 10px 10px 6px; }
+    .hc-nav-link { display: block; padding: 8px 12px; border-radius: var(--hc-nav-radius, 6px); color: var(--hc-sidebar-fg); text-decoration: none; font-size: .875rem; opacity: .82; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-left: var(--hc-nav-indicator-w, 0) solid transparent; }
+    .hc-nav-link:hover { opacity: 1; background: var(--hc-sidebar-hover, rgba(127,127,127,.12)); color: var(--hc-sidebar-fg); }
+    .hc-nav-link.is-active { opacity: 1; background: var(--hc-sidebar-active-bg); color: var(--hc-sidebar-active-fg); font-weight: 600; border-left-color: var(--hc-primary); box-shadow: var(--hc-sidebar-active-shadow, none); }
+    .hc-sidebar-foot { margin-top: auto; padding: 12px 10px 0; font-size: .75rem; color: var(--hc-sidebar-muted); word-break: break-all; }
+    .hc-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .hc-topbar { background: var(--hc-header-bg, transparent); border-bottom: 1px solid var(--hc-header-border, transparent); color: var(--hc-header-fg, var(--hc-fg)); position: sticky; top: 0; z-index: 10; backdrop-filter: var(--hc-header-blur, none); }
+    .hc-topbar-inner { display: flex; align-items: center; gap: 12px; min-height: 56px; }
+    .hc-topbar .hc-btn { background: transparent; color: inherit; border-color: var(--hc-header-btn-border, var(--hc-border)); }
+    .hc-topbar-title { display: none; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hc-container { width: 100%; max-width: var(--hc-container, 1320px); margin: 0 auto; padding: 0 24px; }
+    .hc-actions { margin-left: auto; display: flex; gap: 8px; }
+    .hc-page-head { padding: 28px 0 8px; }
+    .hc-pretitle { font-size: .75rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--hc-muted); }
+    .hc-title { font-size: var(--hc-title-size, 1.6rem); font-weight: 700; margin: 2px 0 4px; letter-spacing: -.015em; }
+    .hc-subtitle { color: var(--hc-muted); margin: 0; }
+    .hc-stack { display: flex; flex-direction: column; gap: var(--hc-gap, 16px); margin-top: var(--hc-gap, 16px); }
+    .hc-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--hc-gap, 16px); }
+    .hc-span-1 { grid-column: span 1; }
+    .hc-span-2 { grid-column: span 2; }
+    .hc-span-3 { grid-column: 1 / -1; }
+    .hc-grid > .hc-card { display: flex; flex-direction: column; }
+    .hc-footer { color: var(--hc-muted); font-size: .8rem; padding: 28px 0 36px; display: flex; flex-wrap: wrap; gap: 4px 16px; }
+    .hc-menu-btn { display: none !important; }
+    .hc-topnav { display: none; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+    /* 상단 내비게이션 배치 */
+    .hc-layout-topnav .hc-sidebar { display: none; }
+    .hc-layout-topnav .hc-topbar-title { display: block; }
+    .hc-layout-topnav .hc-topnav { display: flex; }
+    .hc-layout-topnav .hc-topnav .hc-nav-link { color: var(--hc-header-fg, var(--hc-fg)); padding: 6px 10px; border-left: 0; }
+    .hc-layout-topnav .hc-topnav .hc-nav-link:hover { background: color-mix(in srgb, currentColor 8%, transparent); }
+    @media (max-width: 1100px) { .hc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .hc-span-2 { grid-column: 1 / -1; } }
+    @media (max-width: 991.98px) {
+      .hc-sidebar { position: fixed; left: 0; top: 0; z-index: 40; transform: translateX(-100%); transition: transform .2s; }
+      .hc-sidebar.open { transform: none; box-shadow: 0 0 40px rgba(0,0,0,.3); }
+      .hc-menu-btn { display: inline-flex !important; }
+      .hc-topbar-title { display: block; }
+      .hc-layout-topnav .hc-topnav { display: none; }
+      .hc-layout-topnav .hc-sidebar { display: flex; }
+    }
+    @media (max-width: 700px) { .hc-grid { grid-template-columns: 1fr; } .hc-container { padding: 0 16px; } .hc-title { font-size: 1.35rem; } }
+    @media print { .hc-sidebar, .hc-topbar { display: none !important; } .hc-grid { grid-template-columns: 1fr 1fr; } }
+  </style>
+  <!--HC:STYLE-->
+</head>
+<body class="%%BODY_CLASS%%">
+  <div class="hc-shell">
+    <aside class="hc-sidebar" id="hc-sidebar" aria-label="페이지 내비게이션" data-requires="nav">
+      <div class="hc-brand"><span class="hc-brand-mark" aria-hidden="true">%%BRAND_MARK%%</span><span data-meta="title"></span></div>
+      <div class="hc-nav-title">목차</div>
+      <nav data-region="nav"></nav>
+      <div class="hc-sidebar-foot"><span data-meta="source" data-optional></span></div>
+    </aside>
+
+    <div class="hc-main">
+      <header class="hc-topbar hc-no-print">
+        <div class="hc-container hc-topbar-inner">
+          <button class="hc-btn hc-menu-btn" type="button" aria-controls="hc-sidebar" aria-label="목차 열기" onclick="document.getElementById('hc-sidebar').classList.toggle('open')">☰</button>
+          <span class="hc-topbar-title" data-meta="title"></span>
+          <nav class="hc-topnav" data-region="nav-top" aria-label="페이지 내비게이션"></nav>
+          <div class="hc-actions">
+            <button class="hc-btn" type="button" data-action="print" title="인쇄 / PDF로 저장">⎙ 인쇄</button>
+            <button class="hc-btn" type="button" data-action="theme" aria-label="테마 전환"><span data-slot="theme-icon">☾</span></button>
+          </div>
+        </div>
+      </header>
+
+      <main class="hc-container" id="main">
+        <div class="hc-page-head">
+          <div class="hc-pretitle" data-meta="author" data-optional></div>
+          <h1 class="hc-title" data-meta="title"></h1>
+          <p class="hc-subtitle" data-meta="subtitle" data-optional></p>
+        </div>
+
+        <div class="hc-stack">
+          <div class="hc-card hc-summary" data-requires="summary">
+            <div class="hc-card-body"><div data-meta="summary"></div></div>
+          </div>
+
+          <section data-anchor="kpis" data-requires="kpis" aria-label="핵심 지표">
+            <div class="hc-kpi-grid" data-region="kpis"></div>
+          </section>
+
+          <section data-anchor="charts" data-requires="charts" aria-label="차트">
+            <div class="hc-grid" data-region="charts" data-span1="hc-span-1" data-span2="hc-span-2" data-span3="hc-span-3"></div>
+          </section>
+
+          <div class="hc-stack" style="margin-top:0" data-region="tables" data-requires="tables"></div>
+
+          <div class="hc-stack" style="margin-top:0" data-region="sections" data-requires="sections"></div>
+        </div>
+
+        <footer class="hc-footer">
+          <span data-meta="source" data-optional></span>
+          <span data-meta="generatedAt" data-optional></span>
+          %%CREDIT%%
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <template id="tpl-nav" data-active="is-active"><a class="hc-nav-link" data-slot="link"></a></template>
+
+  <template id="tpl-kpi" data-good="" data-bad="" data-flat="">
+    <div class="hc-card hc-kpi">
+      <div class="hc-kpi-label" data-slot="label"></div>
+      <div class="hc-kpi-value" data-slot="value"></div>
+      <div class="hc-kpi-meta"><span class="hc-delta" data-slot="delta"></span><span data-slot="delta-label"></span><span data-slot="hint"></span></div>
+      <div class="hc-spark" data-slot="spark"></div>
+    </div>
+  </template>
+
+  <template id="tpl-chart">
+    <div class="hc-card">
+      <div class="hc-card-head"><h2 class="hc-card-title" data-slot="title"></h2><p class="hc-card-sub" data-slot="subtitle"></p></div>
+      <div class="hc-card-body"><div data-slot="chart"></div><p class="hc-card-note" data-slot="note"></p></div>
+    </div>
+  </template>
+
+  <template id="tpl-figure">
+    <div class="hc-card hc-figure">
+      <div class="hc-card-head"><h3 class="hc-card-title" data-slot="title"></h3><p class="hc-card-sub" data-slot="subtitle"></p></div>
+      <div class="hc-card-body"><div data-slot="chart"></div><p class="hc-card-note" data-slot="note"></p></div>
+    </div>
+  </template>
+
+  <template id="tpl-table" data-num="hc-num" data-badge-good="hc-badge hc-badge-good" data-badge-warn="hc-badge hc-badge-warn" data-badge-bad="hc-badge hc-badge-bad" data-badge-info="hc-badge hc-badge-info" data-badge-neutral="hc-badge hc-badge-neutral">
+    <div class="hc-card hc-table-card">
+      <div class="hc-table-tools">
+        <div><h2 class="hc-card-title" data-slot="title"></h2><p class="hc-card-sub" data-slot="subtitle"></p></div>
+        <input class="hc-input" type="search" placeholder="표에서 검색" aria-label="표에서 검색" data-slot="search">
+      </div>
+      <div class="hc-table-wrap"><table class="hc-table" data-slot="table"></table></div>
+      <div class="hc-table-foot"><span data-slot="count"></span><button class="hc-btn" type="button" data-slot="more" hidden></button></div>
+    </div>
+  </template>
+
+  <template id="tpl-section">
+    <section class="hc-card">
+      <div class="hc-card-head"><h2 class="hc-card-title" data-slot="title"></h2></div>
+      <div class="hc-card-body hc-prose" data-slot="body"></div>
+    </section>
+  </template>
+
+  <template id="tpl-callout" data-info="hc-callout-info" data-good="hc-callout-good" data-warn="hc-callout-warn" data-bad="hc-callout-bad">
+    <div class="hc-callout"><strong data-slot="title"></strong><div data-slot="text"></div></div>
+  </template>
+
+  <script>
+    window.HC_AFTER_RENDER = function () {
+      // 상단 내비게이션 배치면 목차를 상단 바에도 복제한다
+      var top = document.querySelector('[data-region="nav-top"]');
+      var side = document.querySelector('[data-region="nav"]');
+      if (top && side && document.body.classList.contains('hc-layout-topnav')) top.innerHTML = side.innerHTML;
+      document.querySelectorAll('.hc-sidebar .hc-nav-link').forEach(function (a) {
+        a.addEventListener('click', function () { document.getElementById('hc-sidebar').classList.remove('open'); });
+      });
+    };
+  </script>
+  <!--HC:BODY_END-->
+</body>
+</html>

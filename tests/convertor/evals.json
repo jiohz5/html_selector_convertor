@@ -1,0 +1,7 @@
+{
+  "skill_name": "html-convertor",
+  "evals": [
+    {"id": 1, "prompt": "Previewer에서 디자인 골라서 html-design-references-2026-10-06.md로 내보냈어. 이걸로 production.csv(7~9월 라인별 생산 데이터) 3분기 생산 현황 대시보드 만들어줘. 파일은 eval 폴더 outputs에 저장해줘.", "expected_output": "shadcn-dashboard 디자인 + ECharts, 메모(면적형 차트) 반영, 실제 CSV 집계값의 KPI·차트·표, 단일 HTML", "files": ["fixtures/html-design-references-2026-10-06.md", "fixtures/production.csv"]},
+    {"id": 2, "prompt": "sales_2026.xlsx 가지고 다음 주 영업회의 때 띄울 발표자료 HTML 만들어줘. reveal.js로. 지역별, 제품별 실적이랑 목표 대비 달성률 위주로.", "expected_output": "revealjs 디자인 slides 키트, 엑셀 두 시트 활용, 달성률 계산, 슬라이드별 차트", "files": ["fixtures/sales_2026.xlsx"]}
+  ]
+}

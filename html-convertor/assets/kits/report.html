@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ko" %%HTML_ATTRS%%>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>%%TITLE%%</title>
+  <!--HC:HEAD-->
+  <style>
+    /* ── 키트: 보고서·문서 (제목 블록 + 본문 흐름 + 목차) ──
+       레이아웃: hc-layout-toc-right(본문 + 오른쪽 목차) / hc-layout-docs(왼쪽 내비 + 본문 + 오른쪽 목차) */
+    body { font-size: var(--hc-font-size, 16px); }
+    .hc-header { background: var(--hc-header-bg, var(--hc-bg)); color: var(--hc-header-fg, var(--hc-fg)); border-bottom: 1px solid var(--hc-header-border, var(--hc-border)); position: sticky; top: 0; z-index: 20; }
+    .hc-header-inner { max-width: var(--hc-container, 1220px); margin: 0 auto; padding: 0 24px; min-height: 52px; display: flex; align-items: center; gap: 12px; }
+    .hc-header-title { font-weight: 700; font-size: .95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hc-header .hc-btn { background: transparent; color: inherit; border-color: var(--hc-header-btn-border, var(--hc-border)); }
+    .hc-actions { margin-left: auto; display: flex; gap: 8px; }
+    .hc-page { max-width: var(--hc-container, 1220px); margin: 0 auto; padding: 0 24px; display: grid; gap: 48px; grid-template-columns: minmax(0, 1fr) 220px; }
+    .hc-layout-docs .hc-page { grid-template-columns: 220px minmax(0, 1fr) 200px; }
+    .hc-leftnav { display: none; }
+    .hc-layout-docs .hc-leftnav { display: block; }
+    .hc-aside { position: sticky; top: 72px; align-self: start; max-height: calc(100vh - 88px); overflow-y: auto; padding: 32px 0; font-size: .85rem; }
+    .hc-aside-title { font-size: .75rem; font-weight: 700; letter-spacing: .04em; color: var(--hc-fg); margin: 0 0 8px; }
+    .hc-toc-link { display: block; padding: 4px 0 4px 12px; color: var(--hc-muted); text-decoration: none; border-left: 2px solid var(--hc-border); line-height: 1.4; }
+    .hc-toc-link:hover { color: var(--hc-fg); }
+    .hc-toc-link.is-active { color: var(--hc-primary); border-left-color: var(--hc-primary); font-weight: 600; }
+    .hc-leftnav .hc-toc-link { border-left: 0; padding: 6px 10px; border-radius: 6px; color: var(--hc-fg); }
+    .hc-leftnav .hc-toc-link.is-active { background: color-mix(in srgb, var(--hc-primary) 10%, transparent); }
+    .hc-doc { min-width: 0; padding: 40px 0 64px; max-width: var(--hc-measure, 780px); }
+    .hc-titleblock { margin-bottom: 28px; }
+    .hc-titleblock h1 { font-size: var(--hc-title-size, 2.1rem); font-weight: 700; letter-spacing: -.02em; margin: 0 0 8px; }
+    .hc-titleblock .hc-subtitle { font-size: 1.15rem; color: var(--hc-muted); margin: 0 0 20px; }
+    .hc-meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px 24px; padding: 14px 0; border-top: 1px solid var(--hc-border); border-bottom: 1px solid var(--hc-border); font-size: .875rem; }
+    .hc-meta-grid dt { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--hc-muted); margin-bottom: 2px; }
+    .hc-meta-grid dd { margin: 0; word-break: break-all; }
+    .hc-abstract { background: color-mix(in srgb, var(--hc-primary) 6%, var(--hc-surface)); border: 1px solid color-mix(in srgb, var(--hc-primary) 20%, var(--hc-border)); border-radius: var(--hc-radius); padding: 16px 20px; margin: 24px 0; }
+    .hc-abstract-title { font-weight: 700; font-size: .85rem; margin: 0 0 6px; color: var(--hc-primary); }
+    .hc-abstract ul { margin: 0; padding-left: 1.2rem; }
+    .hc-abstract li + li { margin-top: 4px; }
+    .hc-doc h2 { font-size: 1.5rem; margin: 2.2em 0 .7em; padding-bottom: .3em; border-bottom: 1px solid var(--hc-border); scroll-margin-top: 72px; }
+    .hc-doc section, .hc-doc [id] { scroll-margin-top: 72px; }
+    .hc-doc .hc-kpi-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); margin: 20px 0; }
+    .hc-doc .hc-kpi { padding: 14px 16px; }
+    .hc-doc .hc-kpi-value { font-size: 1.45rem; }
+    .hc-figure { margin: 24px 0; }
+    .hc-figure .hc-figcap { font-size: .85rem; color: var(--hc-muted); margin-top: 8px; }
+    .hc-figure .hc-figcap b { color: var(--hc-fg); font-weight: 600; margin-right: 6px; }
+    .hc-figure-frame { border: 1px solid var(--hc-border); border-radius: var(--hc-radius); padding: 12px 8px 4px; background: var(--hc-surface); }
+    .hc-doc .hc-table-card { margin: 24px 0; box-shadow: none; }
+    .hc-footer { color: var(--hc-muted); font-size: .8rem; padding: 24px 0 0; margin-top: 48px; border-top: 1px solid var(--hc-border); display: flex; flex-wrap: wrap; gap: 4px 16px; }
+    @media (max-width: 1100px) { .hc-layout-docs .hc-page { grid-template-columns: 200px minmax(0, 1fr); } .hc-layout-docs .hc-toc { display: none; } }
+    @media (max-width: 860px) { .hc-page, .hc-layout-docs .hc-page { grid-template-columns: minmax(0, 1fr); } .hc-aside { display: none !important; } .hc-header-inner, .hc-page { padding: 0 16px; } .hc-titleblock h1 { font-size: 1.6rem; } }
+    @media print { .hc-header, .hc-aside { display: none !important; } .hc-page { display: block; } }
+  </style>
+  <!--HC:STYLE-->
+</head>
+<body class="%%BODY_CLASS%%">
+  <header class="hc-header hc-no-print">
+    <div class="hc-header-inner">
+      <span class="hc-header-title" data-meta="title"></span>
+      <div class="hc-actions">
+        <button class="hc-btn" type="button" data-action="print" title="인쇄 / PDF로 저장">⎙ 인쇄</button>
+        <button class="hc-btn" type="button" data-action="theme" aria-label="테마 전환"><span data-slot="theme-icon">☾</span></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="hc-page">
+    <aside class="hc-aside hc-leftnav" aria-label="문서 내비게이션" data-requires="nav">
+      <p class="hc-aside-title">문서</p>
+      <nav data-region="nav-copy"></nav>
+    </aside>
+
+    <main class="hc-doc" id="main">
+      <div class="hc-titleblock">
+        <h1 data-meta="title"></h1>
+        <p class="hc-subtitle" data-meta="subtitle" data-optional></p>
+        <dl class="hc-meta-grid">
+          <div data-hc-meta-wrap><dt>작성</dt><dd data-meta="author" data-optional></dd></div>
+          <div data-hc-meta-wrap><dt>작성일</dt><dd data-meta="generatedAt" data-optional></dd></div>
+          <div data-hc-meta-wrap><dt>데이터 출처</dt><dd data-meta="source" data-optional></dd></div>
+        </dl>
+      </div>
+
+      <div class="hc-abstract" data-requires="summary">
+        <p class="hc-abstract-title">요약</p>
+        <div data-meta="summary"></div>
+      </div>
+
+      <section data-anchor="kpis" data-requires="kpis" aria-label="핵심 지표">
+        <h2>핵심 지표</h2>
+        <div class="hc-kpi-grid" data-region="kpis"></div>
+      </section>
+
+      <div data-region="sections"></div>
+
+      <section data-anchor="charts" data-requires="charts">
+        <h2>차트</h2>
+        <div data-region="charts"></div>
+      </section>
+
+      <section data-anchor="tables" data-requires="tables">
+        <h2>데이터</h2>
+        <div data-region="tables"></div>
+      </section>
+
+      <footer class="hc-footer">
+        <span data-meta="source" data-optional></span>
+        <span data-meta="generatedAt" data-optional></span>
+        %%CREDIT%%
+      </footer>
+    </main>
+
+    <aside class="hc-aside hc-toc" aria-label="목차" data-requires="nav">
+      <p class="hc-aside-title">목차</p>
+      <nav data-region="nav"></nav>
+    </aside>
+  </div>
+
+  <template id="tpl-nav" data-active="is-active"><a class="hc-toc-link" data-slot="link"></a></template>
+
+  <template id="tpl-kpi" data-good="" data-bad="" data-flat="">
+    <div class="hc-card hc-kpi">
+      <div class="hc-kpi-label" data-slot="label"></div>
+      <div class="hc-kpi-value" data-slot="value"></div>
+      <div class="hc-kpi-meta"><span class="hc-delta" data-slot="delta"></span><span data-slot="delta-label"></span><span data-slot="hint"></span></div>
+      <div class="hc-spark" data-slot="spark"></div>
+    </div>
+  </template>
+
+  <template id="tpl-chart">
+    <figure class="hc-figure">
+      <div class="hc-figure-frame"><div data-slot="chart"></div></div>
+      <figcaption class="hc-figcap"><b data-slot="title"></b><span data-slot="subtitle"></span> <span data-slot="note"></span></figcaption>
+    </figure>
+  </template>
+
+  <template id="tpl-table" data-num="hc-num" data-badge-good="hc-badge hc-badge-good" data-badge-warn="hc-badge hc-badge-warn" data-badge-bad="hc-badge hc-badge-bad" data-badge-info="hc-badge hc-badge-info" data-badge-neutral="hc-badge hc-badge-neutral">
+    <div class="hc-card hc-table-card">
+      <div class="hc-table-tools">
+        <div><h3 class="hc-card-title" data-slot="title"></h3><p class="hc-card-sub" data-slot="subtitle"></p></div>
+        <input class="hc-input" type="search" placeholder="표에서 검색" aria-label="표에서 검색" data-slot="search">
+      </div>
+      <div class="hc-table-wrap"><table class="hc-table" data-slot="table"></table></div>
+      <div class="hc-table-foot"><span data-slot="count"></span><button class="hc-btn" type="button" data-slot="more" hidden></button></div>
+    </div>
+  </template>
+
+  <template id="tpl-section">
+    <section>
+      <h2 data-slot="title"></h2>
+      <div class="hc-prose" data-slot="body"></div>
+    </section>
+  </template>
+
+  <template id="tpl-callout" data-info="hc-callout-info" data-good="hc-callout-good" data-warn="hc-callout-warn" data-bad="hc-callout-bad">
+    <div class="hc-callout"><strong data-slot="title"></strong><div data-slot="text"></div></div>
+  </template>
+
+  <script>
+    window.HC_AFTER_RENDER = function () {
+      // 오른쪽 목차를 왼쪽 문서 내비에도 복제(docs 배치)
+      var src = document.querySelector('[data-region="nav"]');
+      var copy = document.querySelector('[data-region="nav-copy"]');
+      if (src && copy) copy.innerHTML = src.innerHTML;
+      // 비어 있는 메타 칸은 감춘다
+      document.querySelectorAll('[data-hc-meta-wrap]').forEach(function (w) { if (!w.querySelector('dd')) w.remove(); });
+      var grid = document.querySelector('.hc-meta-grid');
+      if (grid && !grid.children.length) grid.remove();
+    };
+  </script>
+  <!--HC:BODY_END-->
+</body>
+</html>
