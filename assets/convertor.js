@@ -901,7 +901,13 @@
     } catch (e) {
       if (generation !== inputGeneration) return;
       clearResult({ keepHTML: true });
-      showError(e.message);
+      if (e.code === 'HTML_DATA_UNAVAILABLE' && st.htmlInput && !specOnly) {
+        el.status.textContent = 'HTML 원문 준비';
+        el.htmlAnalysis.textContent = `${e.message}\n원본 렌더링·분석을 눌러 화면에 생성되는 표·본문을 확인한 뒤, 원본 유지 또는 새 디자인을 선택해 주세요.`;
+        showError('');
+      } else {
+        showError(e.message);
+      }
     }
   }
 

@@ -15,7 +15,7 @@
     const headRows = table.tHead ? Array.from(table.tHead.rows) : [];
     if (headRows.length > 1) throw new Error('여러 줄 머리글은 지원하지 않습니다. 머리글을 한 행으로 정리해 주세요.');
     const rows = Array.from(table.rows).filter((row) => row.closest('table') === table && !row.closest('tfoot'));
-    if (rows.length < 2) throw new Error('머리글과 데이터 행이 있는 표가 필요합니다. JavaScript로 행을 채우는 페이지는 내장 JSON 또는 CSV 데이터가 필요합니다.');
+    if (rows.length < 2) throw new Error('머리글과 데이터 행이 있는 표가 필요합니다. JavaScript로 행을 채우는 페이지는 원본 렌더링·분석으로 확인해 주세요.');
     const header = headRows[0] || rows[0];
     const width = header.cells.length;
     if (!width) throw new Error('머리글 열을 찾지 못했습니다.');
@@ -115,9 +115,11 @@
     }
     if (embeddedSpec) return embeddedSpec;
     tables.push(...embeddedJSONTables(root, context));
-    if (!tables.length) throw new Error('HTML에서 정적 데이터 표, 내장 JSON 레코드 또는 내장 spec을 찾지 못했습니다.');
+    // 데이터 추출 실패와 원문 읽기 실패를 구분한다. UI는 이 경우에만 렌더링을 안내한다.
+    const unavailable = (message) => Object.assign(new Error(message), { code: 'HTML_DATA_UNAVAILABLE' });
+    if (!tables.length) throw unavailable('HTML에서 정적 데이터 표, 내장 JSON 레코드 또는 내장 spec을 찾지 못했습니다.');
     const first = tables.find((entry) => entry.table);
-    if (!first) throw new Error(tables.map((entry) => `${entry.label}: ${entry.error}`).join('\n'));
+    if (!first) throw unavailable(tables.map((entry) => `${entry.label}: ${entry.error}`).join('\n'));
     return { kind: 'html', name, tables, tableId: first.id, selectionLabel: tables.some((entry) => entry.embeddedJSON) ? '데이터' : '표' };
   }
 

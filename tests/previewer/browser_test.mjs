@@ -134,6 +134,29 @@ async function waitPreviewLoaded(maxMs = 12000) {
 }
 const click = (sel) => evaluate(`(() => { const e = document.querySelector(${JSON.stringify(sel)}); if (!e) throw new Error('없음: ' + ${JSON.stringify(sel)}); e.click(); return true; })()`);
 
+async function assertHTMLPending(name, source, reason) {
+  assert.equal(await evaluate("document.getElementById('mk-error').hidden"), true, `${name}: recoverable HTML waits for rendering instead of showing a final error`);
+  assert.match(await evaluate("document.getElementById('mk-html-analysis').textContent"), reason, `${name}: the data extraction reason remains visible`);
+  assert.match(await evaluate("document.getElementById('mk-html-analysis').textContent"), /원본 렌더링·분석/, `${name}: the next rendering action is explained`);
+  assert.equal(await evaluate("document.getElementById('mk-status').textContent"), 'HTML 원문 준비');
+  assert.deepEqual(await evaluate(`(() => {
+    const state = window.HC.make.state;
+    return {
+      name: state.htmlInput?.name, raw: state.htmlInput?.html, rendered: state.htmlInput?.rendered,
+      html: state.html, spec: state.spec, table: state.table, source: state.source, originalMode: state.originalMode,
+      frame: document.getElementById('mk-frame').srcdoc,
+      originalFrame: document.getElementById('mk-original-frame').srcdoc,
+      panelVisible: !document.getElementById('mk-html-panel').hidden,
+      renderEnabled: !document.getElementById('mk-html-render').disabled,
+      textResult: document.getElementById('mk-text-result').textContent,
+      actionsDisabled: ['mk-download', 'mk-save-spec', 'mk-open', 'mk-ai-copy', 'mk-html-apply'].every(id => document.getElementById(id).disabled)
+    };
+  })()`), {
+    name, raw: source, rendered: null, html: '', spec: null, table: null, source: null, originalMode: false,
+    frame: '', originalFrame: '', panelVisible: true, renderEnabled: true, textResult: '', actionsDisabled: true,
+  }, `${name}: pending HTML retains only the inert original and clears prior output`);
+}
+
 const url = pathToFileURL(pagePath).href;
 
 try {
@@ -595,11 +618,19 @@ try {
       ['embedded-scalar-root.html', /객체|레코드|배열/],
       ['embedded-empty-only.html', /빈|데이터|레코드|배열/],
     ]) {
-      await check(`${filename} rejects with a useful reason and clears stale output`, async () => {
+      await check(`${filename} stays pending with a useful reason and clears stale output`, async () => {
+        const source = readFileSync(join(fixtures, filename), 'utf8');
+        const apiError = await evaluate(`(async () => {
+          try { await window.HC.make.readText(${JSON.stringify(source)}, 'html'); return {threw:false}; }
+          catch(error) { return {threw:true,code:error.code,message:error.message}; }
+        })()`);
+        assert.equal(apiError.threw, true, `${filename}: parser still rejects unavailable record data`);
+        assert.equal(apiError.code, 'HTML_DATA_UNAVAILABLE');
+        assert.match(apiError.message, reason);
         await load('simple-th.html');
         await setFile(join(fixtures, filename));
-        await waitUntil("!document.getElementById('mk-error').hidden", `reject ${filename}`);
-        assert.match(await evaluate("document.getElementById('mk-error').textContent"), reason);
+        await waitUntil("!document.getElementById('mk-error').hidden || document.getElementById('mk-status').textContent === 'HTML 원문 준비'", `pending ${filename}`);
+        await assertHTMLPending(filename, source, reason);
         assert.deepEqual(await evaluate(`({
           html: ${S}.html, spec: ${S}.spec, table: ${S}.table, source: ${S}.source,
           frame: document.getElementById('mk-frame').srcdoc,
@@ -970,6 +1001,54 @@ try {
     await navigate(`${url}?html-test=1#make`);
     await waitUntil('Boolean(window.HC?.make?.state)', 'converter initialization');
 
+    const pendingSources = [
+      { name: 'body', source: '<!doctype html><h1>본문만 있는 문서</h1><p>표가 없어도 원본 분석을 진행할 수 있습니다.</p><script>window.__pendingHTMLRuns++;</script>', reason: /표|내장/ },
+      { name: 'empty-dynamic', source: '<!doctype html><table><thead><tr><th>부서</th><th>매출</th></tr></thead><tbody id="pendingRows"></tbody></table><script>window.__pendingHTMLRuns++;document.getElementById("pendingRows").innerHTML="<tr><td>서울</td><td>3</td></tr>";</script>', reason: /머리글|데이터 행|JavaScript/ },
+    ];
+    for (const sample of pendingSources) {
+      for (const format of ['auto', 'html', 'htm']) {
+        const apiError = await evaluate(`(async () => {
+          try { await window.HC.make.readText(${JSON.stringify(sample.source)}, ${JSON.stringify(format)}); return {threw:false}; }
+          catch(error) { return {threw:true,code:error.code,message:error.message}; }
+        })()`);
+        assert.equal(apiError.threw, true, 'readText still rejects HTML without readable data');
+        assert.equal(apiError.code, 'HTML_DATA_UNAVAILABLE', 'only the UI recovers this parser condition');
+        assert.match(apiError.message, sample.reason);
+        await load('simple-th.html');
+        await evaluate(`(() => {
+          window.__pendingHTMLRuns = 0;
+          document.getElementById('mk-text-input').open = true;
+          document.getElementById('mk-text-format').value = ${JSON.stringify(format)};
+          document.getElementById('mk-text-source').value = ${JSON.stringify(sample.source)};
+          document.getElementById('mk-text-apply').click();
+        })()`);
+        await waitUntil("!document.getElementById('mk-error').hidden || document.getElementById('mk-status').textContent === 'HTML 원문 준비'", `pending ${sample.name} ${format}`);
+        await assertHTMLPending(`붙여넣은 데이터.${format === 'htm' ? 'htm' : 'html'}`, sample.source, sample.reason);
+        assert.equal(await evaluate('window.__pendingHTMLRuns'), 0, 'pending source scripts remain inert');
+        assert.equal(await evaluate("document.getElementById('mk-text-source').value"), sample.source, 'the pending source remains editable');
+        log(`PASS: ${sample.name} UI paste ${format} retains inert HTML ready for optional rendering`);
+      }
+      await load('simple-th.html');
+      await evaluate('window.__pendingHTMLRuns = 0');
+      const filename = `pending-${sample.name}.${sample.name === 'body' ? 'html' : 'htm'}`;
+      writeFileSync(join(outDir, filename), sample.source, 'utf8');
+      await setFile(join(outDir, filename));
+      await waitUntil("!document.getElementById('mk-error').hidden || document.getElementById('mk-status').textContent === 'HTML 원문 준비'", `pending upload ${sample.name}`);
+      await assertHTMLPending(filename, sample.source, sample.reason);
+      assert.equal(await evaluate('window.__pendingHTMLRuns'), 0);
+      log(`PASS: ${sample.name} upload retains inert HTML ready for optional rendering`);
+    }
+
+    // A renderer that cannot load remains a final error; it is not a data-extraction warning.
+    await evaluate("window.__savedHTMLRenderer = window.HC_HTML_RENDER; window.HC_HTML_RENDER = undefined; document.getElementById('mk-html-render').click()");
+    await waitUntil("!document.getElementById('mk-error').hidden", 'missing renderer is a final error');
+    assert.match(await evaluate("document.getElementById('mk-error').textContent"), /모듈|불러오지/);
+    assert.match(await evaluate("document.getElementById('mk-html-analysis').textContent"), /분석하지 못/);
+    assert.equal(await evaluate(`${S}.html`), '');
+    assert.equal(await evaluate("document.getElementById('mk-download').disabled"), true);
+    await evaluate('window.HC_HTML_RENDER = window.__savedHTMLRenderer; delete window.__savedHTMLRenderer');
+    log('PASS: a missing renderer still reports a final analysis error');
+
     // A CSV fallback, TFOOT inclusion, or flattened markup changes these hand-checked values.
     await load('simple-th.html');
     assert.deepEqual(await table(), {
@@ -1051,26 +1130,39 @@ try {
     assert.equal(await evaluate(`JSON.stringify(${S}.spec).includes('__htmlImportSentinel')`), false, 'source script text does not persist in spec');
     log('PASS: inert source markup and resources');
 
-    for (const [filename, reason] of [
+    for (const [filename, reason, recoverable = false] of [
       ['invalid-spec.html', /spec|JSON/i],
       ['invalid-spec-shape.html', /spec|title/i],
       ['null-spec-item.html', /spec/i],
-      ['no-table.html', /표|table/i],
-      ['nested-table.html', /중첩|nested/i],
-      ['merged-table.html', /병합|rowspan|colspan|merged/i],
-      ['ragged-table.html', /열|cell|column/i],
+      ['no-table.html', /표|table/i, true],
+      ['nested-table.html', /중첩|nested/i, true],
+      ['merged-table.html', /병합|rowspan|colspan|merged/i, true],
+      ['ragged-table.html', /열|cell|column/i, true],
     ]) {
       await load('simple-th.html');
       if (filename === 'invalid-spec.html') {
         await evaluate("(() => { const title = document.getElementById('mk-title'); title.value = '예약된 이전 결과'; title.dispatchEvent(new Event('input')); })()");
       }
       await setFile(join(fixtures, filename));
-      await waitUntil("!document.getElementById('mk-error').hidden && document.getElementById('mk-error').textContent.trim().length > 0", `reject ${filename}`);
-      const error = await evaluate("document.getElementById('mk-error').textContent");
-      assert.match(error, reason, `${filename}: useful reason for rejection`);
+      await waitUntil("!document.getElementById('mk-error').hidden || document.getElementById('mk-status').textContent === 'HTML 원문 준비'", `settle ${filename}`);
+      if (recoverable) {
+        await assertHTMLPending(filename, readFileSync(join(fixtures, filename), 'utf8'), reason);
+      } else {
+        const raw = readFileSync(join(fixtures, filename), 'utf8');
+        const apiError = await evaluate(`(async () => {
+          try { await window.HC.make.readText(${JSON.stringify(raw)}, 'html'); return {threw:false}; }
+          catch(error) { return {threw:true,code:error.code || null,message:error.message}; }
+        })()`);
+        assert.equal(apiError.threw, true, `${filename}: invalid hc-spec still throws in the parser API`);
+        assert.equal(apiError.code, null, `${filename}: invalid hc-spec must not be a recoverable data warning`);
+        assert.match(apiError.message, reason);
+        const error = await evaluate("document.getElementById('mk-error').textContent");
+        assert.equal(await evaluate("document.getElementById('mk-error').hidden"), false, `${filename}: invalid hc-spec is a final error`);
+        assert.match(error, reason, `${filename}: useful reason for rejection`);
+      }
       if (filename === 'invalid-spec.html') await sleep(700);
       await assertEmpty(filename);
-      log(`PASS: ${filename} rejects and clears stale results`);
+      log(`PASS: ${filename} ${recoverable ? 'keeps the original pending' : 'rejects'} and clears stale results`);
     }
 
     writeFileSync(join(outDir, 'csv-regression.csv'), '부서,매출\n서울,100\n부산,200\n', 'utf8');
@@ -1102,18 +1194,22 @@ try {
     }
 
     // These fixtures isolate unsupported header structure and unregistered extensions.
-    for (const [filename, reason] of [
-      ['multirow-thead.html', /머리글|thead|header/i],
+    for (const [filename, reason, recoverable = false] of [
+      ['multirow-thead.html', /머리글|thead|header/i, true],
       ['unsupported.pdf', /지원|형식|확장자|unsupported|format/i],
       ['unsupported.md', /지원|형식|확장자|unsupported|format/i],
       ['invalid-records.json', /JSON/i],
     ]) {
       await load('simple-th.html');
       await setFile(join(fixtures, filename));
-      await waitUntil("!document.getElementById('mk-error').hidden", `reject ${filename}`);
-      assert.match(await evaluate("document.getElementById('mk-error').textContent"), reason);
+      await waitUntil("!document.getElementById('mk-error').hidden || document.getElementById('mk-status').textContent === 'HTML 원문 준비'", `settle ${filename}`);
+      if (recoverable) await assertHTMLPending(filename, readFileSync(join(fixtures, filename), 'utf8'), reason);
+      else {
+        assert.equal(await evaluate("document.getElementById('mk-error').hidden"), false, `${filename}: non-HTML errors remain final`);
+        assert.match(await evaluate("document.getElementById('mk-error').textContent"), reason);
+      }
       await assertEmpty(filename);
-      log(`PASS: ${filename} rejects and clears stale results`);
+      log(`PASS: ${filename} ${recoverable ? 'keeps the original pending' : 'rejects'} and clears stale results`);
     }
 
     await load('records.json');
