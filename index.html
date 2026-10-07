@@ -137,7 +137,7 @@
       <div class="make-head">
         <span class="eyebrow">Step 2 · 데이터로 HTML 만들기</span>
         <h1 id="make-title">내 데이터를 고른 디자인의 HTML 한 장으로</h1>
-        <p>파일을 넣거나 원문 텍스트를 붙여 넣으면 데이터를 읽어 KPI·차트·표를 구성하고, 고른 디자인으로 HTML을 만듭니다. HTML은 정적 표·내장 JSON·이 도구가 저장한 데이터를 읽습니다. <b>데이터는 이 브라우저 안에서만 처리되며 어디에도 전송되지 않습니다.</b></p>
+        <p>파일을 넣거나 원문 텍스트를 붙여 넣으면 데이터를 읽어 KPI·차트·표를 구성하고, 고른 디자인으로 HTML을 만듭니다. HTML은 원본을 렌더링해 확인한 뒤, 원본 유지와 새 디자인 중 선택할 수도 있습니다. <b>데이터는 이 브라우저 안에서 처리됩니다.</b></p>
       </div>
       <div class="make-grid">
         <div class="make-side">
@@ -171,6 +171,21 @@
               <label class="mk-sheet" hidden><span id="mk-sheet-label">시트</span> <select class="select select-sm" id="mk-sheet"></select></label>
             </div>
             <p class="mk-error" id="mk-error" role="alert" hidden></p>
+            <div class="mk-html-input" id="mk-html-panel" hidden>
+              <h3>HTML 원본 활용</h3>
+              <p class="hint">동적으로 만들어지는 표와 본문은 원본을 렌더링한 뒤 읽을 수 있습니다.</p>
+              <button class="btn btn-sm" type="button" id="mk-html-render">원본 렌더링·분석</button>
+              <p class="hint">외부 파일·API 연결은 제한됩니다. 분석은 초기 화면 기준이며, 늦게 추가되는 데이터나 일부 기능을 확인하지 못할 수 있습니다.</p>
+              <p class="mk-html-analysis hint" id="mk-html-analysis" role="status" aria-live="polite"></p>
+              <label class="field">결과 방식
+                <select class="select" id="mk-html-mode">
+                  <option value="preserve">원본 유지</option>
+                  <option value="redesign">다른 느낌으로 · 새 디자인</option>
+                </select>
+              </label>
+              <p class="hint" id="mk-html-mode-hint">원문 HTML을 그대로 저장합니다. 배치·코드·조작 기능과 기존 외부 파일 의존성이 유지됩니다.</p>
+              <button class="btn btn-sm btn-primary" type="button" id="mk-html-apply" disabled>선택한 방식으로 적용</button>
+            </div>
           </section>
 
           <section class="panel" id="mk-cols" hidden aria-labelledby="mk-h-cols">
@@ -209,7 +224,7 @@
             </details>
           </section>
 
-          <section class="panel" aria-labelledby="mk-h-design">
+          <section class="panel" id="mk-design-panel" aria-labelledby="mk-h-design">
             <h2 id="mk-h-design"><span class="step-num">4</span>디자인</h2>
             <label class="field">디자인<select class="select" id="mk-design-select"></select></label>
             <div class="mk-picked" id="mk-picked"></div>
@@ -251,6 +266,9 @@
             </div>
             <div class="pv-device" id="mk-device" hidden>
               <iframe id="mk-frame" title="결과 미리보기" sandbox="allow-scripts allow-same-origin allow-popups allow-modals"></iframe>
+            </div>
+            <div class="pv-device" id="mk-original-device" hidden>
+              <iframe id="mk-original-frame" title="원본 HTML 미리보기" sandbox="allow-scripts" referrerpolicy="no-referrer"></iframe>
             </div>
           </div>
         </div>
@@ -339,6 +357,7 @@
   <script src="assets/hc-render.js"></script>
   <script src="assets/app.js"></script>
   <script src="assets/input-readers.js"></script>
+  <script src="assets/html-render.js"></script>
   <script src="assets/convertor.js"></script>
 </body>
 </html>

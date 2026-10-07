@@ -76,11 +76,13 @@
   }
 
   function readHTML(text, name, context) {
+    context.captureHTML?.(text, name);
     // template의 분리된 문서 조각은 스크립트와 외부 리소스를 활성화하지 않는다.
     const template = document.createElement('template');
     template.innerHTML = text;
     const root = template.content;
     const markers = Array.from(root.querySelectorAll('[id="hc-spec"]'));
+    let embeddedSpec;
     if (markers.length) {
       const marker = markers[0];
       if (markers.length !== 1 || marker.tagName !== 'SCRIPT' || marker.type.toLowerCase() !== 'application/json') {
@@ -97,7 +99,8 @@
             (!Array.isArray(spec.summary) || !spec.summary.every((value) => typeof value === 'string')))) {
         throw new Error('HTML의 내장 spec 형식이 올바르지 않습니다(meta.title과 올바른 데이터 영역이 필요).');
       }
-      return { kind: 'spec', name, spec };
+      embeddedSpec = { kind: 'spec', name, spec };
+      if (!context.preferRenderedTables) return embeddedSpec;
     }
     const candidates = Array.from(root.querySelectorAll('table')).filter((table) => !table.parentElement?.closest('table'));
     const tables = candidates.map((table, index) => {
@@ -106,6 +109,11 @@
       try { entry.table = htmlTable(table, context.tableFromRows); } catch (e) { entry.error = e.message; }
       return entry;
     });
+    // 선택적 렌더 분석에서는 화면에 생성된 실제 표를 내장 원데이터보다 먼저 읽는다.
+    if (context.preferRenderedTables && tables.some((entry) => entry.table)) {
+      return { kind: 'html', name, tables, tableId: tables.find((entry) => entry.table).id, selectionLabel: '표' };
+    }
+    if (embeddedSpec) return embeddedSpec;
     tables.push(...embeddedJSONTables(root, context));
     if (!tables.length) throw new Error('HTML에서 정적 데이터 표, 내장 JSON 레코드 또는 내장 spec을 찾지 못했습니다.');
     const first = tables.find((entry) => entry.table);

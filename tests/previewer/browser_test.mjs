@@ -6,6 +6,7 @@
 //   node tests/previewer/browser_test.mjs html     # HTML 입력: 표·spec 재입력·스크립트 차단·실패 후 초기화 (assert)
 //   node tests/previewer/browser_test.mjs text     # 원문 텍스트 입력: 감지·수동 형식·오류·파일 경합 (assert)
 //   node tests/previewer/browser_test.mjs embedded # application/json 내장 레코드 HTML (합성 데이터, assert)
+//   node tests/previewer/browser_test.mjs render   # 원본 HTML 렌더링·분석과 원본/다른 디자인 적용 (assert)
 //   embedded 모드의 선택적 4번째 인자는 로컬 전용 HTML 첨부 경로입니다(원문·출력 파일 저장 없음).
 //   node tests/previewer/browser_test.mjs search   # 검색만
 //   node tests/previewer/browser_test.mjs embed    # 페이지 안 미리보기가 되는 데모를 전부 실제로 열어 캡처 (몇 분 걸림)
@@ -30,7 +31,7 @@ const mode = process.argv[2] || 'page';
 const pagePath = resolve(ROOT, process.argv[3] || 'index.html');
 const outDir = join(HERE, 'out', mode);
 process.argv[5] = process.argv[5] || join(ROOT, 'tests', 'convertor', 'fixtures'); // make 모드의 테스트 입력 폴더
-const PORT = mode === 'embed' ? 9334 : mode === 'make' ? 9335 : mode === 'html' ? 9336 : mode === 'text' ? 9338 : mode === 'embedded' ? 9339 : 9333;
+const PORT = mode === 'embed' ? 9334 : mode === 'make' ? 9335 : mode === 'html' ? 9336 : mode === 'text' ? 9338 : mode === 'embedded' ? 9339 : mode === 'render' ? 9342 : 9333;
 mkdirSync(outDir, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const log = (...a) => console.log(...a);
@@ -65,9 +66,9 @@ class CDP {
       };
     });
   }
-  send(method, params = {}) {
+  send(method, params = {}, sessionId) {
     const id = ++this.id;
-    this.ws.send(JSON.stringify({ id, method, params }));
+    this.ws.send(JSON.stringify({ id, method, params, ...(sessionId ? { sessionId } : {}) }));
     return new Promise((resolve, reject) => this.pending.set(id, { resolve, reject }));
   }
   on(h) { this.handlers.push(h); }
@@ -81,8 +82,14 @@ await cdp.open();
 
 const problems = [];
 cdp.on((m) => {
-  if (m.method === 'Runtime.exceptionThrown') problems.push(`예외: ${m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text}`);
-  if (m.method === 'Runtime.consoleAPICalled' && m.params.type === 'error') problems.push(`console.error: ${m.params.args.map((a) => a.value || a.description).join(' ')}`);
+  if (m.method === 'Runtime.exceptionThrown') {
+    const description = m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text;
+    if (!(mode === 'render' && description.includes('RENDER_TEST_EXPECTED_FAILURE'))) problems.push(`예외: ${description}`);
+  }
+  if (m.method === 'Runtime.consoleAPICalled' && m.params.type === 'error') {
+    const description = m.params.args.map((a) => a.value || a.description).join(' ');
+    if (!(mode === 'render' && description.includes('RENDER_TEST_EXPECTED_FAILURE'))) problems.push(`console.error: ${description}`);
+  }
   if (m.method === 'Log.entryAdded' && m.params.entry.level === 'error' && /file:\/\//.test(m.params.entry.url || '')) problems.push(`로드 오류: ${m.params.entry.text} ${m.params.entry.url}`);
 });
 await cdp.send('Page.enable');
@@ -130,6 +137,339 @@ const click = (sel) => evaluate(`(() => { const e = document.querySelector(${JSO
 const url = pathToFileURL(pagePath).href;
 
 try {
+  if (mode === 'render') {
+    const fixtures = join(ROOT, 'tests', 'convertor', 'fixtures', 'html-input');
+    const S = 'window.HC.make.state';
+    const source = readFileSync(join(fixtures, 'render-dynamic.html'), 'utf8');
+    const sourceOrigin = 'https://render-html-test.invalid';
+    const sourceRequests = new Map();
+    const contexts = new Map();
+    cdp.on((m) => {
+      const session = m.sessionId || '';
+      if (m.method === 'Runtime.executionContextCreated' && m.params.context.auxData?.isDefault) {
+        contexts.set(`${session}:${m.params.context.id}`, { id: m.params.context.id, session });
+      }
+      if (m.method === 'Runtime.executionContextDestroyed') contexts.delete(`${session}:${m.params.executionContextId}`);
+      if (m.method === 'Runtime.executionContextsCleared') {
+        for (const [key, context] of contexts) if (context.session === session) contexts.delete(key);
+      }
+      if (m.method === 'Network.requestWillBeSent' && m.params.request.url.startsWith(sourceOrigin)) {
+        sourceRequests.set(`${session}:${m.params.requestId}`, { url: m.params.request.url });
+      }
+      if (m.method === 'Network.loadingFailed') {
+        const request = sourceRequests.get(`${session}:${m.params.requestId}`);
+        if (request) request.blockedReason = m.params.blockedReason;
+      }
+      if (m.method === 'Target.attachedToTarget' && m.params.targetInfo.type === 'iframe') {
+        const childSession = m.params.sessionId;
+        // Opaque frames may be separate renderer targets; observe their real realms through CDP.
+        (async () => {
+          await cdp.send('Runtime.enable', {}, childSession);
+          await cdp.send('Network.enable', {}, childSession);
+          await cdp.send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: false, flatten: true }, childSession);
+        })().catch(() => { /* A new input can remove a frame while its observation is being enabled. */ });
+      }
+    });
+    await cdp.send('Network.enable');
+    // Observe the renderer's CSP directly; a CDP blocker would replace its reason with "inspector".
+    await cdp.send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: false, flatten: true });
+    const waitUntil = async (expression, description, maxMs = 12000) => {
+      const start = Date.now();
+      while (Date.now() - start < maxMs) {
+        if (await evaluate(expression)) return;
+        await sleep(50);
+      }
+      const status = await evaluate("document.getElementById('mk-html-analysis')?.textContent || document.getElementById('mk-error').textContent");
+      assert.fail(`${description} timed out${status ? `: ${status}` : ''}`);
+    };
+    const setFile = async (path) => {
+      const { root } = await cdp.send('DOM.getDocument', { depth: -1 });
+      const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector: '#mk-file' });
+      await cdp.send('DOM.setFileInputFiles', { files: [path], nodeId });
+    };
+    const load = async (filename) => {
+      await setFile(join(fixtures, filename));
+      await waitUntil(`${S}.htmlInput?.name === ${JSON.stringify(filename)}`, `read ${filename}`);
+    };
+    const renderSource = async () => {
+      await click('#mk-html-render');
+      await waitUntil(`${S}.htmlInput?.rendered && !document.getElementById('mk-html-apply').disabled`, 'source rendering and analysis');
+    };
+    const applyMode = async (modeName) => {
+      await evaluate(`(() => { const mode = document.getElementById('mk-html-mode'); mode.value = ${JSON.stringify(modeName)}; mode.dispatchEvent(new Event('change')); document.getElementById('mk-html-apply').click(); })()`);
+      await waitUntil(`${S}.htmlMode === ${JSON.stringify(modeName)} && ${S}.html.length > 0 && ${S}.originalMode === ${modeName === 'preserve'}`, `apply ${modeName}`);
+    };
+    const originalValue = async (expression) => {
+      const start = Date.now();
+      while (Date.now() - start < 4000) {
+        for (const context of [...contexts.values()].reverse()) {
+          try {
+            const result = await cdp.send('Runtime.evaluate', {
+              contextId: context.id, returnByValue: true,
+              expression: `(() => { if (!document.getElementById('counterButton')) return {found:false}; return {found:true,value:(${expression})}; })()`,
+            }, context.session || undefined);
+            if (result.result?.value?.found) return result.result.value.value;
+          } catch { /* Ignore realms removed by an input or mode change. */ }
+        }
+        await sleep(50);
+      }
+      assert.fail('the opaque original source realm is available to CDP');
+    };
+    const expectRedesign = async () => {
+      assert.deepEqual(await evaluate(`({columns:${S}.table.columns,rows:${S}.table.rows})`), { columns: ['부서', '매출'], rows: [['서울', '100'], ['부산', '200']] });
+      assert.equal(await evaluate(`${S}.spec.kpis.find(k => k.label === '총 매출')?.value`), 300);
+      assert.equal(await evaluate(`${S}.html.includes('parent.document.body.dataset.renderSourceTouched')`), false, 'source JavaScript is absent from redesigned output');
+      assert.equal(await evaluate("document.getElementById('mk-save-spec').disabled"), false);
+    };
+
+    await navigate(`${url}#make`);
+    await evaluate('localStorage.clear()');
+    await navigate(`${url}?render-test=1#make`);
+    assert.equal(await evaluate("Boolean(document.getElementById('mk-html-panel'))"), true, 'the HTML render/analyze panel exists');
+    assert.equal(await evaluate("Boolean(document.getElementById('mk-html-render'))"), true, 'the original rendering action exists');
+    assert.equal(await evaluate("Boolean(document.getElementById('mk-original-frame'))"), true, 'original HTML uses its dedicated frame');
+    assert.deepEqual(await evaluate("[...document.getElementById('mk-html-mode').options].map(o => o.value).sort()"), ['preserve', 'redesign']);
+
+    await load('render-dynamic.html');
+    assert.equal(await evaluate("document.getElementById('mk-html-panel').hidden"), false);
+    assert.equal(await evaluate(`${S}.htmlInput.html`), source);
+    assert.equal(await evaluate(`${S}.htmlInput.rendered`), null, 'HTML upload keeps source execution opt-in');
+    assert.equal(await evaluate(`${S}.originalMode`), false);
+    assert.equal(await evaluate("document.body.dataset.renderSourceTouched"), undefined);
+    log('PASS: HTML upload stays inert and offers explicit rendering');
+
+    await renderSource();
+    assert.deepEqual(await evaluate(`({tables:${S}.htmlInput.rendered.analysis.tableCount,svg:${S}.htmlInput.rendered.analysis.svgCount})`), { tables: 1, svg: 1 });
+    assert.deepEqual(await evaluate(`(() => {
+      const snapshot = document.createElement('template'); snapshot.innerHTML = ${S}.htmlInput.rendered.snapshot;
+      return {
+        rows: [...snapshot.content.querySelectorAll('#salesRows tr')].map(row => [...row.cells].map(cell => cell.textContent)),
+        circles: snapshot.content.querySelectorAll('#drawing circle').length,
+        executableScripts: snapshot.content.querySelectorAll('script:not([type="application/json"])').length,
+        eventAttribute: snapshot.content.querySelector('#counterButton').hasAttribute('onclick')
+      };
+    })()`), { rows: [['서울', '100'], ['부산', '200']], circles: 3, executableScripts: 0, eventAttribute: false });
+    assert.equal(await evaluate(`${S}.html`), '', 'rendering collects a snapshot before a mode is applied');
+    assert.equal(await evaluate("document.getElementById('mk-download').disabled"), true);
+    assert.match(await evaluate("document.getElementById('mk-html-analysis').textContent"), /표|table|SVG/i);
+    log('PASS: explicit rendering captures dynamic table and SVG without auto-applying');
+
+    await applyMode('preserve');
+    assert.equal(await evaluate(`${S}.html`), source, 'preserve output is byte-for-byte source text');
+    assert.equal(await evaluate(`${S}.spec`), null);
+    assert.equal(await evaluate("document.getElementById('mk-save-spec').disabled"), true);
+    assert.equal(await evaluate("document.getElementById('mk-download').disabled"), false);
+    assert.equal(await evaluate("document.getElementById('mk-original-device').hidden"), false);
+    const sandbox = await evaluate("document.getElementById('mk-original-frame').getAttribute('sandbox').split(/\\s+/)");
+    assert.ok(sandbox.includes('allow-scripts') && !sandbox.includes('allow-same-origin'), 'original preview uses an opaque sandbox');
+    assert.equal(await originalValue("document.getElementById('counterValue').textContent"), '0');
+    await originalValue("(document.getElementById('counterButton').click(), 'clicked')");
+    assert.equal(await originalValue("document.getElementById('counterValue').textContent"), '1', 'the preserved source button keeps its original behavior');
+    assert.equal(await originalValue('window.__renderTopBlocked'), true);
+    assert.equal(await evaluate("document.body.dataset.renderSourceTouched"), undefined);
+    log('PASS: preserve keeps source text, interactive controls and sandbox isolation');
+    await shot('render_original');
+
+    const downloads = [];
+    const completedDownloads = new Set();
+    const browser = new CDP(version.webSocketDebuggerUrl); await browser.open();
+    browser.on(m => {
+      if (m.method === 'Browser.downloadWillBegin') downloads.push(m.params);
+      if (m.method === 'Browser.downloadProgress' && m.params.state === 'completed') completedDownloads.add(m.params.guid);
+    });
+    await browser.send('Browser.setDownloadBehavior', { behavior: 'allowAndName', downloadPath: outDir, eventsEnabled: true });
+    const downloadBytes = async () => {
+      const before = downloads.length;
+      await click('#mk-download');
+      for (let attempts = 0; attempts < 100 && (!downloads[before] || !completedDownloads.has(downloads[before].guid)); attempts += 1) await sleep(50);
+      assert.equal(downloads.length, before + 1, 'preserve starts one real download');
+      const item = downloads[before];
+      assert.ok(completedDownloads.has(item.guid), 'the original download finishes before its bytes are checked');
+      assert.match(item.suggestedFilename, /\.html$/i);
+      return readFileSync(join(outDir, item.guid));
+    };
+    assert.equal((await downloadBytes()).toString('utf8'), source, 'the downloaded original remains unchanged');
+    log('PASS: preserved HTML download contains exact original source');
+
+    await applyMode('redesign');
+    await expectRedesign();
+    await waitUntil("(() => { const text=document.getElementById('mk-frame').contentDocument?.body?.innerText || ''; return text.includes('서울') && text.includes('300'); })()", 'visible redesigned frame content before screenshot', 20000);
+    await waitUntil("!document.getElementById('toast').classList.contains('show')", 'download notification closes before screenshot');
+    await shot('render_redesign', { full: true });
+    await applyMode('preserve');
+    assert.equal(await evaluate(`${S}.html`), source);
+    assert.equal(await evaluate(`${S}.htmlInput.html`), source);
+    await applyMode('redesign');
+    await expectRedesign();
+    log('PASS: redesign uses rendered rows and mode round trips keep the same original');
+
+    await evaluate(`(() => { document.getElementById('mk-text-input').open = true; document.getElementById('mk-text-format').value = 'auto'; document.getElementById('mk-text-source').value = ${JSON.stringify(source)}; document.getElementById('mk-text-apply').click(); })()`);
+    await waitUntil(`${S}.htmlInput?.name === '붙여넣은 데이터.html'`, 'pasted HTML source');
+    assert.equal(await evaluate(`${S}.htmlInput.rendered`), null);
+    await renderSource();
+    await applyMode('redesign');
+    await expectRedesign();
+    await applyMode('preserve');
+    assert.equal(await evaluate(`${S}.html`), source);
+    log('PASS: pasted HTML offers both source and redesigned modes');
+
+    await load('render-body.html');
+    await renderSource();
+    await applyMode('redesign');
+    assert.equal(await evaluate(`${S}.table`), null);
+    assert.match(await evaluate(`JSON.stringify({sections:${S}.spec.sections,summary:${S}.spec.summary})`), /동적으로 채운 본문/);
+    assert.equal(await evaluate(`${S}.html.includes("document.getElementById('dynamicBody').textContent")`), false,
+      `body redesign excludes source JavaScript; analyzed body: ${await evaluate(`${S}.htmlInput.rendered.analysis.bodyText`)}`);
+    log('PASS: rendered body text redesigns without a table');
+
+    await load('render-network.html');
+    await renderSource();
+    assert.equal(await evaluate(`${S}.htmlInput.rendered.analysis.partial`), true);
+    assert.match(await evaluate(`JSON.stringify(${S}.htmlInput.rendered.analysis.warnings)`), /CSP|외부|차단|restrict/i);
+    const networkWarnings = await evaluate(`JSON.stringify(${S}.htmlInput.rendered.analysis.warnings)`);
+    // Edge reports a blocked cross-origin frame navigation using its origin, without the URL path.
+    assert.match(networkWarnings, /frame-src.*https:\/\/render-html-test\.invalid/, 'an attempted source-frame navigation is reported as a CSP frame restriction');
+    assert.ok(sourceRequests.size > 0, 'CDP observes source resource requests and their blocked outcomes');
+    assert.ok([...sourceRequests.values()].every(request => request.blockedReason === 'csp'), `source resource requests are blocked by CSP: ${JSON.stringify([...sourceRequests.values()])}`);
+    assert.equal(await evaluate("document.body.dataset.renderSourceTouched"), undefined);
+    log('PASS: source resource restrictions produce partial-result warnings');
+
+    await load('render-failure.html');
+    await renderSource();
+    assert.equal(await evaluate(`${S}.htmlInput.rendered.analysis.partial`), true);
+    assert.match(await evaluate(`JSON.stringify(${S}.htmlInput.rendered.analysis.warnings)`), /RENDER_TEST_EXPECTED_FAILURE/);
+    assert.equal(await evaluate(`${S}.html`), '');
+    assert.equal(await evaluate(`${S}.spec`), null);
+    assert.equal(await evaluate("document.getElementById('mk-download').disabled"), true);
+    log('PASS: source script failure is reported without retaining a previous output');
+
+    await load('render-dynamic.html');
+    await click('#mk-html-render');
+    await load('render-body.html');
+    await sleep(1400);
+    assert.equal(await evaluate(`${S}.htmlInput.name`), 'render-body.html');
+    assert.equal(await evaluate(`${S}.htmlInput.rendered`), null, 'an older source render cannot attach its snapshot to a new input');
+    assert.equal(await evaluate("document.getElementById('mk-html-apply').disabled"), true);
+    log('PASS: replacing HTML ignores an older pending render');
+
+    await renderSource(); await applyMode('preserve');
+    await evaluate("(() => { document.getElementById('mk-text-format').value='csv'; document.getElementById('mk-text-source').value='부서,매출\\n서울,100\\n부산,200'; document.getElementById('mk-text-apply').click(); })()");
+    await waitUntil(`${S}.source?.name === '붙여넣은 데이터.csv' && ${S}.html.length > 0`, 'CSV replaces preserved HTML');
+    assert.equal(await evaluate(`${S}.htmlInput`), null);
+    assert.equal(await evaluate(`${S}.originalMode`), false);
+    assert.equal(await evaluate("document.getElementById('mk-original-device').hidden"), true);
+    assert.equal(await evaluate("document.getElementById('mk-html-panel').hidden"), true);
+    log('PASS: ordinary data input clears preserved source state');
+
+    await evaluate(`(() => {
+      const file = new File([${JSON.stringify(source)}], 'late-render-source.html');
+      const readBytes = file.arrayBuffer.bind(file);
+      file.arrayBuffer = async () => { await new Promise(resolve => {window.__releaseRenderRead=resolve;}); return readBytes(); };
+      window.__lateRenderRead=window.HC.make.ingest(file);
+    })()`);
+    await evaluate("(() => { document.getElementById('mk-text-format').value='csv'; document.getElementById('mk-text-source').value='부서,매출\\n서울,100\\n부산,200'; document.getElementById('mk-text-apply').click(); })()");
+    await waitUntil(`${S}.source?.name === '붙여넣은 데이터.csv' && ${S}.html.length > 0`, 'newer CSV while HTML bytes wait');
+    await evaluate('(async () => { window.__releaseRenderRead(); await window.__lateRenderRead; })()');
+    assert.equal(await evaluate(`${S}.htmlInput`), null, 'late HTML bytes cannot restore stale rendering state');
+    assert.equal(await evaluate(`${S}.originalMode`), false);
+    log('PASS: late HTML reads cannot overwrite newer source state');
+
+    await load('render-spec-priority.html');
+    await waitUntil(`${S}.spec?.kpis?.[0]?.value === 100`, 'default embedded spec');
+    assert.equal(await evaluate(`${S}.spec.kpis[0].value`), 100, 'inert HTML import keeps the embedded spec contract');
+    await renderSource();
+    await applyMode('redesign');
+    assert.deepEqual(await evaluate(`({columns:${S}.table.columns,rows:${S}.table.rows})`), { columns: ['부서', '매출'], rows: [['부산', '200']] });
+    assert.equal(await evaluate(`${S}.spec.kpis.find(k => k.label === '총 매출')?.value`), 200, 'opt-in redesign prioritizes the current rendered table');
+    log('PASS: embedded spec is the default while redesign uses updated rendered table values');
+
+    for (const filename of ['render-body-layout.html', 'render-body-empty-table.html']) {
+      await load(filename);
+      await renderSource();
+      await applyMode('redesign');
+      assert.equal(await evaluate(`${S}.table`), null, `${filename}: unsupported table falls back to prose`);
+      assert.deepEqual(await evaluate(`${S}.spec.kpis`), [], `${filename}: prose fallback invents no numeric KPI`);
+      assert.match(await evaluate(`JSON.stringify(${S}.spec.sections)`), /읽을 본문/);
+      assert.match(await evaluate("document.getElementById('mk-html-analysis').textContent"), /본문으로|본문.*적용/);
+      assert.match(await evaluate("document.getElementById('mk-html-analysis').textContent"), /집계.*않|집계.*없/);
+      log(`PASS: ${filename} keeps prose and explains why no data table was applied`);
+    }
+
+    await load('render-delayed.html');
+    await renderSource();
+    assert.deepEqual(await evaluate(`(() => {
+      const snapshot=document.createElement('template');snapshot.innerHTML=${S}.htmlInput.rendered.snapshot;
+      return [...snapshot.content.querySelectorAll('#delayedRows tr')].map(row=>[...row.cells].map(cell=>cell.textContent));
+    })()`), [['서울', '3']], 'analysis includes a table populated after a 1.5 second timer');
+    await applyMode('redesign');
+    assert.deepEqual(await evaluate(`({columns:${S}.table.columns,rows:${S}.table.rows})`), { columns: ['부서', '매출'], rows: [['서울', '3']] });
+    assert.equal(await evaluate(`${S}.spec.kpis.find(k => k.label === '총 매출')?.value`), 3);
+    log('PASS: analysis captures a table created by a delayed inline timer');
+
+    const legacySource = '<!doctype html><meta charset="euc-kr"><title>한글 원본</title><table><thead><tr><th>부서</th><th>매출</th></tr></thead><tbody><tr><td>서울</td><td>3</td></tr></tbody></table>';
+    // Independent EUC-KR byte literals protect the source charset, rather than using app decoding as an oracle.
+    const legacyBytes = Buffer.concat([
+      Buffer.from('<!doctype html><meta charset="euc-kr"><title>'), Buffer.from('c7d1b1db20bff8babb', 'hex'),
+      Buffer.from('</title><table><thead><tr><th>'), Buffer.from('bacebcad', 'hex'),
+      Buffer.from('</th><th>'), Buffer.from('b8c5c3e2', 'hex'),
+      Buffer.from('</th></tr></thead><tbody><tr><td>'), Buffer.from('bcadbfef', 'hex'),
+      Buffer.from('</td><td>3</td></tr></tbody></table>'),
+    ]);
+    const byteSources = [
+      { name: 'render-legacy-euckr.html', bytes: legacyBytes, expected: legacySource },
+      { name: 'render-utf8-bom.html', bytes: Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from(source)]), expected: source },
+    ];
+    for (const sample of byteSources) {
+      const path = join(outDir, sample.name); writeFileSync(path, sample.bytes);
+      await setFile(path);
+      await waitUntil(`${S}.htmlInput?.name === ${JSON.stringify(sample.name)}`, `read ${sample.name}`);
+      assert.equal(await evaluate(`${S}.htmlInput.html`), sample.expected);
+      await renderSource(); await applyMode('preserve');
+      assert.equal(await evaluate(`${S}.html`), sample.expected);
+      assert.deepEqual(await downloadBytes(), sample.bytes, `${sample.name}: original download preserves exact bytes including charset/BOM`);
+      log(`PASS: ${sample.name} preservation downloads exact original file bytes`);
+    }
+    await evaluate(`window.HC.make.ingestText(${JSON.stringify(legacySource)}, 'html')`);
+    await renderSource(); await applyMode('preserve');
+    assert.equal(await evaluate(`${S}.html`), legacySource, 'pasted legacy meta keeps the entered Unicode source');
+    const pastedBytes = await downloadBytes();
+    assert.deepEqual(pastedBytes, Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from(legacySource)]), 'pasted legacy charset source downloads Unicode as UTF-8 with a BOM');
+    const reopened = join(outDir, 'render-pasted-legacy-reopened.html'); writeFileSync(reopened, pastedBytes);
+    await navigate(pathToFileURL(reopened).href);
+    assert.equal(await evaluate('document.title'), '한글 원본', 'reopened pasted output honors the UTF-8 BOM');
+    assert.match(await evaluate('document.body.innerText'), /부서.*매출.*서울/s);
+    log('PASS: pasted HTML with a legacy charset reopens with correct Unicode');
+    await navigate(`${url}?render-test=2#make`);
+
+    if (process.argv[4]) {
+      // Read this attachment only into the browser; never save its source, output or screenshots.
+      await setFile(resolve(process.argv[4]));
+      await waitUntil(`${S}.htmlInput`, 'local attachment input');
+      await renderSource();
+      assert.deepEqual(await evaluate(`(() => {
+        const snapshot=document.createElement('template');snapshot.innerHTML=${S}.htmlInput.rendered.snapshot;
+        const rows=[...snapshot.content.querySelectorAll('#viaRows tr')];
+        return {rows:rows.length,cuts:rows.reduce((sum,row)=>sum+Number(row.cells[1].textContent),0)};
+      })()`), { rows: 15, cuts: 189 });
+      assert.ok(await evaluate(`${S}.htmlInput.rendered.analysis.svgCount > 0`));
+      log('PASS: local attachment rendering captures 15 visible VIA rows and Cut total 189');
+      await applyMode('preserve');
+      assert.equal(await evaluate(`${S}.html === ${S}.htmlInput.html`), true);
+      assert.equal(await evaluate(`${S}.spec`), null);
+      assert.equal(await evaluate("document.getElementById('mk-save-spec').disabled"), true);
+      log('PASS: local attachment preservation keeps exact source and disables spec output');
+      await applyMode('redesign');
+      assert.deepEqual(await evaluate(`(() => {
+        const table=${S}.table;
+        const cutIndex=table.columns.findIndex(column=>/cut/i.test(column));
+        if(cutIndex<0)return {rows:table.rows.length,cuts:null};
+        return {rows:table.rows.length,cuts:table.rows.reduce((sum,row)=>sum+Number(String(row[cutIndex]).replace(/,/g,'')),0)};
+      })()`), { rows: 15, cuts: 189 });
+      assert.equal(await evaluate(`${S}.originalMode`), false);
+      log('PASS: local attachment redesign uses 15 rendered VIA rows and Cut total 189');
+    }
+  }
+
   if (mode === 'embedded') {
     const fixtures = join(ROOT, 'tests', 'convertor', 'fixtures', 'html-input');
     const S = 'window.HC.make.state';

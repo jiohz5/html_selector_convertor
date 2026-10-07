@@ -1,0 +1,6 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>렌더 표 우선</title>
+<script type="application/json" id="hc-spec">{"meta":{"title":"입력 spec"},"kpis":[{"label":"총 매출","value":100}],"tables":[{"title":"입력 표","columns":["부서","매출"],"rows":[["서울",100]]}]}</script>
+<table><thead><tr><th>부서</th><th>매출</th></tr></thead><tbody id="currentRows"></tbody></table>
+<script>document.getElementById('currentRows').innerHTML='<tr><td>부산</td><td>200</td></tr>';</script>

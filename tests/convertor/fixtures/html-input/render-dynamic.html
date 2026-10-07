@@ -1,0 +1,21 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>원본 동적 현황</title>
+<style>body{font-family:sans-serif;margin:20px}table{border-collapse:collapse}td,th{border:1px solid #ccc;padding:8px}button{padding:8px;margin-top:12px}</style>
+<h1>원본 동적 현황</h1>
+<table><caption>지역 매출</caption><thead><tr><th>부서</th><th>매출</th></tr></thead><tbody id="salesRows"></tbody></table>
+<svg id="drawing" width="160" height="60" aria-label="동적 그림"></svg>
+<button id="counterButton" type="button" onclick="window.__renderClickAttribute=true">누른 횟수 <span id="counterValue">0</span></button>
+<script>
+  const records = [{dept:'서울',sales:100},{dept:'부산',sales:200}];
+  document.getElementById('salesRows').innerHTML = records.map(row => `<tr><td>${row.dept}</td><td>${row.sales}</td></tr>`).join('');
+  const drawing = document.getElementById('drawing');
+  for (let i=0;i<3;i+=1) {
+    const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx',String(25+i*50));circle.setAttribute('cy','30');circle.setAttribute('r','15');circle.setAttribute('fill','#147d92');drawing.appendChild(circle);
+  }
+  let clicks = 0;
+  document.getElementById('counterButton').addEventListener('click',() => { document.getElementById('counterValue').textContent=String(++clicks); });
+  window.__renderTopBlocked = false;
+  try { parent.document.body.dataset.renderSourceTouched = 'unsafe'; } catch { window.__renderTopBlocked = true; }
+</script>

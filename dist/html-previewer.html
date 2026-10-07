@@ -702,6 +702,9 @@ textarea.input { resize: vertical; line-height: 1.55; }
 @media (max-width: 480px) {
   .brand-name { display: none; } /* 단계 전환 버튼 자리를 위해 로고만 남긴다 */
 }
+.mk-html-input { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+.mk-html-input h3 { margin: 0 0 8px; font-size: 14px; }
+.mk-html-analysis { white-space: pre-wrap; overflow-wrap: anywhere; }
 
 </style>
 </head>
@@ -827,7 +830,7 @@ textarea.input { resize: vertical; line-height: 1.55; }
       <div class="make-head">
         <span class="eyebrow">Step 2 · 데이터로 HTML 만들기</span>
         <h1 id="make-title">내 데이터를 고른 디자인의 HTML 한 장으로</h1>
-        <p>파일을 넣거나 원문 텍스트를 붙여 넣으면 데이터를 읽어 KPI·차트·표를 구성하고, 고른 디자인으로 HTML을 만듭니다. HTML은 정적 표·내장 JSON·이 도구가 저장한 데이터를 읽습니다. <b>데이터는 이 브라우저 안에서만 처리되며 어디에도 전송되지 않습니다.</b></p>
+        <p>파일을 넣거나 원문 텍스트를 붙여 넣으면 데이터를 읽어 KPI·차트·표를 구성하고, 고른 디자인으로 HTML을 만듭니다. HTML은 원본을 렌더링해 확인한 뒤, 원본 유지와 새 디자인 중 선택할 수도 있습니다. <b>데이터는 이 브라우저 안에서 처리됩니다.</b></p>
       </div>
       <div class="make-grid">
         <div class="make-side">
@@ -861,6 +864,21 @@ textarea.input { resize: vertical; line-height: 1.55; }
               <label class="mk-sheet" hidden><span id="mk-sheet-label">시트</span> <select class="select select-sm" id="mk-sheet"></select></label>
             </div>
             <p class="mk-error" id="mk-error" role="alert" hidden></p>
+            <div class="mk-html-input" id="mk-html-panel" hidden>
+              <h3>HTML 원본 활용</h3>
+              <p class="hint">동적으로 만들어지는 표와 본문은 원본을 렌더링한 뒤 읽을 수 있습니다.</p>
+              <button class="btn btn-sm" type="button" id="mk-html-render">원본 렌더링·분석</button>
+              <p class="hint">외부 파일·API 연결은 제한됩니다. 분석은 초기 화면 기준이며, 늦게 추가되는 데이터나 일부 기능을 확인하지 못할 수 있습니다.</p>
+              <p class="mk-html-analysis hint" id="mk-html-analysis" role="status" aria-live="polite"></p>
+              <label class="field">결과 방식
+                <select class="select" id="mk-html-mode">
+                  <option value="preserve">원본 유지</option>
+                  <option value="redesign">다른 느낌으로 · 새 디자인</option>
+                </select>
+              </label>
+              <p class="hint" id="mk-html-mode-hint">원문 HTML을 그대로 저장합니다. 배치·코드·조작 기능과 기존 외부 파일 의존성이 유지됩니다.</p>
+              <button class="btn btn-sm btn-primary" type="button" id="mk-html-apply" disabled>선택한 방식으로 적용</button>
+            </div>
           </section>
 
           <section class="panel" id="mk-cols" hidden aria-labelledby="mk-h-cols">
@@ -899,7 +917,7 @@ textarea.input { resize: vertical; line-height: 1.55; }
             </details>
           </section>
 
-          <section class="panel" aria-labelledby="mk-h-design">
+          <section class="panel" id="mk-design-panel" aria-labelledby="mk-h-design">
             <h2 id="mk-h-design"><span class="step-num">4</span>디자인</h2>
             <label class="field">디자인<select class="select" id="mk-design-select"></select></label>
             <div class="mk-picked" id="mk-picked"></div>
@@ -941,6 +959,9 @@ textarea.input { resize: vertical; line-height: 1.55; }
             </div>
             <div class="pv-device" id="mk-device" hidden>
               <iframe id="mk-frame" title="결과 미리보기" sandbox="allow-scripts allow-same-origin allow-popups allow-modals"></iframe>
+            </div>
+            <div class="pv-device" id="mk-original-device" hidden>
+              <iframe id="mk-original-frame" title="원본 HTML 미리보기" sandbox="allow-scripts" referrerpolicy="no-referrer"></iframe>
             </div>
           </div>
         </div>
@@ -3521,11 +3542,13 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
   }
 
   function readHTML(text, name, context) {
+    context.captureHTML?.(text, name);
     // template의 분리된 문서 조각은 스크립트와 외부 리소스를 활성화하지 않는다.
     const template = document.createElement('template');
     template.innerHTML = text;
     const root = template.content;
     const markers = Array.from(root.querySelectorAll('[id="hc-spec"]'));
+    let embeddedSpec;
     if (markers.length) {
       const marker = markers[0];
       if (markers.length !== 1 || marker.tagName !== 'SCRIPT' || marker.type.toLowerCase() !== 'application/json') {
@@ -3542,7 +3565,8 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
             (!Array.isArray(spec.summary) || !spec.summary.every((value) => typeof value === 'string')))) {
         throw new Error('HTML의 내장 spec 형식이 올바르지 않습니다(meta.title과 올바른 데이터 영역이 필요).');
       }
-      return { kind: 'spec', name, spec };
+      embeddedSpec = { kind: 'spec', name, spec };
+      if (!context.preferRenderedTables) return embeddedSpec;
     }
     const candidates = Array.from(root.querySelectorAll('table')).filter((table) => !table.parentElement?.closest('table'));
     const tables = candidates.map((table, index) => {
@@ -3551,6 +3575,11 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
       try { entry.table = htmlTable(table, context.tableFromRows); } catch (e) { entry.error = e.message; }
       return entry;
     });
+    // 선택적 렌더 분석에서는 화면에 생성된 실제 표를 내장 원데이터보다 먼저 읽는다.
+    if (context.preferRenderedTables && tables.some((entry) => entry.table)) {
+      return { kind: 'html', name, tables, tableId: tables.find((entry) => entry.table).id, selectionLabel: '표' };
+    }
+    if (embeddedSpec) return embeddedSpec;
     tables.push(...embeddedJSONTables(root, context));
     if (!tables.length) throw new Error('HTML에서 정적 데이터 표, 내장 JSON 레코드 또는 내장 spec을 찾지 못했습니다.');
     const first = tables.find((entry) => entry.table);
@@ -3608,6 +3637,305 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
     accept: () => READERS.flatMap((entry) => entry.extensions.map((ext) => `.${ext}`)).join(','),
     hint: () => READERS.map((entry) => entry.label).join(' · '),
   };
+})();
+
+</script>
+  <script>
+/* assets/html-render.js */
+/* 원본 HTML의 선택적 렌더링 분석. 파일판에서도 서버나 브라우저 도우미 없이 실행한다. */
+(() => {
+  'use strict';
+
+  const POLICY = "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; frame-src 'none'; base-uri 'none'; form-action 'none'";
+  const MAX_INPUT = 8_000_000;
+  const MAX_RESULT = 16_000_000;
+  const running = new WeakMap();
+  const inlineScript = (code) => `<script>${code.replace(/<\/script/gi, '<\\/script')}<\/script>`;
+  const meta = `<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="${POLICY}">`;
+
+  // 이 함수는 원본의 모든 스크립트보다 먼저 실행된다. DOM에 남는 토큰은 제거하고
+  // 필요한 native API를 먼저 보관한다. 수집 결과의 최종 정제는 converter 문서에서 한다.
+  function collectSource(config) {
+    const sendMessage = parent.postMessage.bind(parent);
+    const schedule = window.setTimeout.bind(window);
+    const unschedule = window.clearTimeout.bind(window);
+    const listen = window.addEventListener.bind(window);
+    const unlisten = window.removeEventListener.bind(window);
+    const query = document.querySelectorAll.bind(document);
+    const getHTML = Object.getOwnPropertyDescriptor(Element.prototype, 'outerHTML').get;
+    const getText = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'innerText').get;
+    const getRects = Element.prototype.getClientRects;
+    const setHTML = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML').set;
+    const getContent = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent').get;
+    const fragmentQuery = DocumentFragment.prototype.querySelectorAll;
+    const remove = Element.prototype.remove;
+    const replace = Element.prototype.replaceWith;
+    const append = Node.prototype.appendChild;
+    const makeElement = document.createElement.bind(document);
+    const makeText = document.createTextNode.bind(document);
+    const now = Date.now.bind(Date);
+    const warnings = [];
+    let omittedWarnings = 0;
+    let done = false;
+    let ready = false;
+    let tickTimer;
+    let timeoutTimer;
+    let lastFingerprint;
+    let lastChanged = now();
+    let lastProgress = 0;
+    let readyAt = 0;
+    const post = (type, payload) => sendMessage({ session: config.session, type, payload }, '*');
+    const warn = (message) => {
+      const value = String(message);
+      if (warnings.includes(value)) return;
+      if (warnings.length >= 100) { omittedWarnings++; return; }
+      warnings.push(value.length > 2000 ? value.slice(0, 2000) + ' [오류 설명 길이 한도 초과]' : value);
+    };
+    const onError = (event) => warn(`원본 실행 오류: ${event.message || '알 수 없는 오류'}`);
+    const onRejection = (event) => {
+      const reason = event.reason;
+      warn(`원본 비동기 오류: ${typeof reason === 'string' ? reason : reason?.message || '처리되지 않은 Promise 오류'}`);
+    };
+    const onPolicy = (event) => warn(`원본 리소스 차단: ${event.effectiveDirective} · ${event.blockedURI || 'inline'}`);
+    const textOf = (element) => {
+      if (!element) return '';
+      if (getRects.call(element).length) return getText.call(element);
+      // 숨겨진 원본 pane에서는 innerText가 textContent로 바뀌어 script/style까지
+      // 포함한다. 원본 DOM은 유지하고 inert 조각에서 비본문 노드를 제거한다.
+      const copy = makeElement('template');
+      setHTML.call(copy, getHTML.call(element));
+      const content = copy.content;
+      for (const node of fragmentQuery.call(content, 'script,style,template,noscript,iframe,object,embed')) remove.call(node);
+      for (const node of fragmentQuery.call(content, 'br')) replace.call(node, makeText('\n'));
+      for (const node of fragmentQuery.call(content, 'p,div,section,article,header,footer,li,pre,tr,h1,h2,h3,h4,h5,h6')) append.call(node, makeText('\n'));
+      return getContent.call(content);
+    };
+    const analysis = (partial) => {
+      const headings = [];
+      for (const element of query('h1,h2,h3,h4,h5,h6')) {
+        const text = textOf(element).trim();
+        if (text) headings.push(text);
+      }
+      return {
+        title: document.title,
+        headings,
+        bodyText: textOf(document.body),
+        tableCount: query('table').length,
+        svgCount: query('svg').length,
+        canvasCount: query('canvas').length,
+        warnings: omittedWarnings ? [...warnings, `추가 경고 ${omittedWarnings}건은 경고 개수 한도로 생략했습니다.`] : [...warnings],
+        partial: partial || warnings.length > 0
+      };
+    };
+    const capture = (partial) => ({ snapshot: getHTML.call(document.documentElement), analysis: analysis(partial) });
+    const stop = () => {
+      done = true;
+      unschedule(tickTimer);
+      unschedule(timeoutTimer);
+      unlisten('DOMContentLoaded', onReady);
+      unlisten('error', onError);
+      unlisten('unhandledrejection', onRejection);
+      document.removeEventListener('securitypolicyviolation', onPolicy);
+    };
+    const finish = (partial) => {
+      if (done) return;
+      try {
+        if (partial) warn(ready ? '제한 시간 안에 본문과 표가 안정되지 않아 현재 상태를 분석했습니다.' : '문서 준비가 끝나기 전에 제한 시간이 도달해 현재 상태를 분석했습니다.');
+        const result = capture(partial);
+        stop();
+        post('result', result);
+      } catch (error) {
+        stop();
+        post('error', `원본 내용을 읽지 못했습니다: ${error?.message || 'DOM 수집 오류'}`);
+      }
+    };
+    const tick = () => {
+      if (done) return;
+      try {
+        const state = analysis(false);
+        const tables = [];
+        for (const table of query('table')) tables.push(textOf(table));
+        // SVG의 좌표·회전 애니메이션은 대기 시간을 계속 초기화하지 않는다.
+        const fingerprint = [state.bodyText, ...tables, state.svgCount, state.canvasCount].join('\u0000');
+        const time = now();
+        if (fingerprint !== lastFingerprint) { lastFingerprint = fingerprint; lastChanged = Math.max(time, readyAt + 2000); }
+        // 이동 차단으로 inner 문서가 사라져도 부모가 유용한 부분 결과를 반환할 수 있다.
+        if (!lastProgress || time - lastProgress >= 1000) {
+          post('progress', { snapshot: getHTML.call(document.documentElement), analysis: state });
+          lastProgress = time;
+        }
+        if (time - lastChanged >= 800) { finish(false); return; }
+        tickTimer = schedule(tick, 100);
+      } catch (error) {
+        warn(`원본 분석 오류: ${error?.message || 'DOM 수집 오류'}`);
+        finish(true);
+      }
+    };
+    function onReady() {
+      ready = true;
+      readyAt = now();
+      // 원본 DOMContentLoaded 리스너 다음 작업부터 수집하며 최초 2초는 기다린다.
+      // 그 뒤 본문·표의 800ms 안정화를 확인한다. 미래 작업 완료를 보장하는 기준은 아니다.
+      tickTimer = schedule(tick, 0);
+    }
+    listen('error', onError);
+    listen('unhandledrejection', onRejection);
+    document.addEventListener('securitypolicyviolation', onPolicy);
+    listen('DOMContentLoaded', onReady);
+    timeoutTimer = schedule(() => finish(true), Math.max(0, config.deadline - now() - 100));
+    document.currentScript.remove();
+  }
+
+  function mountSource(source, session) {
+    const inner = document.createElement('iframe');
+    inner.setAttribute('sandbox', 'allow-scripts');
+    inner.setAttribute('referrerpolicy', 'no-referrer');
+    inner.style.cssText = 'width:100%;height:100%;border:0;display:block';
+    const post = (type, payload) => parent.postMessage({ session, type, payload }, '*');
+    const receive = (event) => {
+      if (event.source !== inner.contentWindow || event.origin !== 'null' || event.data?.session !== session) return;
+      if (!['progress', 'result', 'error'].includes(event.data.type)) return;
+      post(event.data.type, event.data.payload);
+      if (event.data.type !== 'progress') window.removeEventListener('message', receive);
+    };
+    window.addEventListener('message', receive);
+    document.addEventListener('securitypolicyviolation', (event) => {
+      post('warning', `원본 이동·리소스 차단: ${event.effectiveDirective} · ${event.blockedURI || 'inline'}`);
+    });
+    inner.srcdoc = source;
+    document.body.append(inner);
+  }
+
+  function validateResult(result) {
+    if (!result || typeof result.snapshot !== 'string' || result.snapshot.length > MAX_RESULT) throw new Error('원본 분석 결과가 처리 한도를 초과했거나 올바르지 않습니다.');
+    const data = result.analysis;
+    const strings = (value, maximum) => Array.isArray(value) && value.length <= maximum && value.every((item) => typeof item === 'string');
+    if (!data || typeof data.title !== 'string' || typeof data.bodyText !== 'string' ||
+        !strings(data.headings, 10_000) || !strings(data.warnings, 101) || typeof data.partial !== 'boolean' ||
+        ['tableCount', 'svgCount', 'canvasCount'].some((key) => !Number.isSafeInteger(data[key]) || data[key] < 0)) {
+      throw new Error('원본 분석 결과 형식이 올바르지 않습니다.');
+    }
+    const clean = { snapshot: result.snapshot, analysis: {
+      title: data.title, headings: [...data.headings], bodyText: data.bodyText,
+      tableCount: data.tableCount, svgCount: data.svgCount, canvasCount: data.canvasCount,
+      warnings: [...data.warnings], partial: data.partial
+    } };
+    if (JSON.stringify(clean).length > MAX_RESULT) throw new Error('원본 분석 결과가 처리 한도를 초과했습니다. 본문을 잘라서 반환하지 않았습니다.');
+    return clean;
+  }
+
+  function safeSnapshot(snapshot) {
+    const template = document.createElement('template');
+    template.innerHTML = snapshot;
+    const fragments = [template.content];
+    while (fragments.length) {
+      const root = fragments.pop();
+      root.querySelectorAll('iframe,object,embed').forEach((element) => element.remove());
+      root.querySelectorAll('script').forEach((element) => {
+        if (element.type.trim().toLowerCase() !== 'application/json' || element.hasAttribute('src')) element.remove();
+      });
+      root.querySelectorAll('*').forEach((element) => {
+        for (const attribute of Array.from(element.attributes)) {
+          if (attribute.name.toLowerCase().startsWith('on')) element.removeAttributeNode(attribute);
+        }
+      });
+      // querySelectorAll은 template.content 경계를 넘지 않으므로 내부 조각도 정제한다.
+      root.querySelectorAll('template').forEach((element) => fragments.push(element.content));
+    }
+    return template.innerHTML;
+  }
+
+  function start(hostFrame, html, { timeoutMs = 8000 } = {}) {
+    let resolvePromise, rejectPromise;
+    const promise = new Promise((resolve, reject) => { resolvePromise = resolve; rejectPromise = reject; });
+    let settled = false;
+    let timer;
+    let receive;
+    let record;
+    let latest;
+    const outerWarnings = [];
+    const cleanup = (clearFrame) => {
+      clearTimeout(timer);
+      if (receive) window.removeEventListener('message', receive);
+      if (clearFrame && record && hostFrame && running.get(hostFrame) === record) {
+        hostFrame.srcdoc = '';
+        running.delete(hostFrame);
+      }
+    };
+    const fail = (error) => {
+      if (settled) return;
+      settled = true;
+      cleanup(true);
+      rejectPromise(error);
+    };
+    const cancel = () => {
+      cleanup(true);
+      if (!settled) { settled = true; rejectPromise(new DOMException('원본 렌더링 분석을 취소했습니다.', 'AbortError')); }
+    };
+    const handle = { promise, cancel };
+    if (!hostFrame || hostFrame.localName !== 'iframe') { fail(new Error('원본 미리보기 프레임이 필요합니다.')); return handle; }
+    running.get(hostFrame)?.cancel();
+    record = handle;
+    running.set(hostFrame, record);
+    if (typeof html !== 'string' || !html.trim()) { fail(new Error('원본 HTML이 비어 있습니다.')); return handle; }
+    if (html.length > MAX_INPUT) { fail(new Error('원본 HTML이 처리 한도(800만 글자)를 초과했습니다.')); return handle; }
+    if (!Number.isFinite(timeoutMs) || timeoutMs <= 0 || timeoutMs > 60_000) { fail(new Error('분석 제한 시간은 0초 초과, 60초 이하여야 합니다.')); return handle; }
+    // getRandomValues는 HTTPS 외의 사내 HTTP 주소에서도 사용할 수 있다.
+    let session;
+    try {
+      session = Array.from(crypto.getRandomValues(new Uint32Array(4)), (value) => value.toString(16).padStart(8, '0')).join('');
+    } catch (error) { fail(new Error('이 브라우저에서 원본 분석 세션을 만들지 못했습니다.')); return handle; }
+    const deadline = Date.now() + timeoutMs;
+    const finish = (raw, partial = false) => {
+      if (settled) return;
+      try {
+        const result = validateResult(raw);
+        const combinedWarnings = [...new Set([...result.analysis.warnings, ...outerWarnings])];
+        result.analysis.warnings = combinedWarnings.length > 100
+          ? [...combinedWarnings.slice(0, 100), `경고 목록 한도로 ${combinedWarnings.length - 100}개 추가 항목을 생략했습니다.`]
+          : combinedWarnings;
+        result.analysis.partial ||= partial || outerWarnings.length > 0;
+        result.snapshot = safeSnapshot(result.snapshot);
+        validateResult(result);
+        settled = true;
+        cleanup(false); // 원본의 선택·회전 등은 분석이 끝난 뒤에도 계속 사용할 수 있다.
+        resolvePromise(result);
+      } catch (error) { fail(error); }
+    };
+    receive = (event) => {
+      if (settled || event.source !== hostFrame.contentWindow || event.origin !== 'null' || event.data?.session !== session) return;
+      const { type, payload } = event.data;
+      if (type === 'warning' && typeof payload === 'string' && payload.length <= 2500) {
+        if (outerWarnings.length < 100 && !outerWarnings.includes(payload)) outerWarnings.push(payload);
+      } else if (type === 'progress' || type === 'result') {
+        try { latest = validateResult(payload); } catch (error) { fail(error); return; }
+        if (type === 'result') finish(latest);
+      } else if (type === 'error' && typeof payload === 'string' && payload.length <= 2500) fail(new Error(payload));
+    };
+    window.addEventListener('message', receive);
+    // 이 타이머는 무한 JavaScript 실행을 강제로 중단하는 보장이 아니다.
+    timer = setTimeout(() => {
+      if (latest && (latest.analysis.bodyText.trim() || latest.analysis.title || latest.analysis.tableCount || latest.analysis.svgCount || latest.analysis.canvasCount)) {
+        outerWarnings.push('제한 시간 안에 원본 분석이 끝나지 않아 마지막으로 읽은 상태를 반환했습니다.');
+        finish(latest, true);
+      } else fail(new Error(`원본 렌더링 응답이 제한 시간(${timeoutMs / 1000}초) 안에 도착하지 않았습니다.${outerWarnings.length ? '\n' + outerWarnings.join('\n') : ''}`));
+    }, timeoutMs);
+    try {
+      const doctype = html.match(/^\uFEFF?\s*(?:<!--[\s\S]*?-->\s*)*(<!doctype[^>]*>)/i)?.[1] || '';
+      const collector = inlineScript(`(${collectSource.toString()})(${JSON.stringify({ session, deadline })});`);
+      // 선행 head 안에서 정책·수집기가 먼저 처리되고 원본 head/CSP·본문이 그대로 이어진다.
+      const inner = `${doctype}<html><head>${meta}${collector}${html}`;
+      // Edge의 file:/HTTP 실험: frame-src 'none'은 srcdoc 초기 실행을 허용하면서
+      // inner 자기 HTTP(S) 이동·meta refresh를 차단한다. 'self'는 같은 HTTP 호스트를 허용한다.
+      const outer = `<!doctype html><html><head>${meta}<style>html,body{margin:0;width:100%;height:100%;overflow:hidden}</style></head><body>${inlineScript(`(${mountSource.toString()})(${JSON.stringify(inner)},${JSON.stringify(session)});`)}</body></html>`;
+      hostFrame.setAttribute('sandbox', 'allow-scripts');
+      hostFrame.setAttribute('referrerpolicy', 'no-referrer');
+      hostFrame.srcdoc = outer;
+    } catch (error) { fail(error); }
+    return handle;
+  }
+
+  window.HC_HTML_RENDER = Object.freeze({ start });
 })();
 
 </script>
@@ -3752,9 +4080,9 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
     return tableFromRows(columns, arr.map((o) => columns.map((c) => o[c])));
   }
 
-  function readerContext() {
+  function readerContext(captureHTML, preferRenderedTables = false) {
     return {
-      decodeText, isSpec, tableFromRows, parseCSV, detectDelimiter,
+      decodeText, isSpec, tableFromRows, parseCSV, detectDelimiter, captureHTML, preferRenderedTables,
       async readWorkbook(buffer, name) {
         const XLSX = await loadSheetJS();
         const workbook = XLSX.read(buffer, { type: 'array', cellDates: true });
@@ -3773,12 +4101,12 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
     };
   }
 
-  async function readFile(file) {
-    return window.HC_INPUT.read(file, readerContext());
+  async function readFile(file, captureHTML) {
+    return window.HC_INPUT.read(file, readerContext(captureHTML));
   }
 
-  async function readText(text, format) {
-    return window.HC_INPUT.readText(text, format, readerContext());
+  async function readText(text, format, captureHTML) {
+    return window.HC_INPUT.readText(text, format, readerContext(captureHTML));
   }
 
   function sheetTable(wb, sheet) {
@@ -4232,6 +4560,8 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
     view: $('#view-make'), pick: $('#view-pick'), drop: $('#mk-drop'), file: $('#mk-file'), sample: $('#mk-sample'),
     specBtn: $('#mk-spec-btn'), specFile: $('#mk-spec-file'), info: $('#mk-file-info'), sheet: $('#mk-sheet'), sheetLabel: $('#mk-sheet-label'),
     textSource: $('#mk-text-source'), textFormat: $('#mk-text-format'), textApply: $('#mk-text-apply'), textResult: $('#mk-text-result'),
+    htmlPanel: $('#mk-html-panel'), htmlRender: $('#mk-html-render'), htmlMode: $('#mk-html-mode'), htmlApply: $('#mk-html-apply'), htmlAnalysis: $('#mk-html-analysis'), htmlModeHint: $('#mk-html-mode-hint'),
+    originalDevice: $('#mk-original-device'), originalFrame: $('#mk-original-frame'), designPanel: $('#mk-design-panel'),
     colsPanel: $('#mk-cols'), colBody: $('#mk-col-body'), gran: $('#mk-gran'),
     contentPanel: $('#mk-content'), title: $('#mk-title'), subtitle: $('#mk-subtitle'), summary: $('#mk-summary'),
     design: $('#mk-design-select'), picked: $('#mk-picked'), kit: $('#mk-kit'), chart: $('#mk-chart'),
@@ -4252,7 +4582,7 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
     design: saved.design || 'tabler', designChosen: !!saved.designChosen,
     kit: saved.kit || '', chartLib: saved.chartLib || '', theme: saved.theme || '',
     brandOn: !!saved.brandOn, brand: saved.brand || '#1428a0',
-    device: 'desktop', html: '',
+    device: 'desktop', html: '', htmlInput: null, htmlMode: 'preserve', originalMode: false,
   };
   const persist = () => storage.set({ design: st.design, designChosen: st.designChosen, kit: st.kit, chartLib: st.chartLib, theme: st.theme, brandOn: st.brandOn, brand: st.brand });
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -4369,12 +4699,33 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
 
   let renderTimer = 0;
   let inputGeneration = 0;
-  function clearResult() {
+  let htmlJob = null;
+  function cancelHTML() {
+    const job = htmlJob;
+    htmlJob = null;
+    job?.cancel();
+    if (job && st.htmlInput) st.htmlInput.rendered = null;
+  }
+  function syncHTMLPanel() {
+    el.htmlPanel.hidden = !st.htmlInput;
+    el.htmlMode.value = st.htmlMode;
+    el.htmlRender.disabled = !!htmlJob && !st.htmlInput?.rendered;
+    el.htmlApply.disabled = !st.htmlInput?.rendered;
+    el.designPanel.hidden = st.originalMode;
+    el.htmlModeHint.textContent = st.htmlMode === 'preserve'
+      ? '원문 HTML을 그대로 저장합니다. 배치·코드·조작 기능과 기존 외부 파일 의존성이 유지됩니다.'
+      : '렌더링된 표·본문을 선택한 디자인에 적용합니다. 원본의 임의 도형과 조작 기능은 새 디자인에 자동 복제되지 않습니다.';
+  }
+  function clearResult({ keepHTML = false, cancelRender = true } = {}) {
     clearTimeout(renderTimer);
+    if (cancelRender) cancelHTML();
+    if (!keepHTML) { st.htmlInput = null; el.htmlAnalysis.textContent = ''; }
     Object.assign(st, { source: null, table: null, cols: [], spec: null, specFromFile: false, html: '', edited: { title: false, subtitle: false, summary: false } });
+    st.originalMode = false;
     el.frame.srcdoc = '';
     el.empty.hidden = false;
     el.device.hidden = true;
+    el.originalDevice.hidden = true;
     el.info.hidden = true;
     el.colsPanel.hidden = true;
     el.contentPanel.hidden = true;
@@ -4385,6 +4736,7 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
     el.status.textContent = '';
     el.textResult.textContent = '';
     [el.download, el.saveSpec, el.open, el.aiCopy].forEach((button) => { button.disabled = true; });
+    syncHTMLPanel();
   }
   function scheduleRender(ms = 250) {
     clearTimeout(renderTimer);
@@ -4392,6 +4744,7 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
   }
 
   function render() {
+    if (st.originalMode) { fit(); return; }
     syncControls();
     renderPicked();
     const lib = st.chartLib || HC.resolve(st.design).d.chartLib || 'echarts';
@@ -4403,6 +4756,7 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
       st.html = res.html;
       el.empty.hidden = true;
       el.device.hidden = false;
+      el.originalDevice.hidden = true;
       el.frame.srcdoc = previewHtml(res.html);
       const D = (window.PREVIEWER_DATA.items || []).find((it) => it.id === res.design);
       el.status.innerHTML = `<b>${esc(D ? D.name : res.design)}</b> · ${esc(KIT_LABEL[res.kit] || res.kit)} · ${esc(LIB_LABEL[res.chartLib] || res.chartLib)} · ${Math.round(new Blob([res.html]).size / 1024)}KB`;
@@ -4410,7 +4764,7 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
       showError('');
       fit();
     } catch (e) {
-      clearResult();
+      clearResult({ keepHTML: true });
       showError(`만들지 못했습니다: ${e.message}`);
     }
   }
@@ -4418,7 +4772,10 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
   // 미리보기 크기 맞춤 (① 미리보기와 같은 방식)
   const DEVICES = { desktop: { w: 1440, h: 900 }, tablet: { w: 820, h: 1180 }, mobile: { w: 390, h: 844 } };
   function fit() {
-    if (el.device.hidden || el.view.hidden) return;
+    const original = !el.originalDevice.hidden;
+    const device = original ? el.originalDevice : el.device;
+    const frame = original ? el.originalFrame : el.frame;
+    if (device.hidden || el.view.hidden) return;
     const d = DEVICES[st.device];
     const desk = st.device === 'desktop';
     const pad = desk ? 0 : 24;
@@ -4427,12 +4784,12 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
     const w = desk ? Math.max(d.w, aw) : d.w;
     const scale = desk ? Math.min(1, aw / w) : Math.min(1, aw / d.w, ah / d.h);
     const h = desk ? Math.ceil(ah / scale) : d.h;
-    Object.assign(el.frame.style, { width: `${w}px`, height: `${h}px`, transform: `scale(${scale})` });
-    Object.assign(el.device.style, { width: `${Math.floor(w * scale)}px`, height: `${Math.floor(h * scale)}px` });
+    Object.assign(frame.style, { width: `${w}px`, height: `${h}px`, transform: `scale(${scale})` });
+    Object.assign(device.style, { width: `${Math.floor(w * scale)}px`, height: `${Math.floor(h * scale)}px` });
     el.stage.dataset.device = st.device;
   }
 
-  const fileBase = () => (((st.spec && st.spec.meta && st.spec.meta.title) || 'result').replace(/[\\/:*?"<>|]+/g, '_').trim() || 'result');
+  const fileBase = () => (((st.spec && st.spec.meta && st.spec.meta.title) || (st.originalMode && st.htmlInput?.name.replace(/\.html?$/i, '')) || 'result').replace(/[\\/:*?"<>|]+/g, '_').trim() || 'result');
   function download(text, filename, type) {
     const url = URL.createObjectURL(new Blob([text], { type }));
     const a = Object.assign(document.createElement('a'), { href: url, download: filename });
@@ -4462,11 +4819,11 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
   }
 
   async function ingest(file, { specOnly = false } = {}) {
-    return loadSource(() => readFile(file), file.name, { specOnly });
+    return loadSource((capture) => readFile(file, (html, name) => capture(html, name, file)), file.name, { specOnly });
   }
 
   async function ingestText(text = el.textSource.value, format = el.textFormat.value) {
-    return loadSource(() => readText(text, format), '원문 텍스트', { autoText: format === 'auto' });
+    return loadSource((capture) => readText(text, format, (_, name) => capture(text, name)), '원문 텍스트', { autoText: format === 'auto' });
   }
 
   async function loadSource(readSource, name, { specOnly = false, autoText = false } = {}) {
@@ -4475,33 +4832,137 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
     showError('');
     el.status.textContent = `${name} 읽는 중…`;
     try {
-      const src = await readSource();
+      const src = await readSource((html, sourceName, file) => {
+        if (generation !== inputGeneration || specOnly) return;
+        st.htmlInput = { html, name: sourceName, file: file || null, rendered: null };
+        syncHTMLPanel();
+      });
       if (generation !== inputGeneration) return;
       if (src.textFormat) el.textResult.textContent = `${autoText ? '자동 인식' : '지정한 형식'}: ${src.textFormat.toUpperCase()} (.${src.textFormat})`;
       if (specOnly && src.kind !== 'spec') throw new Error('spec.json 형식이 아닙니다(meta·kpis·charts·tables 등이 필요).');
-      if (src.kind === 'spec') { useSpec(src.spec, src.name); return; }
-      let table = src.table;
-      if (src.kind === 'workbook') {
-        const sheets = src.sheets.filter((s) => sheetTable(src.workbook, s));
-        if (!sheets.length) throw new Error('데이터가 있는 시트를 찾지 못했습니다.');
-        table = sourceTable(src, sheets[0]);
-        el.sheetLabel.textContent = '시트';
-        el.sheet.innerHTML = sheets.map((s) => `<option>${esc(s)}</option>`).join('');
-        el.sheet.closest('label').hidden = sheets.length < 2;
-      } else if (src.kind === 'html') {
-        table = sourceTable(src, src.tableId);
-        el.sheetLabel.textContent = src.selectionLabel || '표';
-        el.sheet.innerHTML = src.tables.map((entry) => `<option value="${esc(entry.id)}"${entry.table ? '' : ' disabled'}>${esc(entry.label)}${entry.error ? ` · 사용 불가: ${esc(entry.error)}` : ''}</option>`).join('');
-        el.sheet.value = src.tableId;
-        el.sheet.closest('label').hidden = src.tables.length < 2;
-      } else {
-        el.sheet.closest('label').hidden = true;
-      }
-      useTable(src, table);
+      acceptSource(src);
     } catch (e) {
       if (generation !== inputGeneration) return;
-      clearResult();
+      clearResult({ keepHTML: true });
       showError(e.message);
+    }
+  }
+
+  function acceptSource(src) {
+    if (src.kind === 'spec') { useSpec(src.spec, src.name); return; }
+    let table = src.table;
+    if (src.kind === 'workbook') {
+      const sheets = src.sheets.filter((s) => sheetTable(src.workbook, s));
+      if (!sheets.length) throw new Error('데이터가 있는 시트를 찾지 못했습니다.');
+      table = sourceTable(src, sheets[0]);
+      el.sheetLabel.textContent = '시트';
+      el.sheet.innerHTML = sheets.map((s) => `<option>${esc(s)}</option>`).join('');
+      el.sheet.closest('label').hidden = sheets.length < 2;
+    } else if (src.kind === 'html') {
+      table = sourceTable(src, src.tableId);
+      el.sheetLabel.textContent = src.selectionLabel || '표';
+      el.sheet.innerHTML = src.tables.map((entry) => `<option value="${esc(entry.id)}"${entry.table ? '' : ' disabled'}>${esc(entry.label)}${entry.error ? ` · 사용 불가: ${esc(entry.error)}` : ''}</option>`).join('');
+      el.sheet.value = src.tableId;
+      el.sheet.closest('label').hidden = src.tables.length < 2;
+    } else {
+      el.sheet.closest('label').hidden = true;
+    }
+    useTable(src, table);
+  }
+
+  // 원문과 렌더 DOM은 분리한다. 실행은 전용 opaque frame에서 사용자 선택으로만 시작한다.
+  async function renderHTML() {
+    const input = st.htmlInput;
+    if (!input) return;
+    const generation = ++inputGeneration;
+    clearResult({ keepHTML: true });
+    input.rendered = null;
+    showError('');
+    el.empty.hidden = true;
+    el.originalDevice.hidden = false;
+    el.htmlAnalysis.textContent = '원본을 렌더링하고 표·본문을 분석하는 중…';
+    el.status.textContent = '원본 분석 중…';
+    try {
+      if (!window.HC_HTML_RENDER) throw new Error('HTML 렌더링 모듈을 불러오지 못했습니다.');
+      const job = window.HC_HTML_RENDER.start(el.originalFrame, input.html);
+      htmlJob = job;
+      syncHTMLPanel();
+      fit();
+      const rendered = await job.promise;
+      if (generation !== inputGeneration || input !== st.htmlInput || htmlJob !== job) return;
+      input.rendered = rendered;
+      const a = rendered.analysis;
+      el.htmlAnalysis.textContent = [
+        a.title || input.name,
+        `표 ${a.tableCount}개 · 머리글 ${a.headings.length}개 · SVG ${a.svgCount}개 · canvas ${a.canvasCount}개`,
+        a.partial ? '일부 기능을 확인하지 못했습니다. 결과를 검토해 주세요.' : '분석 완료. 결과 방식을 선택한 뒤 적용하세요.',
+        ...a.warnings,
+      ].join('\n');
+      el.status.textContent = '원본 미리보기 · 결과 방식 적용 전';
+      syncHTMLPanel();
+    } catch (e) {
+      if (generation !== inputGeneration || input !== st.htmlInput) return;
+      clearResult({ keepHTML: true });
+      el.htmlAnalysis.textContent = `분석하지 못했습니다: ${e.message}`;
+      showError(e.message);
+    }
+  }
+
+  function bodySpec(analysis, name) {
+    if (!analysis.bodyText.trim()) throw new Error('렌더링 결과에서 읽을 표나 본문을 찾지 못했습니다.');
+    return {
+      meta: { title: analysis.title || analysis.headings[0] || name.replace(/\.html?$/i, ''), source: name },
+      summary: [], kpis: [], charts: [], tables: [],
+      sections: [{ id: 'html-body', title: '원본 본문', text: analysis.bodyText }],
+    };
+  }
+
+  async function applyHTML() {
+    const input = st.htmlInput;
+    if (!input?.rendered) return;
+    const generation = ++inputGeneration;
+    st.htmlMode = el.htmlMode.value;
+    clearResult({ keepHTML: true, cancelRender: false });
+    showError('');
+    try {
+      if (st.htmlMode === 'preserve') {
+        // 원본은 기존 결과 frame/document.write 경로로 절대 보내지 않는다.
+        st.originalMode = true;
+        st.source = { kind: 'original', name: input.name };
+        st.html = input.html;
+        el.info.hidden = false;
+        $('.mk-file-name', el.info).textContent = input.name;
+        $('.mk-file-meta', el.info).textContent = '원본 유지 · 원문 HTML 저장';
+        el.empty.hidden = true;
+        el.originalDevice.hidden = false;
+        el.download.disabled = false;
+        // 원본의 새 창 실행은 부모 권한으로 승격하지 않는다. 다운로드해서 열도록 한다.
+        el.open.title = '원본은 HTML 다운로드 후 브라우저에서 열어 주세요';
+        el.status.textContent = '원본 유지 · 기존 배치와 코드 보존';
+      } else {
+        let src;
+        let bodyNotice = '';
+        try {
+          src = await window.HC_INPUT.readText(input.rendered.snapshot, 'html', readerContext(undefined, true));
+        } catch (e) {
+          const snapshot = document.createElement('template');
+          snapshot.innerHTML = input.rendered.snapshot;
+          if (snapshot.content.querySelector('[id="hc-spec"]')) throw e;
+          src = { kind: 'spec', name: input.name, spec: bodySpec(input.rendered.analysis, input.name) };
+          bodyNotice = `\n데이터 표로 읽을 수 없어 본문으로 적용했습니다. 수치 집계는 만들지 않았습니다.\n${e.message}`;
+        }
+        if (generation !== inputGeneration || input !== st.htmlInput) return;
+        src.name = input.name;
+        el.open.title = '새 창으로 크게 보기';
+        acceptSource(src);
+        if (bodyNotice) el.htmlAnalysis.textContent += bodyNotice;
+      }
+      syncHTMLPanel();
+      fit();
+    } catch (e) {
+      if (generation !== inputGeneration || input !== st.htmlInput) return;
+      clearResult({ keepHTML: true, cancelRender: false });
+      showError(`선택한 방식으로 만들지 못했습니다: ${e.message}`);
     }
   }
 
@@ -4593,6 +5054,9 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
   el.drop.addEventListener('drop', (e) => { const f = e.dataTransfer.files[0]; if (f) ingest(f); });
   el.sample.addEventListener('click', () => ingest(new File([buildSample()], SAMPLE_NAME, { type: 'text/csv' })));
   el.textApply.addEventListener('click', () => ingestText());
+  el.htmlRender.addEventListener('click', renderHTML);
+  el.htmlApply.addEventListener('click', applyHTML);
+  el.htmlMode.addEventListener('change', () => { st.htmlMode = el.htmlMode.value; syncHTMLPanel(); });
   $$('[data-mk-sample]').forEach((b) => b.addEventListener('click', () => el.sample.click()));
   el.specBtn.addEventListener('click', () => el.specFile.click());
   el.specFile.addEventListener('change', () => {
@@ -4654,10 +5118,18 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
     fit();
   }
   $$('[data-mk-device]').forEach((b) => b.addEventListener('click', () => { st.deviceChosen = true; setDevice(b.dataset.mkDevice); }));
-  el.download.addEventListener('click', () => { if (st.html) download(st.html, `${fileBase()}.html`, 'text/html;charset=utf-8'); });
+  el.download.addEventListener('click', () => {
+    if (!st.html) return;
+    // 파일 원본은 선언된 문자셋과 BOM까지 보존한다. 붙여넣기는 UTF-8 BOM으로
+    // 원문의 legacy charset 선언보다 입력한 Unicode 텍스트의 인코딩을 우선한다.
+    const content = st.originalMode
+      ? st.htmlInput.file || (st.html.startsWith('\uFEFF') ? st.html : '\uFEFF' + st.html)
+      : st.html;
+    download(content, `${fileBase()}.html`, 'text/html;charset=utf-8');
+  });
   el.saveSpec.addEventListener('click', () => { if (st.spec) download(JSON.stringify(st.spec, null, 2), `${fileBase()}.spec.json`, 'application/json;charset=utf-8'); });
   el.open.addEventListener('click', () => {
-    if (!st.html) return;
+    if (!st.html || st.originalMode) return;
     const w = window.open('', '_blank');
     if (!w) { toast('팝업이 막혀 있습니다. 브라우저에서 팝업을 허용해 주세요'); return; }
     w.document.open();
@@ -4703,7 +5175,7 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
   if (location.hash === '#make') showView('make', false);
 
   // 콘솔·테스트용
-  Object.assign(window.HC.make, { ingest, ingestText, render, showView, state: st });
+  Object.assign(window.HC.make, { ingest, ingestText, render, renderHTML, applyHTML, showView, state: st });
 })();
 
 </script>

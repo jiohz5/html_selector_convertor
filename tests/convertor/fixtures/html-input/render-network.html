@@ -1,0 +1,7 @@
+<!doctype html>
+<meta charset="utf-8">
+<h1>외부 자원 제한</h1>
+<p id="resourceStatus">외부 응답 대기</p>
+<script>fetch('https://render-html-test.invalid/source.json').then(()=>{document.getElementById('resourceStatus').textContent='잘못된 외부 접근';}).catch(()=>{document.getElementById('resourceStatus').textContent='외부 자원이 차단되었습니다.';});</script>
+<script>setTimeout(()=>{location.href='https://render-html-test.invalid/source-navigation';},100);</script>
+<img src="https://render-html-test.invalid/source.png" alt="차단된 원본 이미지">

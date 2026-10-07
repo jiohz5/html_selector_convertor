@@ -686,3 +686,6 @@ textarea.input { resize: vertical; line-height: 1.55; }
 @media (max-width: 480px) {
   .brand-name { display: none; } /* 단계 전환 버튼 자리를 위해 로고만 남긴다 */
 }
+.mk-html-input { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+.mk-html-input h3 { margin: 0 0 8px; font-size: 14px; }
+.mk-html-analysis { white-space: pre-wrap; overflow-wrap: anywhere; }

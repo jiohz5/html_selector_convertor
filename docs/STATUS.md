@@ -25,11 +25,23 @@ HTML Previewer(① 디자인 고르기)와 html-convertor(② 데이터 → HTML
 ### HTML 내장 JSON 레코드 읽기
 
 - HTML의 정적 표와 인라인 `script[type="application/json"]` 레코드를 같은 데이터 선택 목록에 넣는다. 표 머리글만 있고 본문을 원본 JavaScript로 채우는 HTML도 내장 JSON 레코드가 있으면 읽을 수 있다.
-- `hc-spec`이 있으면 먼저 검증하여 복원하고, 손상 spec은 오류로 처리한다. spec이 없으면 첫 유효 정적 표를 기본 선택하며 정적 표가 모두 읽기 불가일 때 첫 유효 JSON을 선택한다. JSON 선택 항목은 script ID·JSON 경로·행 수를 표시한다.
+- 기본 비실행 읽기에서는 `hc-spec`이 있으면 먼저 검증하여 복원하고, 손상 spec은 오류로 처리한다. spec이 없으면 첫 유효 정적 표를 기본 선택하며 정적 표가 모두 읽기 불가일 때 첫 유효 JSON을 선택한다. JSON 선택 항목은 script ID·JSON 경로·행 수를 표시한다.
 - JSON 객체 경로를 탐색하다 배열을 만나면 그 아래를 더 탐색하지 않는다. 모든 행이 null이 아닌 객체인 배열만 표로 바꾸며 열은 전체 행의 키를 합친다. 레코드 셀의 객체·배열은 JSON 문자열로 보존한다.
 - 속성의 스칼라 배열은 제외하고, 빈·혼합·null 행이 있는 레코드 후보는 사용 불가 사유를 표시한다. JSON-LD·일반 JavaScript·외부 `src`는 실행하거나 읽어 오지 않는다. 이 경로 탐색은 HTML 내장 JSON의 지원 범위이며 일반 JSON 파일의 중첩 입력 지원과는 별도다.
-- 원본 레코드를 읽어 현재 디자인으로 다시 만드는 기능이다. 원본 페이지의 계산·집계·입체 SVG·조작 기능을 재현하거나 원본 JavaScript의 계산을 실행하는 기능은 포함하지 않는다.
+- 내장 JSON 읽기는 원본 레코드를 현재 디자인으로 다시 만드는 기능이다. 이 경로에서는 원본 페이지의 계산·집계·입체 SVG·조작 기능을 재현하거나 원본 JavaScript의 계산을 실행하지 않는다.
 - 로컬 검증: 폴더판·단일판 내장 JSON 회귀 16개 기능 그룹씩 통과. 특수 필드 이름과 누락 칸, 501번째 행에서 등장한 열도 보존한다. 실제 첨부는 파일·자동 감지·HTML 지정 원문 입력으로 두 데이터 목록을 확인했다. 기존 HTML 27개·텍스트 32개 그룹은 두 배포판에서 통과했고, 엑셀·CSV·다운로드·spec·모바일 make 흐름도 통과했다.
+
+### HTML 원본 렌더링과 두 모드
+
+- 기본 HTML 읽기는 원본 코드를 실행하지 않는다. HTML 입력 패널의 "원본 렌더링·분석"을 선택할 때 전용 renderer에서 실행하고 원본 미리보기와 제목·머리글·본문, 표·SVG·canvas 수를 확인한다.
+- "원본 유지"의 파일 다운로드는 원본 File Blob을 사용하여 BOM·문자 인코딩 바이트를 보존한다. 붙여 넣은 원문은 UTF-8 BOM을 붙여 저장하여 기존 legacy charset 선언보다 입력한 Unicode 텍스트의 인코딩을 우선한다.
+- "다른 느낌으로 · 새 디자인"은 유효한 렌더 DOM 표를 내장 spec·JSON보다 먼저 읽고, 없으면 유효 spec → 내장 JSON → 본문 순서로 공통 spec·renderer에 적용한다. 표 태그가 있어도 읽을 데이터 표가 없고 본문이 있으면 수치 집계 없이 본문을 사용하며 parser 사유를 표시한다. 새 디자인에서 원본의 임의 SVG·canvas·조작 기능을 자동 재현하지 않는다.
+- 기본 읽기와 새 디자인 적용은 손상 `hc-spec`에 오류를 표시하며 다른 표·JSON·본문으로 대체하지 않는다. 렌더 DOM 표 우선 선택은 유효 spec이 있거나 spec 표식이 없는 HTML에 적용한다. 원본 유지의 원문 저장은 별도 경로이며 분석 결과를 확인한 뒤 그대로 보존할 수 있다.
+- 기본 분석은 `DOMContentLoaded` 후 초기 2초 대기와 본문·표의 800ms 안정화를 확인하며 전체 제한 시간은 8초다. 초기 화면을 읽는 휴리스틱으로, 늦게 추가되는 비동기 데이터의 완결성은 보장하지 않는다. 이 한계를 화면에 안내한다.
+- "선택한 방식으로 적용" 후 HTML 다운로드로 저장한다. 원본 유지 모드에서는 새 창 열기를 비활성으로 두며 다운로드한 원문에는 기존 외부 자산·API·storage 의존성이 남는다.
+- 분석 미리보기의 외부 통신은 제한한다. 이에 의존하는 원본은 일부 기능이 동작하지 않을 수 있다. Chromium Edge에서 폴더판·단일판 통합 회귀를 확인했으며 다른 브라우저·실행 환경과 무한 루프의 강제 중단을 보장하지 않는다. 상세 구성과 검증 범위는 [MAINTENANCE.md](MAINTENANCE.md)를 따른다.
+
+- 검증: 폴더판·단일판 렌더 회귀 19개 합성 그룹씩 통과. 실제 로컬 첨부는 원본 분석·원문 보존·새 디자인의 3개 경로를 별도로 검증했다. 동적 표·SVG·원본 버튼, 실제 다운로드, 모드 전환, 입력 경합, 본문 대체, 지연 생성 표, 손상 source, CSP 통신·이동 차단, EUC-KR·BOM 바이트 보존과 붙여넣기 재열기를 확인했다. 첨부 원문·결과는 저장소에 추가하지 않았다.
 
 ### 문장 다듬기 표시 보류
 
@@ -200,6 +212,8 @@ HTML Previewer(① 디자인 고르기)와 html-convertor(② 데이터 → HTML
 | `node tests/previewer/browser_test.mjs page` | ① 고르기 전 기능 통과, 콘솔 오류 0 |
 | `node tests/previewer/browser_test.mjs make` | ② 만들기(샘플·엑셀·cp949 CSV·다운로드·spec·모바일) 통과, 콘솔 오류 0 |
 | `node tests/previewer/browser_test.mjs html` | HTML 입력 27개 기능 그룹 통과, 콘솔 오류 0 |
+| `node tests/previewer/browser_test.mjs render` | 원본 렌더링·두 모드 합성 19개 기능 그룹 통과, 콘솔 오류 0 |
+| `node tests/previewer/browser_test.mjs render dist/html-previewer.html` | 단일 파일판 렌더링·두 모드 합성 19개 기능 그룹 통과, 콘솔 오류 0 |
 | `node tests/previewer/browser_test.mjs embedded` | HTML 내장 JSON 입력 16개 기능 그룹 통과, 콘솔 오류 0 |
 | `node tests/previewer/browser_test.mjs embedded dist/html-previewer.html` | 단일 파일판 내장 JSON 입력 16개 기능 그룹 통과, 콘솔 오류 0 |
 | `node tests/previewer/browser_test.mjs text` | 원문 텍스트 입력 32개 기능 그룹 통과, 콘솔 오류 0 |
