@@ -5,12 +5,14 @@
 //   node tests/previewer/browser_test.mjs make     # ② 만들기: 선택 연동·샘플·엑셀·CSV·디자인 변경·다운로드·spec·모바일
 //   node tests/previewer/browser_test.mjs html     # HTML 입력: 표·spec 재입력·스크립트 차단·실패 후 초기화 (assert)
 //   node tests/previewer/browser_test.mjs text     # 원문 텍스트 입력: 감지·수동 형식·오류·파일 경합 (assert)
+//   node tests/previewer/browser_test.mjs embedded # application/json 내장 레코드 HTML (합성 데이터, assert)
+//   embedded 모드의 선택적 4번째 인자는 로컬 전용 HTML 첨부 경로입니다(원문·출력 파일 저장 없음).
 //   node tests/previewer/browser_test.mjs search   # 검색만
 //   node tests/previewer/browser_test.mjs embed    # 페이지 안 미리보기가 되는 데모를 전부 실제로 열어 캡처 (몇 분 걸림)
 //   node tests/previewer/browser_test.mjs page dist/html-previewer.html   # 단일 파일판 검사
 // 결과(로그·스크린샷·다운로드 파일)는 tests/previewer/out/<mode>/ 에 남는다. 마지막 줄이 '콘솔 오류·예외 없음'이면 통과.
 import { spawn, execFileSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, mkdirSync, existsSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
@@ -28,7 +30,7 @@ const mode = process.argv[2] || 'page';
 const pagePath = resolve(ROOT, process.argv[3] || 'index.html');
 const outDir = join(HERE, 'out', mode);
 process.argv[5] = process.argv[5] || join(ROOT, 'tests', 'convertor', 'fixtures'); // make 모드의 테스트 입력 폴더
-const PORT = mode === 'embed' ? 9334 : mode === 'make' ? 9335 : mode === 'html' ? 9336 : mode === 'text' ? 9338 : 9333;
+const PORT = mode === 'embed' ? 9334 : mode === 'make' ? 9335 : mode === 'html' ? 9336 : mode === 'text' ? 9338 : mode === 'embedded' ? 9339 : 9333;
 mkdirSync(outDir, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const log = (...a) => console.log(...a);
@@ -128,6 +130,199 @@ const click = (sel) => evaluate(`(() => { const e = document.querySelector(${JSO
 const url = pathToFileURL(pagePath).href;
 
 try {
+  if (mode === 'embedded') {
+    const fixtures = join(ROOT, 'tests', 'convertor', 'fixtures', 'html-input');
+    const S = 'window.HC.make.state';
+    const metals = {
+      columns: ['name', 'z', 'bbox', 'meta'],
+      rows: [['M1', 1, '[0,1,2,3]', '{"color":"red"}'], ['M2', 2, '[4,5,6,7]', '{"color":"blue"}']],
+    };
+    const sourceRequests = [];
+    const sourceOrigin = 'https://embedded-html-test.invalid';
+    cdp.on((m) => {
+      if (m.method === 'Network.requestWillBeSent' && m.params.request.url.startsWith(sourceOrigin)) sourceRequests.push(m.params.request.url);
+    });
+    await cdp.send('Network.enable');
+    await cdp.send('Network.setBlockedURLs', { urls: [`${sourceOrigin}/*`] });
+    const waitUntil = async (expression, description, maxMs = 8000) => {
+      const t0 = Date.now();
+      while (Date.now() - t0 < maxMs) {
+        if (await evaluate(expression)) return;
+        await sleep(50);
+      }
+      assert.fail(`${description} timed out`);
+    };
+    const check = async (description, action) => {
+      try { await action(); log(`PASS: ${description}`); }
+      catch (e) { problems.push(`테스트 실패: ${description}: ${e.message}`); }
+    };
+    const setFile = async (path) => {
+      const { root } = await cdp.send('DOM.getDocument', { depth: -1 });
+      const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector: '#mk-file' });
+      await cdp.send('DOM.setFileInputFiles', { files: [path], nodeId });
+    };
+    const load = async (filename) => {
+      await setFile(join(fixtures, filename));
+      await waitUntil(`!document.getElementById('mk-error').hidden || (${S}.source?.name === ${JSON.stringify(filename)} && ${S}.html.length > 0)`, `settle ${filename}`);
+      const error = await evaluate("document.getElementById('mk-error').textContent");
+      assert.equal(await evaluate("document.getElementById('mk-error').hidden"), true, `embedded records import successfully${error ? `: ${error}` : ''}`);
+    };
+    const table = () => evaluate(`({ columns: ${S}.table.columns, rows: ${S}.table.rows })`);
+    const choices = () => evaluate("[...document.getElementById('mk-sheet').options].map(o => ({value: o.value, label: o.textContent, disabled: o.disabled}))");
+    const selectCandidate = async (labelPart) => {
+      const candidate = (await choices()).find(o => !o.disabled && o.label.includes(labelPart));
+      assert.ok(candidate, `selectable candidate ${labelPart}`);
+      await evaluate(`(() => { const select = document.getElementById('mk-sheet'); select.value = ${JSON.stringify(candidate.value)}; select.dispatchEvent(new Event('change')); })()`);
+      await waitUntil(`${S}.source?.tableId === ${JSON.stringify(candidate.value)} && ${S}.html.length > 0`, `select ${labelPart}`);
+    };
+
+    await navigate(`${url}#make`);
+    await evaluate('localStorage.clear()');
+    await navigate(`${url}?embedded-test=1#make`);
+    await check('empty static tbody falls back to embedded metal records', async () => {
+      await load('embedded-records.html');
+      assert.deepEqual(await table(), metals, 'object and array cells stay JSON strings');
+    });
+
+    await check('embedded arrays expose paths without treating cell or coordinate arrays as tables', async () => {
+      await load('embedded-records.html');
+      const candidates = await choices();
+      assert.equal(candidates.filter(o => !o.disabled).length, 3, 'only metals, vias and nested pins are record-array candidates');
+      assert.ok(candidates.some(o => o.disabled), 'the empty static table remains an explained disabled candidate');
+      assert.ok(candidates.every(o => !/\.(?:bbox|meta|points|xy)(?:\.|$)|\.outline\.rect(?:\.|$)/.test(o.label)), 'cell arrays and scalar coordinate properties stay outside the candidate list');
+      await selectCandidate('$.vias');
+      assert.deepEqual(await table(), { columns: ['name', 'from', 'to', 'points'], rows: [['V1', 'M1', 'M2', '[[0,0],[1,1]]']] });
+      await selectCandidate('$.regions.pins');
+      assert.deepEqual(await table(), { columns: ['id', 'xy'], rows: [['P1', '[2,3]']] });
+    });
+
+    for (const format of ['auto', 'html']) {
+      await check(`embedded records through pasted ${format}`, async () => {
+        const source = readFileSync(join(fixtures, 'embedded-records.html'), 'utf8');
+        await evaluate("document.getElementById('mk-text-input').open = true");
+        await evaluate(`(() => {
+          document.getElementById('mk-text-format').value = ${JSON.stringify(format)};
+          const text = document.getElementById('mk-text-source'); text.value = ${JSON.stringify(source)};
+          text.dispatchEvent(new Event('input', { bubbles: true }));
+          document.getElementById('mk-text-apply').click();
+        })()`);
+        await waitUntil(`!document.getElementById('mk-error').hidden || (${S}.source?.name === '붙여넣은 데이터.html' && ${S}.html.length > 0)`, `pasted embedded ${format}`);
+        assert.equal(await evaluate("document.getElementById('mk-error').hidden"), true);
+        assert.deepEqual(await table(), metals);
+        assert.equal(await evaluate("document.getElementById('mk-text-source').value"), source);
+      });
+    }
+
+    await check('root JSON record array remains a table with JSON-string cells', async () => {
+      await load('embedded-root-array.html');
+      assert.deepEqual(await table(), { columns: ['dept', 'sales', 'extra'], rows: [['서울', 100, '{"ok":true}'], ['부산', 200, '[1,2]']] });
+    });
+
+    await check('valid static table precedes available embedded JSON records', async () => {
+      await load('embedded-static-priority.html');
+      assert.deepEqual(await table(), { columns: ['부서', '매출'], rows: [['서울', '100'], ['부산', '200']] });
+      assert.equal((await choices()).filter(o => !o.disabled).length, 2);
+      await selectCandidate('$.metals');
+      assert.deepEqual(await table(), { columns: ['name', 'z'], rows: [['M1', 1], ['M2', 2]] });
+    });
+
+    await check('hc-spec takes precedence over static tables and embedded record candidates', async () => {
+      await load('embedded-spec-priority.html');
+      assert.deepEqual(await evaluate(`${S}.spec`), { meta: { title: '내장 spec 우선' }, summary: ['우선순위 내용'], kpis: [{ label: '원본', value: 7 }], charts: null, tables: null, sections: null });
+      assert.equal(await evaluate(`${S}.table`), null);
+      assert.equal(await evaluate("document.querySelector('.mk-sheet').hidden"), true);
+    });
+
+    await check('bad embedded candidates are disabled beside usable records', async () => {
+      await load('embedded-mixed-candidates.html');
+      assert.deepEqual(await table(), { columns: ['name', 'z'], rows: [['M1', 1]] });
+      const candidates = await choices();
+      assert.equal(candidates.filter(o => !o.disabled).length, 1);
+      for (const labelPart of ['$.mixed', '$.empty', 'brokenData']) {
+        const candidate = candidates.find(o => o.label.includes(labelPart));
+        assert.ok(candidate?.disabled, `${labelPart} carries a disabled error candidate`);
+        assert.match(candidate.label, /사용 불가|오류|JSON|배열|객체/);
+      }
+      assert.ok(candidates.every(o => !/coordinates|linkedData/.test(o.label)), 'pure scalar properties and JSON-LD do not become record tables');
+    });
+
+    for (const [filename, reason] of [
+      ['embedded-jsonld-only.html', /JSON|내장|지원|후보/],
+      ['embedded-broken-json.html', /JSON|구문/],
+      ['embedded-mixed-only.html', /객체|레코드|배열/],
+      ['embedded-scalar-root.html', /객체|레코드|배열/],
+      ['embedded-empty-only.html', /빈|데이터|레코드|배열/],
+    ]) {
+      await check(`${filename} rejects with a useful reason and clears stale output`, async () => {
+        await load('simple-th.html');
+        await setFile(join(fixtures, filename));
+        await waitUntil("!document.getElementById('mk-error').hidden", `reject ${filename}`);
+        assert.match(await evaluate("document.getElementById('mk-error').textContent"), reason);
+        assert.deepEqual(await evaluate(`({
+          html: ${S}.html, spec: ${S}.spec, table: ${S}.table, source: ${S}.source,
+          frame: document.getElementById('mk-frame').srcdoc,
+          actionsDisabled: ['mk-download', 'mk-save-spec', 'mk-open', 'mk-ai-copy'].every(id => document.getElementById(id).disabled)
+        })`), { html: '', spec: null, table: null, source: null, frame: '', actionsDisabled: true });
+      });
+    }
+
+    await check('embedded-data extraction leaves original scripts and resources inert', async () => {
+      await load('embedded-records.html');
+      await sleep(300);
+      assert.equal(await evaluate('window.__embeddedImportSentinel'), undefined);
+      assert.deepEqual(sourceRequests, []);
+      assert.equal(await evaluate(`${S}.html.includes(${JSON.stringify(sourceOrigin)})`), false);
+      assert.equal(await evaluate(`JSON.stringify(${S}.spec).includes('__embeddedImportSentinel')`), false);
+    });
+
+    await check('embedded records preserve special property names and absent own cells', async () => {
+      await load('embedded-special-keys.html');
+      assert.deepEqual(await table(), {
+        columns: ['constructor', 'toString', '__proto__', 'sales'],
+        rows: [['A', '직접 문자열', '{"x":1}', 100], [null, null, null, 200]],
+      }, 'raw JSON property names remain unchanged and inherited properties never fill missing cells');
+    });
+
+    await check('embedded record columns include fields first appearing after row 500', async () => {
+      const records = Array.from({ length: 501 }, (_, index) => index === 500 ? { base: index, late: '501번째 값' } : { base: index });
+      const source = `<script type="application/json" id="lateField">${JSON.stringify({ records })}</script>`;
+      await evaluate(`window.HC.make.ingestText(${JSON.stringify(source)}, 'auto')`);
+      await waitUntil(`!document.getElementById('mk-error').hidden || (${S}.source?.name === '붙여넣은 데이터.html' && ${S}.html.length > 0)`, 'late embedded field import');
+      assert.equal(await evaluate("document.getElementById('mk-error').hidden"), true);
+      assert.deepEqual(await evaluate(`({
+        columns: ${S}.table.columns, rowCount: ${S}.table.rows.length,
+        first: ${S}.table.rows[0], beforeLateField: ${S}.table.rows[499], last: ${S}.table.rows[500],
+        earlierMissingValuesAreNull: ${S}.table.rows.slice(0, 500).every(row => row[1] === null)
+      })`), {
+        columns: ['base', 'late'], rowCount: 501,
+        first: [0, null], beforeLateField: [499, null], last: [500, '501번째 값'], earlierMissingValuesAreNull: true,
+      }, 'the union includes all record keys and preserves absent values in earlier rows');
+    });
+
+    if (process.argv[4]) {
+      // This optional check reads private source locally without creating any copy or screenshot.
+      const attachmentPath = resolve(process.argv[4]);
+      const attachment = readFileSync(attachmentPath, 'utf8');
+      for (const format of ['file', 'auto', 'html']) {
+        await check(`local attachment through ${format}`, async () => {
+          if (format === 'file') await setFile(attachmentPath);
+          else await evaluate(`window.HC.make.ingestText(${JSON.stringify(attachment)}, ${JSON.stringify(format)})`);
+          await waitUntil(`!document.getElementById('mk-error').hidden || (${S}.spec && ${S}.html.length > 0)`, `local attachment ${format}`);
+          const error = await evaluate("document.getElementById('mk-error').textContent");
+          assert.equal(await evaluate("document.getElementById('mk-error').hidden"), true, `local embedded records import successfully${error ? `: ${error}` : ''}`);
+          const metalChoice = await evaluate("[...document.getElementById('mk-sheet').options].find(o => !o.disabled && o.textContent.includes('$.metals'))?.value");
+          assert.ok(metalChoice, 'local attachment exposes its metals record array');
+          await evaluate(`(() => { const select = document.getElementById('mk-sheet'); select.value = ${JSON.stringify(metalChoice)}; select.dispatchEvent(new Event('change')); })()`);
+          assert.equal(await evaluate(`${S}.table.rows.length`), 32);
+          const viaChoice = await evaluate("[...document.getElementById('mk-sheet').options].find(o => !o.disabled && o.textContent.includes('$.vias'))?.value");
+          assert.ok(viaChoice, 'local attachment exposes its vias record array');
+          await evaluate(`(() => { const select = document.getElementById('mk-sheet'); select.value = ${JSON.stringify(viaChoice)}; select.dispatchEvent(new Event('change')); })()`);
+          assert.equal(await evaluate(`${S}.table.rows.length`), 30);
+        });
+      }
+    }
+  }
+
   if (mode === 'text') {
     const S = 'window.HC.make.state';
     const csv = '부서,매출\n서울,100\n부산,200\n';

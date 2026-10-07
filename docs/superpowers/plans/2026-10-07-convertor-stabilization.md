@@ -94,6 +94,20 @@ Python 3.10.9, Node 24.19.0, pandas·openpyxl·Pillow, Edge·Chrome을 확인했
 
 발행 대상은 기존 GitHub 작업 브랜치 `codex/html-input`이다.
 
+## HTML 내장 JSON 보완
+
+원본 JavaScript가 표를 채우는 HTML은 원문에 데이터 행이 없어 정적 표 추출만으로 읽을 수 없다. 인라인 `application/json`의 객체 경로에서 레코드 배열을 찾아 정적 표와 같은 데이터 선택 목록으로 제공한다. 기본 선택은 기존 spec, 유효한 정적 표, 유효한 JSON 순서다. 레코드 안의 배열·객체는 셀 JSON 문자열로 보존하며 원본 계산·입체 뷰어 동작을 복제하지 않는다.
+
+- [x] 빈 tbody와 내장 레코드의 실패를 재현한 뒤 공통 HTML reader를 보완한다.
+- [x] 여러 데이터 선택, 셀 보존, 후보 오류, spec·표 우선순위, 원본 코드 미실행을 검증한다.
+- [x] 특수 JSON 키의 열 이름 변경과 누락 칸 오염을 재현하고 원문 키·null을 보존하도록 수정한다.
+- [x] 501번째 행에서 처음 등장한 열과 앞 행의 null 보존을 검증한다.
+- [x] 실제 첨부의 파일·자동 감지·HTML 지정 입력에서 두 레코드 목록을 확인한다.
+- [x] 단일 파일을 재생성하고 기존 HTML·텍스트 회귀를 확인한다.
+- [x] 별도 코드 검토에서 발견한 문제의 해결을 확인한다.
+
+내장 JSON 회귀는 폴더판·단일판 16개 그룹씩 통과했다. 단일판의 실제 첨부 파일·자동 감지·HTML 지정 입력 3개 경로도 통과했다. 기존 HTML 27개·텍스트 32개 그룹은 두 배포판에서 통과했고 make의 엑셀·CSV·다운로드·spec·모바일도 확인했다.
+
 ## Task 0 로컬 테스트를 완료 기준으로 만들기
 
 **Files:** Modify `tests/previewer/browser_test.mjs:241-342,394-405`; Create `tests/convertor/fixtures/stabilization/README.md`; Modify `docs/STATUS.md` 검증 기록.

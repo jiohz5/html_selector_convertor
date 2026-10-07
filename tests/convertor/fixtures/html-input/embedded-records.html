@@ -1,0 +1,17 @@
+<!doctype html>
+<meta charset="utf-8">
+<table><thead><tr><th>name</th><th>z</th></tr></thead><tbody id="metalRows"></tbody></table>
+<script type="application/json" id="embeddedData">
+{
+  "metals": [
+    {"name":"M1","z":1,"bbox":[0,1,2,3],"meta":{"color":"red"}},
+    {"name":"M2","z":2,"bbox":[4,5,6,7],"meta":{"color":"blue"}}
+  ],
+  "vias": [{"name":"V1","from":"M1","to":"M2","points":[[0,0],[1,1]]}],
+  "regions": {"pins": [{"id":"P1","xy":[2,3]}]},
+  "outline": {"rect": [0,1,2,3]}
+}
+</script>
+<script>top.__embeddedImportSentinel = true; document.getElementById('metalRows').innerHTML = '<tr><td>viewer output</td><td>999</td></tr>';</script>
+<script src="https://embedded-html-test.invalid/viewer.js"></script>
+<img src="https://embedded-html-test.invalid/texture.png" onerror="top.__embeddedImportSentinel = true">

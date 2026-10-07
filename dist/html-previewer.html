@@ -827,7 +827,7 @@ textarea.input { resize: vertical; line-height: 1.55; }
       <div class="make-head">
         <span class="eyebrow">Step 2 · 데이터로 HTML 만들기</span>
         <h1 id="make-title">내 데이터를 고른 디자인의 HTML 한 장으로</h1>
-        <p>파일을 넣거나 원문 텍스트를 붙여 넣으면 데이터를 읽어 KPI·차트·표를 구성하고, 고른 디자인으로 HTML을 만듭니다. HTML은 표 또는 이 도구가 저장한 데이터를 읽습니다. <b>데이터는 이 브라우저 안에서만 처리되며 어디에도 전송되지 않습니다.</b></p>
+        <p>파일을 넣거나 원문 텍스트를 붙여 넣으면 데이터를 읽어 KPI·차트·표를 구성하고, 고른 디자인으로 HTML을 만듭니다. HTML은 정적 표·내장 JSON·이 도구가 저장한 데이터를 읽습니다. <b>데이터는 이 브라우저 안에서만 처리되며 어디에도 전송되지 않습니다.</b></p>
       </div>
       <div class="make-grid">
         <div class="make-side">
@@ -3444,7 +3444,7 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
   <script>
 /* assets/input-readers.js */
 /* 입력 형식 등록과 HTML 데이터 읽기. 새 형식은 READERS에 등록한다.
- * 입력 HTML의 노드를 화면에 붙이지 않고 표의 문자열 또는 내장 spec만 반환한다. */
+ * 입력 HTML의 노드를 화면에 붙이지 않고 표·내장 JSON 레코드 또는 spec만 반환한다. */
 (() => {
   'use strict';
 
@@ -3460,7 +3460,7 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
     const headRows = table.tHead ? Array.from(table.tHead.rows) : [];
     if (headRows.length > 1) throw new Error('여러 줄 머리글은 지원하지 않습니다. 머리글을 한 행으로 정리해 주세요.');
     const rows = Array.from(table.rows).filter((row) => row.closest('table') === table && !row.closest('tfoot'));
-    if (rows.length < 2) throw new Error('머리글과 데이터 행이 있는 표가 필요합니다.');
+    if (rows.length < 2) throw new Error('머리글과 데이터 행이 있는 표가 필요합니다. JavaScript로 행을 채우는 페이지는 내장 JSON 또는 CSV 데이터가 필요합니다.');
     const header = headRows[0] || rows[0];
     const width = header.cells.length;
     if (!width) throw new Error('머리글 열을 찾지 못했습니다.');
@@ -3473,6 +3473,51 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
     }
     const body = rows.filter((row) => row !== header).map((row) => Array.from(row.cells, textOf));
     return toTable(Array.from(header.cells, textOf), body);
+  }
+
+  function embeddedJSONTables(root, context) {
+    const isRecord = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+    const scripts = Array.from(root.querySelectorAll('script[type]')).filter((script) =>
+      script.type.trim().toLowerCase() === 'application/json' && !script.hasAttribute('src'));
+    return scripts.flatMap((script, index) => {
+      const label = `내장 JSON ${index + 1}${script.id ? ` · ${script.id}` : ''}`;
+      let data;
+      try { data = JSON.parse(script.textContent.replace(/^\uFEFF/, '')); } catch (e) {
+        return [{ id: `json-${index}-error`, label, embeddedJSON: true, error: `JSON을 읽지 못했습니다: ${e.message}` }];
+      }
+      const entries = [];
+      const pending = [{ value: data, path: '$' }];
+      while (pending.length) {
+        const { value, path } = pending.pop();
+        if (Array.isArray(value)) {
+          // 좌표 같은 속성의 스칼라 배열은 표가 아니다. 레코드 내부 배열은 더 탐색하지 않는다.
+          if (path !== '$' && value.length && !value.some(isRecord)) continue;
+          const entry = { id: `json-${index}-${entries.length}`, label: `${label} · ${path}`, embeddedJSON: true };
+          if (!value.length) entry.error = '빈 레코드 배열입니다.';
+          else if (!value.every(isRecord)) entry.error = '모든 행이 null이 아닌 객체인 레코드 배열이 필요합니다.';
+          else {
+            const columns = new Set();
+            value.forEach((record) => Object.keys(record).forEach((key) => columns.add(key)));
+            if (!columns.size) entry.error = '레코드에서 데이터 열을 찾지 못했습니다.';
+            else {
+              const header = Array.from(columns);
+              entry.table = context.tableFromRows(header, value.map((record) => header.map((key) => Object.hasOwn(record, key) ? record[key] : null)));
+              entry.label += ` · ${value.length.toLocaleString('ko-KR')}행`;
+            }
+          }
+          entries.push(entry);
+        } else if (isRecord(value)) {
+          // 역순으로 쌓아 원문의 속성 순서대로 목록을 제공한다.
+          Object.entries(value).reverse().forEach(([key, child]) => {
+            if (child !== null && typeof child === 'object') {
+              const suffix = /^[A-Za-z_$][\w$]*$/.test(key) ? `.${key}` : `[${JSON.stringify(key)}]`;
+              pending.push({ value: child, path: path + suffix });
+            }
+          });
+        }
+      }
+      return entries.length ? entries : [{ id: `json-${index}-empty`, label, embeddedJSON: true, error: '표로 읽을 객체 배열을 찾지 못했습니다.' }];
+    });
   }
 
   function readHTML(text, name, context) {
@@ -3500,16 +3545,17 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
       return { kind: 'spec', name, spec };
     }
     const candidates = Array.from(root.querySelectorAll('table')).filter((table) => !table.parentElement?.closest('table'));
-    if (!candidates.length) throw new Error('HTML에서 데이터 표나 내장 spec을 찾지 못했습니다.');
     const tables = candidates.map((table, index) => {
       const title = table.caption ? textOf(table.caption) : table.id;
       const entry = { id: `table-${index}`, label: `표 ${index + 1}${title ? ` · ${title}` : ''}` };
       try { entry.table = htmlTable(table, context.tableFromRows); } catch (e) { entry.error = e.message; }
       return entry;
     });
+    tables.push(...embeddedJSONTables(root, context));
+    if (!tables.length) throw new Error('HTML에서 정적 데이터 표, 내장 JSON 레코드 또는 내장 spec을 찾지 못했습니다.');
     const first = tables.find((entry) => entry.table);
     if (!first) throw new Error(tables.map((entry) => `${entry.label}: ${entry.error}`).join('\n'));
-    return { kind: 'html', name, tables, tableId: first.id };
+    return { kind: 'html', name, tables, tableId: first.id, selectionLabel: tables.some((entry) => entry.embeddedJSON) ? '데이터' : '표' };
   }
 
   const READERS = [
@@ -3671,7 +3717,7 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
   }
 
   function tableFromRows(header, body) {
-    const seen = {};
+    const seen = Object.create(null);
     const columns = header.map((h, i) => {
       let name = String(h == null ? '' : h).trim() || `열${i + 1}`;
       if (seen[name]) { seen[name] += 1; name = `${name}_${seen[name]}`; } else seen[name] = 1;
@@ -4407,7 +4453,7 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
     }
     if (src.kind === 'html') {
       const entry = src.tables.find((candidate) => candidate.id === selection);
-      if (!entry?.table) throw new Error(entry?.error || '선택한 HTML 표를 찾지 못했습니다.');
+      if (!entry?.table) throw new Error(entry?.error || '선택한 HTML 데이터를 찾지 못했습니다.');
       src.tableId = entry.id;
       src.tableLabel = entry.label;
       return entry.table;
@@ -4444,7 +4490,7 @@ window.HC_BUNDLE = {"hash":"9aa7bb771bb21aba","designs":{"_about":"디자인 레
         el.sheet.closest('label').hidden = sheets.length < 2;
       } else if (src.kind === 'html') {
         table = sourceTable(src, src.tableId);
-        el.sheetLabel.textContent = '표';
+        el.sheetLabel.textContent = src.selectionLabel || '표';
         el.sheet.innerHTML = src.tables.map((entry) => `<option value="${esc(entry.id)}"${entry.table ? '' : ' disabled'}>${esc(entry.label)}${entry.error ? ` · 사용 불가: ${esc(entry.error)}` : ''}</option>`).join('');
         el.sheet.value = src.tableId;
         el.sheet.closest('label').hidden = src.tables.length < 2;

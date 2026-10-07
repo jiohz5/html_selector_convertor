@@ -102,7 +102,7 @@
   }
 
   function tableFromRows(header, body) {
-    const seen = {};
+    const seen = Object.create(null);
     const columns = header.map((h, i) => {
       let name = String(h == null ? '' : h).trim() || `열${i + 1}`;
       if (seen[name]) { seen[name] += 1; name = `${name}_${seen[name]}`; } else seen[name] = 1;
@@ -838,7 +838,7 @@
     }
     if (src.kind === 'html') {
       const entry = src.tables.find((candidate) => candidate.id === selection);
-      if (!entry?.table) throw new Error(entry?.error || '선택한 HTML 표를 찾지 못했습니다.');
+      if (!entry?.table) throw new Error(entry?.error || '선택한 HTML 데이터를 찾지 못했습니다.');
       src.tableId = entry.id;
       src.tableLabel = entry.label;
       return entry.table;
@@ -875,7 +875,7 @@
         el.sheet.closest('label').hidden = sheets.length < 2;
       } else if (src.kind === 'html') {
         table = sourceTable(src, src.tableId);
-        el.sheetLabel.textContent = '표';
+        el.sheetLabel.textContent = src.selectionLabel || '표';
         el.sheet.innerHTML = src.tables.map((entry) => `<option value="${esc(entry.id)}"${entry.table ? '' : ' disabled'}>${esc(entry.label)}${entry.error ? ` · 사용 불가: ${esc(entry.error)}` : ''}</option>`).join('');
         el.sheet.value = src.tableId;
         el.sheet.closest('label').hidden = src.tables.length < 2;

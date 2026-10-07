@@ -22,6 +22,15 @@ HTML Previewer(① 디자인 고르기)와 html-convertor(② 데이터 → HTML
 - 빈 첫 TSV 머리글·마지막 빈 TSV 열과 따옴표 안의 구분자·줄바꿈이 있는 CSV 머리글을 보존한다. CSV 구분자 수정은 파일 입력에도 적용한다.
 - 로컬 검증: 폴더판·단일판 원문 입력 32개 기능 그룹씩 통과. 자동·수동 형식, 오류 후 본문 유지와 결과 제거, HTML spec·다중 표, 파일/텍스트 읽기 경쟁, 모바일 화면, 실제 CSV 파일 선택을 포함한다. 수정 후 기존 HTML 입력 27개 기능 그룹도 통과했다.
 
+### HTML 내장 JSON 레코드 읽기
+
+- HTML의 정적 표와 인라인 `script[type="application/json"]` 레코드를 같은 데이터 선택 목록에 넣는다. 표 머리글만 있고 본문을 원본 JavaScript로 채우는 HTML도 내장 JSON 레코드가 있으면 읽을 수 있다.
+- `hc-spec`이 있으면 먼저 검증하여 복원하고, 손상 spec은 오류로 처리한다. spec이 없으면 첫 유효 정적 표를 기본 선택하며 정적 표가 모두 읽기 불가일 때 첫 유효 JSON을 선택한다. JSON 선택 항목은 script ID·JSON 경로·행 수를 표시한다.
+- JSON 객체 경로를 탐색하다 배열을 만나면 그 아래를 더 탐색하지 않는다. 모든 행이 null이 아닌 객체인 배열만 표로 바꾸며 열은 전체 행의 키를 합친다. 레코드 셀의 객체·배열은 JSON 문자열로 보존한다.
+- 속성의 스칼라 배열은 제외하고, 빈·혼합·null 행이 있는 레코드 후보는 사용 불가 사유를 표시한다. JSON-LD·일반 JavaScript·외부 `src`는 실행하거나 읽어 오지 않는다. 이 경로 탐색은 HTML 내장 JSON의 지원 범위이며 일반 JSON 파일의 중첩 입력 지원과는 별도다.
+- 원본 레코드를 읽어 현재 디자인으로 다시 만드는 기능이다. 원본 페이지의 계산·집계·입체 SVG·조작 기능을 재현하거나 원본 JavaScript의 계산을 실행하는 기능은 포함하지 않는다.
+- 로컬 검증: 폴더판·단일판 내장 JSON 회귀 16개 기능 그룹씩 통과. 특수 필드 이름과 누락 칸, 501번째 행에서 등장한 열도 보존한다. 실제 첨부는 파일·자동 감지·HTML 지정 원문 입력으로 두 데이터 목록을 확인했다. 기존 HTML 27개·텍스트 32개 그룹은 두 배포판에서 통과했고, 엑셀·CSV·다운로드·spec·모바일 make 흐름도 통과했다.
+
 ### 문장 다듬기 표시 보류
 
 ②의 "Claude로 문장 다듬기"는 현재 화면에서 숨겼으며 기존 기능 코드는 보존한다. 자동 외부 전송과 모델 API 연결은 구현하지 않았다. 사내 모델 또는 승인된 Claude Enterprise 연계는 아래 G 항목의 후속 작업이다. spec.json 저장·불러오기는 계속 사용한다.
@@ -52,7 +61,7 @@ HTML Previewer(① 디자인 고르기)와 html-convertor(② 데이터 → HTML
    ├─ (A) 같은 페이지의 ② HTML 만들기 ── 브라우저 안에서 규칙대로, AI 없음, 데이터 외부 전송 없음
    │     ① 선택 자동 적용 (차트가 아닌 첫 항목 = 디자인, 차트 항목 = 차트 라이브러리)
    │     파일 또는 원문 텍스트 → 공통 입력 reader
-   │     CSV·TSV·TXT / 엑셀(파일·SheetJS) / JSON(레코드·spec) / HTML(표·내장 spec)
+   │     CSV·TSV·TXT / 엑셀(파일·SheetJS) / JSON(레코드·spec) / HTML(표·내장 JSON·spec)
    │     → profile: 열 판별(날짜·숫자·범주) → buildSpec: KPI·차트·표·요약 자동 구성
    │     → HC.build(렌더링) → 미리보기 → HTML 다운로드 · spec.json 저장
    │
@@ -79,7 +88,7 @@ HTML Previewer(① 디자인 고르기)와 html-convertor(② 데이터 → HTML
 | spec.json | ✅ 그대로 렌더링 | ✅ `render.py`로 바로 |
 | MD 보고서 | ❌ 미지원 확장자로 오류 표시 | ✅ Claude가 읽고 섹션·표를 뽑음(스크립트는 미지원) |
 | MD 표 | ❌ 미지원 확장자로 오류 표시 | ⚠️ 스크립트는 잘못 읽음, Claude가 읽으면 가능 |
-| HTML(`<table>`) · 우리 출력 HTML | ✅ 정적 표 선택 또는 내장 spec 복원 | ⚠️ Python 입력 스크립트는 미지원 |
+| HTML(`<table>`) · 인라인 JSON · 우리 출력 HTML | 정적 표·내장 JSON 레코드 선택 또는 내장 spec 복원 | ⚠️ Python 입력 스크립트는 미지원 |
 | PDF · DOCX · 이미지 | ❌ 미지원 확장자로 오류 표시 | PDF는 Claude가 읽음 |
 | ① 내보내기 .md/.json | ❌ 디자인 선택이 아니라 데이터로 처리됨 | ✅ 정확히 해석 |
 
@@ -90,7 +99,7 @@ HTML Previewer(① 디자인 고르기)와 html-convertor(② 데이터 → HTML
 아래는 2026-10-06 분석 당시의 문제 기록이다. P1·P3(일부)·P5 확인, 나머지는 대부분 맞고 일부를 바로잡았다. 줄 번호는 분석 당시 기준이며 후속 개선은 각 항목에 날짜로 표시한다.
 
 ### 🔴 P1. 지원하지 않는 입력을 오류 없이 잘못 읽는다
-2026-10-07: 브라우저는 등록된 확장자만 읽고 HTML 표·내장 spec을 지원한다. MD·PDF 등은 명시적으로 거부한다. Python 스크립트와 선택 내보내기 분류는 남은 작업이다.
+2026-10-07: 브라우저는 등록된 확장자만 읽고 HTML 표·내장 JSON 레코드·내장 spec을 지원한다. MD·PDF 등은 명시적으로 거부한다. Python 스크립트와 선택 내보내기 분류는 남은 작업이다.
 
 - `assets/convertor.js` readFile(:124-143)의 분기는 엑셀(:128) · JSON(:134) · 그 밖(:140 CSV)뿐이다. 구분자는 첫 줄로 정한다(detectDelimiter :57-66).
 - 끌어다 놓기(:897)와 ingest(:788-810)에 확장자 검사가 없다. 제한은 `index.html`:151 `accept`뿐이다.
@@ -191,6 +200,8 @@ HTML Previewer(① 디자인 고르기)와 html-convertor(② 데이터 → HTML
 | `node tests/previewer/browser_test.mjs page` | ① 고르기 전 기능 통과, 콘솔 오류 0 |
 | `node tests/previewer/browser_test.mjs make` | ② 만들기(샘플·엑셀·cp949 CSV·다운로드·spec·모바일) 통과, 콘솔 오류 0 |
 | `node tests/previewer/browser_test.mjs html` | HTML 입력 27개 기능 그룹 통과, 콘솔 오류 0 |
+| `node tests/previewer/browser_test.mjs embedded` | HTML 내장 JSON 입력 16개 기능 그룹 통과, 콘솔 오류 0 |
+| `node tests/previewer/browser_test.mjs embedded dist/html-previewer.html` | 단일 파일판 내장 JSON 입력 16개 기능 그룹 통과, 콘솔 오류 0 |
 | `node tests/previewer/browser_test.mjs text` | 원문 텍스트 입력 32개 기능 그룹 통과, 콘솔 오류 0 |
 | `node tests/previewer/browser_test.mjs text dist/html-previewer.html` | 단일 파일판 원문 입력 32개 기능 그룹 통과, 콘솔 오류 0 |
 | 단일 파일 | 빈 폴더에서 ①·② 모두 동작 |
