@@ -2,6 +2,8 @@
 
 결과물을 HTML로 표현하기 위한 도구입니다. **페이지 하나**에서 디자인을 고르고, 내 데이터를 그 디자인의 HTML로 만듭니다.
 
+웹에서 실행: [GitHub Pages](https://jiohz5.github.io/html_selector_convertor/). Pages 게시 원본은 `main`의 루트(`/`)이며 `index.html`을 시작 페이지로 사용합니다. `.nojekyll`로 정적 파일을 그대로 게시하고, `main`에 push하면 사이트가 갱신됩니다.
+
 ```
 ① 디자인 고르기   완성도 높은 템플릿·데모 45종을 실제 데모로 비교하고 ☆로 담기
 ② HTML 만들기     CSV·엑셀·JSON·HTML을 넣으면 KPI·차트·표 구성 → 고른 디자인의 HTML 한 장 다운로드
