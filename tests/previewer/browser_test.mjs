@@ -4,6 +4,7 @@
 //   node tests/previewer/browser_test.mjs page     # ① 고르기: 카드·필터·검색·미리보기·선택·내보내기·다크·모바일
 //   node tests/previewer/browser_test.mjs make     # ② 만들기: 선택 연동·샘플·엑셀·CSV·디자인 변경·다운로드·spec·모바일
 //   node tests/previewer/browser_test.mjs html     # HTML 입력: 표·spec 재입력·스크립트 차단·실패 후 초기화 (assert)
+//   node tests/previewer/browser_test.mjs text     # 원문 텍스트 입력: 감지·수동 형식·오류·파일 경합 (assert)
 //   node tests/previewer/browser_test.mjs search   # 검색만
 //   node tests/previewer/browser_test.mjs embed    # 페이지 안 미리보기가 되는 데모를 전부 실제로 열어 캡처 (몇 분 걸림)
 //   node tests/previewer/browser_test.mjs page dist/html-previewer.html   # 단일 파일판 검사
@@ -27,7 +28,7 @@ const mode = process.argv[2] || 'page';
 const pagePath = resolve(ROOT, process.argv[3] || 'index.html');
 const outDir = join(HERE, 'out', mode);
 process.argv[5] = process.argv[5] || join(ROOT, 'tests', 'convertor', 'fixtures'); // make 모드의 테스트 입력 폴더
-const PORT = mode === 'embed' ? 9334 : mode === 'make' ? 9335 : mode === 'html' ? 9336 : 9333;
+const PORT = mode === 'embed' ? 9334 : mode === 'make' ? 9335 : mode === 'html' ? 9336 : mode === 'text' ? 9338 : 9333;
 mkdirSync(outDir, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const log = (...a) => console.log(...a);
@@ -127,6 +128,257 @@ const click = (sel) => evaluate(`(() => { const e = document.querySelector(${JSO
 const url = pathToFileURL(pagePath).href;
 
 try {
+  if (mode === 'text') {
+    const S = 'window.HC.make.state';
+    const csv = '부서,매출\n서울,100\n부산,200\n';
+    const expectedTable = { columns: ['부서', '매출'], rows: [['서울', '100'], ['부산', '200']] };
+    const waitUntil = async (expression, description, maxMs = 8000) => {
+      const t0 = Date.now();
+      while (Date.now() - t0 < maxMs) {
+        if (await evaluate(expression)) return;
+        await sleep(50);
+      }
+      const error = await evaluate("document.getElementById('mk-error').textContent");
+      assert.fail(`${description} timed out${error ? `: ${error}` : ''}`);
+    };
+    const submitText = (contents, format = 'auto') => evaluate(`(() => {
+      const select = document.getElementById('mk-text-format');
+      select.value = ${JSON.stringify(format)};
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      const source = document.getElementById('mk-text-source');
+      source.value = ${JSON.stringify(contents)};
+      source.dispatchEvent(new Event('input', { bubbles: true }));
+      document.getElementById('mk-text-apply').click();
+    })()`);
+    const applyText = async (contents, format, extension) => {
+      await submitText(contents, format);
+      const name = `붙여넣은 데이터.${extension}`;
+      await waitUntil(`!document.getElementById('mk-error').hidden || (${S}.source?.name === ${JSON.stringify(name)} && ${S}.spec && ${S}.html.length > 0)`, `apply ${format} as ${extension}`);
+      const error = await evaluate("document.getElementById('mk-error').textContent");
+      assert.equal(await evaluate("document.getElementById('mk-error').hidden"), true, `pasted ${format} imports successfully${error ? `: ${error}` : ''}`);
+      assert.equal(await evaluate(`${S}.source.name`), name);
+      assert.equal(await evaluate("document.getElementById('mk-text-source').value"), contents, 'applying text preserves the editable original');
+      assert.ok(await evaluate("document.getElementById('mk-text-result').textContent.trim().length > 0"), 'the result reports its input format');
+    };
+    const table = () => evaluate(`({ columns: ${S}.table.columns, rows: ${S}.table.rows })`);
+    const total = () => evaluate(`${S}.spec.kpis.find(k => k.label === '총 매출')?.value`);
+
+    await navigate(`${url}#make`);
+    await evaluate('localStorage.clear()');
+    await navigate(`${url}?text-test=1#make`);
+    assert.equal(await evaluate("Boolean(document.querySelector('details#mk-text-input'))"), true, 'the original-text input form exists');
+    assert.equal(await evaluate("document.querySelector('#mk-text-input summary').textContent.trim()"), '원문 텍스트로 입력');
+    await evaluate("document.getElementById('mk-text-input').open = true");
+    assert.deepEqual(await evaluate("[...document.getElementById('mk-text-format').options].map(o => o.value).sort()"), ['auto', 'csv', 'htm', 'html', 'json', 'tsv', 'txt'], 'text input offers supported text formats and excludes XLSX');
+
+    await applyText(csv, 'auto', 'csv');
+    assert.deepEqual(await table(), expectedTable, 'automatic CSV uses literal columns and rows');
+    assert.equal(await total(), 300);
+    assert.match(await evaluate("document.getElementById('mk-text-result').textContent"), /csv/i);
+    log('PASS: text form and automatic CSV');
+
+    const quotedCsv = '부서,매출,메모\n서울,100,"첫째\n둘째"\n부산,200,"쉼표, 있는 메모"\n';
+    await applyText(quotedCsv, 'auto', 'csv');
+    assert.deepEqual(await table(), { columns: ['부서', '매출', '메모'], rows: [['서울', '100', '첫째\n둘째'], ['부산', '200', '쉼표, 있는 메모']] }, 'CSV detection respects quoted newlines and commas');
+    assert.equal(await total(), 300);
+    log('PASS: automatic quoted CSV');
+
+    const tsv = '부서\t매출\n서울\t100\n부산\t200\n';
+    const json = '[{"부서":"서울","매출":100},{"부서":"부산","매출":200}]';
+    const jsonTable = { columns: ['부서', '매출'], rows: [['서울', 100], ['부산', 200]] };
+    const html = '<table><tr><th>부서</th><th>매출</th></tr><tr><td>서울</td><td>100</td></tr><tr><td>부산</td><td>200</td></tr></table>';
+    for (const [extension, contents, expected] of [
+      ['tsv', tsv, expectedTable], ['json', json, jsonTable], ['html', html, expectedTable],
+    ]) {
+      await applyText(contents, 'auto', extension);
+      assert.deepEqual(await table(), expected, `automatic ${extension} produces the literal table`);
+      assert.equal(await total(), 300);
+      assert.match(await evaluate("document.getElementById('mk-text-result').textContent"), new RegExp(extension, 'i'));
+      log(`PASS: automatic ${extension}`);
+    }
+
+    for (const [format, contents, expected] of [
+      ['csv', csv, expectedTable], ['tsv', tsv, expectedTable], ['txt', csv, expectedTable],
+      ['html', html, expectedTable], ['htm', html, expectedTable], ['json', json, jsonTable],
+    ]) {
+      await applyText(contents, format, format);
+      assert.deepEqual(await table(), expected, `manual ${format} uses the selected reader`);
+      assert.equal(await total(), 300);
+      log(`PASS: manual ${format}`);
+    }
+
+    const assertEmpty = async (description, source) => {
+      assert.deepEqual(await evaluate(`({
+        html: ${S}.html, spec: ${S}.spec, table: ${S}.table, source: ${S}.source,
+        frame: document.getElementById('mk-frame').srcdoc,
+        empty: !document.getElementById('mk-empty').hidden,
+        previewHidden: document.getElementById('mk-device').hidden,
+        panelsHidden: ['mk-file-info', 'mk-cols', 'mk-content'].every(id => document.getElementById(id).hidden),
+        actionsDisabled: ['mk-download', 'mk-save-spec', 'mk-open', 'mk-ai-copy'].every(id => document.getElementById(id).disabled)
+      })`), { html: '', spec: null, table: null, source: null, frame: '', empty: true, previewHidden: true, panelsHidden: true, actionsDisabled: true }, `${description}: failure clears the previous output`);
+      assert.equal(await evaluate("document.getElementById('mk-text-source').value"), source, `${description}: original text remains editable`);
+    };
+    const bracketCsv = '[분류],매출\n서울,100\n부산,200\n';
+    for (const [description, contents, format, reason] of [
+      ['empty text', '', 'auto', /입력|빈|비어|empty/i],
+      ['whitespace text', ' \n \t ', 'auto', /입력|공백|빈|비어|empty/i],
+      ['undetected text', '부서별 매출을 정리해 주세요.', 'auto', /형식|선택|format/i],
+      ['broken leading JSON', '{broken JSON', 'auto', /JSON/i],
+      ['CSV beginning with a bracket', bracketCsv, 'auto', /JSON/i],
+      ['selected JSON overrides CSV detection', csv, 'json', /JSON/i],
+    ]) {
+      await applyText(csv, 'auto', 'csv');
+      if (description === 'empty text') {
+        await evaluate("(() => { const title = document.getElementById('mk-title'); title.value = '취소되어야 할 이전 결과'; title.dispatchEvent(new Event('input')); })()");
+      }
+      await submitText(contents, format);
+      await waitUntil("!document.getElementById('mk-error').hidden && document.getElementById('mk-error').textContent.trim().length > 0", description);
+      assert.match(await evaluate("document.getElementById('mk-error').textContent"), reason, `${description}: useful error`);
+      if (description === 'empty text') await sleep(700);
+      await assertEmpty(description, contents);
+      log(`PASS: ${description} preserves text and clears stale results`);
+    }
+
+    await applyText(bracketCsv, 'csv', 'csv');
+    assert.deepEqual(await table(), { columns: ['[분류]', '매출'], rows: [['서울', '100'], ['부산', '200']] }, 'manual CSV recovers input that automatic detection treats as JSON');
+    assert.equal(await total(), 300);
+    log('PASS: manual format takes precedence over automatic detection');
+
+    const originalSpec = {
+      meta: { title: '붙여넣은 원본', subtitle: '문자열 </script> 보존' },
+      summary: '본문 한 문단', kpis: [{ label: '매출', value: 300 }], charts: null,
+      tables: [{ id: 'detail', columns: [{ key: 'region', label: '부서' }, { key: 'sales', label: '매출', type: 'number' }], rows: [{ region: '서울', sales: 100 }, { region: '부산', sales: 200 }] }],
+      sections: [{ title: '참고', text: '원본 내용 그대로' }],
+    };
+    const ownHtml = await evaluate(`window.HC.build(${JSON.stringify(originalSpec)}, 'tabler').html`);
+    await applyText(ownHtml, 'auto', 'html');
+    assert.deepEqual(await evaluate(`${S}.spec`), originalSpec, 'pasting an own HTML export preserves its complete embedded content');
+    assert.equal(await evaluate(`${S}.table`), null);
+    log('PASS: pasted own HTML preserves embedded spec');
+
+    const multipleHtml = '<table><caption>지역 매출</caption><tr><th>부서</th><th>매출</th></tr><tr><td>서울</td><td>100</td></tr><tr><td>부산</td><td>200</td></tr></table><table><caption>지역 매출</caption><tr><th>부서</th><th>매출</th></tr><tr><td>서울</td><td>10</td></tr><tr><td>부산</td><td>20</td></tr></table>';
+    await applyText(multipleHtml, 'auto', 'html');
+    assert.deepEqual(await table(), expectedTable);
+    assert.equal(await evaluate("document.getElementById('mk-sheet-label').textContent.trim()"), '표');
+    const choices = await evaluate("[...document.getElementById('mk-sheet').options].map(o => o.value)");
+    assert.equal(choices.length, 2);
+    assert.notEqual(choices[0], choices[1]);
+    const firstHtml = await evaluate(`${S}.html`);
+    await evaluate(`(() => { const select = document.getElementById('mk-sheet'); select.value = ${JSON.stringify(choices[1])}; select.dispatchEvent(new Event('change')); })()`);
+    await waitUntil(`${S}.html !== ${JSON.stringify(firstHtml)} && ${S}.spec.kpis.find(k => k.label === '총 매출')?.value === 30`, 'second pasted HTML table');
+    assert.deepEqual(await table(), { columns: ['부서', '매출'], rows: [['서울', '10'], ['부산', '20']] });
+    assert.equal(await total(), 30);
+    log('PASS: pasted HTML table selection');
+
+    // Preserve the actual File/parser path while controlling only when its bytes become available.
+    await evaluate(`(() => {
+      const file = new File([${JSON.stringify('부서,매출\n대전,900\n')}], 'late-file.csv');
+      const readBytes = file.arrayBuffer.bind(file);
+      file.arrayBuffer = async () => {
+        await new Promise(resolve => { window.__releaseLateFile = resolve; });
+        return readBytes();
+      };
+      window.__lateFileImport = window.HC.make.ingest(file);
+    })()`);
+    await applyText(csv, 'auto', 'csv');
+    await evaluate(`(async () => {
+      window.__releaseLateFile();
+      await window.__lateFileImport;
+      await new Promise(resolve => setTimeout(resolve, 50));
+    })()`);
+    assert.deepEqual(await table(), expectedTable, 'a late older file cannot replace newer pasted text');
+    assert.equal(await total(), 300);
+    assert.equal(await evaluate(`${S}.source.name`), '붙여넣은 데이터.csv');
+    log('PASS: newer text survives an older file read');
+
+    await evaluate(`(() => {
+      const readBytes = File.prototype.arrayBuffer;
+      window.__textReadStarted = false;
+      window.__textReadFinished = false;
+      File.prototype.arrayBuffer = async function () {
+        if (this.name !== '붙여넣은 데이터.csv') return readBytes.call(this);
+        File.prototype.arrayBuffer = readBytes;
+        window.__textReadStarted = true;
+        await new Promise(resolve => { window.__releaseTextRead = resolve; });
+        const bytes = await readBytes.call(this);
+        window.__textReadFinished = true;
+        return bytes;
+      };
+    })()`);
+    await submitText(csv, 'auto');
+    await waitUntil('window.__textReadStarted', 'pasted text uses the shared File byte-reader');
+    writeFileSync(join(outDir, 'newer-file.csv'), '부서,매출\n서울,10\n부산,20\n', 'utf8');
+    const { root } = await cdp.send('DOM.getDocument', { depth: -1 });
+    const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector: '#mk-file' });
+    await cdp.send('DOM.setFileInputFiles', { files: [join(outDir, 'newer-file.csv')], nodeId });
+    await waitUntil(`${S}.source?.name === 'newer-file.csv' && ${S}.html.length > 0`, 'newer actual file-picker import');
+    await evaluate('window.__releaseTextRead()');
+    await waitUntil('window.__textReadFinished', 'older text byte-reader completes');
+    await sleep(50);
+    assert.deepEqual(await table(), { columns: ['부서', '매출'], rows: [['서울', '10'], ['부산', '20']] }, 'a late older text import cannot replace a newer file');
+    assert.equal(await total(), 30);
+    assert.equal(await evaluate(`${S}.source.name`), 'newer-file.csv');
+    log('PASS: newer file survives an older text read');
+
+    await applyText(csv, 'auto', 'csv');
+    await evaluate('window.scrollTo(0, 0)');
+    await shot('text_input');
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
+    await click('[data-mk-device="mobile"]');
+    await sleep(200);
+    const overflow = await evaluate('({ width: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth })');
+    assert.ok(overflow.scrollWidth <= overflow.width, `text input has no horizontal overflow at 390px: ${JSON.stringify(overflow)}`);
+    await shot('text_input_mobile', { scale: 0.5 });
+    await cdp.send('Emulation.clearDeviceMetricsOverride');
+    log('PASS: text input desktop/mobile layout');
+
+    // Trimming for detection must not remove empty fields at either edge of a TSV row.
+    for (const [description, contents, expected] of [
+      ['empty first TSV heading', '\t매출\n서울\t100\n부산\t200', { columns: ['열1', '매출'], rows: [['서울', '100'], ['부산', '200']] }],
+      ['empty final TSV column', '부서\t매출\t\n서울\t100\t\n부산\t200\t', { columns: ['부서', '매출', '열3'], rows: [['서울', '100', null], ['부산', '200', null]] }],
+    ]) {
+      try {
+        await applyText(contents, 'auto', 'tsv');
+        assert.deepEqual(await table(), expected, `${description}: preserve empty TSV fields`);
+        assert.equal(await total(), 300);
+        log(`PASS: ${description}`);
+      } catch (e) {
+        problems.push(`테스트 실패: ${description}: ${e.message}`);
+      }
+    }
+
+    // Separator candidates inside a quoted heading are content, including across physical lines.
+    for (const [description, contents, columns] of [
+      ['semicolons in a quoted CSV heading', '"부서;구분;이름",매출\n서울,100\n부산,200\n', ['부서;구분;이름', '매출']],
+      ['tabs in a quoted CSV heading', '"부서\t구분\t이름",매출\n서울,100\n부산,200\n', ['부서\t구분\t이름', '매출']],
+      ['a multiline quoted CSV heading', '"부서;구분\n이름",매출\n서울,100\n부산,200\n', ['부서;구분\n이름', '매출']],
+    ]) {
+      for (const format of ['auto', 'csv']) {
+        try {
+          await applyText(contents, format, 'csv');
+          assert.deepEqual(await table(), { columns, rows: [['서울', '100'], ['부산', '200']] }, `${description} (${format}): keep the CSV heading and body columns intact`);
+          assert.equal(await total(), 300, `${description} (${format}): numeric data remains available for aggregation`);
+          log(`PASS: ${description} (${format})`);
+        } catch (e) {
+          problems.push(`테스트 실패: ${description} (${format}): ${e.message}`);
+        }
+      }
+    }
+
+    try {
+      writeFileSync(join(outDir, 'quoted-header.csv'), '"부서;구분;이름",매출\n서울,100\n부산,200\n', 'utf8');
+      const { root: fileDocument } = await cdp.send('DOM.getDocument', { depth: -1 });
+      const { nodeId: fileInputNode } = await cdp.send('DOM.querySelector', { nodeId: fileDocument.nodeId, selector: '#mk-file' });
+      await cdp.send('DOM.setFileInputFiles', { files: [join(outDir, 'quoted-header.csv')], nodeId: fileInputNode });
+      await waitUntil(`${S}.source?.name === 'quoted-header.csv' && ${S}.spec && ${S}.html.length > 0`, 'actual quoted-header CSV file upload');
+      assert.deepEqual(await table(), { columns: ['부서;구분;이름', '매출'], rows: [['서울', '100'], ['부산', '200']] }, 'the shared file reader ignores semicolons inside the quoted CSV heading');
+      assert.equal(await total(), 300);
+      log('PASS: quoted CSV heading through the file picker');
+    } catch (e) {
+      problems.push(`테스트 실패: quoted CSV heading through the file picker: ${e.message}`);
+    }
+  }
+
   if (mode === 'html') {
     const fixtures = join(ROOT, 'tests', 'convertor', 'fixtures', 'html-input');
     const S = 'window.HC.make.state';

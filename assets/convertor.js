@@ -55,11 +55,27 @@
   }
 
   function detectDelimiter(text) {
-    const line = text.split(/\r?\n/).find((l) => l.trim()) || '';
+    const counts = new Map([',', '\t', ';', '|'].map((delimiter) => [delimiter, 0]));
+    let quoted = false;
+    let hasContent = false;
+    // 첫 논리 행의 따옴표 밖 구분자만 센다. 머리글의 줄바꿈·이스케이프도 보존한다.
+    for (let i = 0; i < text.length; i += 1) {
+      const c = text[i];
+      if (c === '"') {
+        if (quoted && text[i + 1] === '"') { i += 1; continue; }
+        quoted = !quoted;
+        hasContent = true;
+      } else if (!quoted && c === '\n') {
+        if (hasContent) break;
+        counts.forEach((_, delimiter) => counts.set(delimiter, 0));
+      } else {
+        if (!quoted && counts.has(c)) counts.set(c, counts.get(c) + 1);
+        if (c.trim()) hasContent = true;
+      }
+    }
     let best = ',';
     let bestN = 0;
-    for (const d of [',', '\t', ';', '|']) {
-      const n = line.split(d).length - 1;
+    for (const [d, n] of counts) {
       if (n > bestN) { best = d; bestN = n; }
     }
     return best;
@@ -121,9 +137,9 @@
     return tableFromRows(columns, arr.map((o) => columns.map((c) => o[c])));
   }
 
-  async function readFile(file) {
-    return window.HC_INPUT.read(file, {
-      decodeText, isSpec, tableFromRows,
+  function readerContext() {
+    return {
+      decodeText, isSpec, tableFromRows, parseCSV, detectDelimiter,
       async readWorkbook(buffer, name) {
         const XLSX = await loadSheetJS();
         const workbook = XLSX.read(buffer, { type: 'array', cellDates: true });
@@ -139,7 +155,15 @@
         if (rows.length < 2) throw new Error('머리글과 데이터 행이 있는 표를 찾지 못했습니다.');
         return { kind: 'table', name, table: tableFromRows(rows[0], rows.slice(1)) };
       },
-    });
+    };
+  }
+
+  async function readFile(file) {
+    return window.HC_INPUT.read(file, readerContext());
+  }
+
+  async function readText(text, format) {
+    return window.HC_INPUT.readText(text, format, readerContext());
   }
 
   function sheetTable(wb, sheet) {
@@ -585,13 +609,14 @@
   }
 
   // 계산 함수는 화면이 없어도 쓸 수 있게 먼저 내보낸다 (콘솔·테스트용)
-  window.HC.make = { readFile, profile, buildSpec, parseCSV, decodeText, tableFromRows, tableFromJSON, isSpec, sampleText: buildSample };
+  window.HC.make = { readFile, readText, profile, buildSpec, parseCSV, decodeText, tableFromRows, tableFromJSON, isSpec, sampleText: buildSample };
 
   // ───────────────────────── 4. 화면 ─────────────────────────
   if (!$('#view-make')) return;
   const el = {
     view: $('#view-make'), pick: $('#view-pick'), drop: $('#mk-drop'), file: $('#mk-file'), sample: $('#mk-sample'),
     specBtn: $('#mk-spec-btn'), specFile: $('#mk-spec-file'), info: $('#mk-file-info'), sheet: $('#mk-sheet'), sheetLabel: $('#mk-sheet-label'),
+    textSource: $('#mk-text-source'), textFormat: $('#mk-text-format'), textApply: $('#mk-text-apply'), textResult: $('#mk-text-result'),
     colsPanel: $('#mk-cols'), colBody: $('#mk-col-body'), gran: $('#mk-gran'),
     contentPanel: $('#mk-content'), title: $('#mk-title'), subtitle: $('#mk-subtitle'), summary: $('#mk-summary'),
     design: $('#mk-design-select'), picked: $('#mk-picked'), kit: $('#mk-kit'), chart: $('#mk-chart'),
@@ -743,6 +768,7 @@
     el.colBody.innerHTML = '';
     [el.title, el.subtitle, el.summary].forEach((input) => { input.value = ''; });
     el.status.textContent = '';
+    el.textResult.textContent = '';
     [el.download, el.saveSpec, el.open, el.aiCopy].forEach((button) => { button.disabled = true; });
   }
   function scheduleRender(ms = 250) {
@@ -821,13 +847,22 @@
   }
 
   async function ingest(file, { specOnly = false } = {}) {
+    return loadSource(() => readFile(file), file.name, { specOnly });
+  }
+
+  async function ingestText(text = el.textSource.value, format = el.textFormat.value) {
+    return loadSource(() => readText(text, format), '원문 텍스트', { autoText: format === 'auto' });
+  }
+
+  async function loadSource(readSource, name, { specOnly = false, autoText = false } = {}) {
     const generation = ++inputGeneration;
     clearResult();
     showError('');
-    el.status.textContent = `${file.name} 읽는 중…`;
+    el.status.textContent = `${name} 읽는 중…`;
     try {
-      const src = await readFile(file);
+      const src = await readSource();
       if (generation !== inputGeneration) return;
+      if (src.textFormat) el.textResult.textContent = `${autoText ? '자동 인식' : '지정한 형식'}: ${src.textFormat.toUpperCase()} (.${src.textFormat})`;
       if (specOnly && src.kind !== 'spec') throw new Error('spec.json 형식이 아닙니다(meta·kpis·charts·tables 등이 필요).');
       if (src.kind === 'spec') { useSpec(src.spec, src.name); return; }
       let table = src.table;
@@ -942,6 +977,7 @@
   ['dragleave', 'drop'].forEach((t) => el.drop.addEventListener(t, (e) => { e.preventDefault(); el.drop.classList.remove('is-over'); }));
   el.drop.addEventListener('drop', (e) => { const f = e.dataTransfer.files[0]; if (f) ingest(f); });
   el.sample.addEventListener('click', () => ingest(new File([buildSample()], SAMPLE_NAME, { type: 'text/csv' })));
+  el.textApply.addEventListener('click', () => ingestText());
   $$('[data-mk-sample]').forEach((b) => b.addEventListener('click', () => el.sample.click()));
   el.specBtn.addEventListener('click', () => el.specFile.click());
   el.specFile.addEventListener('change', () => {
@@ -1043,6 +1079,7 @@
   // ── 시작 ──
   el.file.accept = window.HC_INPUT.accept();
   $('#mk-drop-hint').textContent = window.HC_INPUT.hint();
+  el.textFormat.innerHTML = '<option value="auto">자동 인식</option>' + window.HC_INPUT.textFormats().map((format) => `<option value="${esc(format.extension)}">${esc(format.label)}</option>`).join('');
   if (!HC.list().some((d) => d.id === st.design)) st.design = 'tabler';
   if (st.chartLib && !HC.chartLibs().includes(st.chartLib)) st.chartLib = '';
   if (st.kit && !HC.kits()[st.kit]) st.kit = '';
@@ -1051,5 +1088,5 @@
   if (location.hash === '#make') showView('make', false);
 
   // 콘솔·테스트용
-  Object.assign(window.HC.make, { ingest, render, showView, state: st });
+  Object.assign(window.HC.make, { ingest, ingestText, render, showView, state: st });
 })();

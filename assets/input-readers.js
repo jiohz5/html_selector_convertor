@@ -68,10 +68,21 @@
   }
 
   const READERS = [
-    { id: 'delimited', extensions: ['csv', 'tsv', 'txt'], label: 'CSV·TSV·TXT', read: (buffer, file, ctx) => ctx.readDelimited(ctx.decodeText(buffer), file.name) },
+    // 구조가 있는 형식을 구분표보다 먼저 판별한다. 손상 JSON/HTML도 CSV로 우회하지 않는다.
+    { id: 'json', extensions: ['json'], label: 'JSON', text: true, detectText: (text) => /^[\[{]/.test(text.trimStart()) ? 'json' : null, read: (buffer, file, ctx) => ctx.readJSON(ctx.decodeText(buffer), file.name) },
+    { id: 'html', extensions: ['html', 'htm'], label: 'HTML', text: true, detectText: (text) => text.trimStart().startsWith('<') ? 'html' : null, read: (buffer, file, ctx) => readHTML(ctx.decodeText(buffer), file.name, ctx) },
+    {
+      id: 'delimited', extensions: ['csv', 'tsv', 'txt'], label: 'CSV·TSV·TXT', text: true,
+      detectText(text, ctx) {
+        const delimiter = ctx.detectDelimiter(text);
+        const rows = ctx.parseCSV(text, delimiter);
+        const width = rows[0]?.length || 0;
+        if (rows.length < 2 || width < 2 || rows.some((row) => row.length !== width)) return null;
+        return delimiter === '\t' ? 'tsv' : 'csv';
+      },
+      read: (buffer, file, ctx) => ctx.readDelimited(ctx.decodeText(buffer), file.name),
+    },
     { id: 'workbook', extensions: ['xlsx', 'xlsm', 'xls'], label: '엑셀', read: (buffer, file, ctx) => ctx.readWorkbook(buffer, file.name) },
-    { id: 'json', extensions: ['json'], label: 'JSON', read: (buffer, file, ctx) => ctx.readJSON(ctx.decodeText(buffer), file.name) },
-    { id: 'html', extensions: ['html', 'htm'], label: 'HTML', read: (buffer, file, ctx) => readHTML(ctx.decodeText(buffer), file.name, ctx) },
   ];
 
   async function read(file, context) {
@@ -81,8 +92,28 @@
     return reader.read(await file.arrayBuffer(), file, context);
   }
 
+  async function readText(text, format, context) {
+    // 표의 선행/후행 탭도 빈 열이다. 공백 검사는 하되 판별할 표를 trim하지 않는다.
+    const probe = typeof text === 'string' ? text.replace(/^\uFEFF/, '') : '';
+    if (!probe.trim()) throw new Error('붙여 넣을 원문 텍스트를 입력해 주세요.');
+    let extension = format;
+    if (format === 'auto') {
+      for (const reader of READERS) {
+        extension = reader.detectText?.(probe, context);
+        if (extension) break;
+      }
+      if (!extension) throw new Error('형식을 자동으로 인식하지 못했습니다. 원문 텍스트의 입력 형식을 직접 선택해 주세요.');
+    }
+    if (!READERS.some((reader) => reader.text && reader.extensions.includes(extension))) {
+      throw new Error('텍스트로 지원하지 않는 입력 형식입니다. 엑셀은 셀을 복사하거나 CSV로 저장해 넣어 주세요.');
+    }
+    const source = await read(new File([text], `붙여넣은 데이터.${extension}`), context);
+    return { ...source, textFormat: extension };
+  }
+
   window.HC_INPUT = {
-    read,
+    read, readText,
+    textFormats: () => READERS.filter((reader) => reader.text).flatMap((reader) => reader.extensions.map((extension) => ({ extension, label: `${extension.toUpperCase()} (.${extension})` }))),
     accept: () => READERS.flatMap((entry) => entry.extensions.map((ext) => `.${ext}`)).join(','),
     hint: () => READERS.map((entry) => entry.label).join(' · '),
   };

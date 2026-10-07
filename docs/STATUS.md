@@ -12,6 +12,16 @@ HTML Previewer(① 디자인 고르기)와 html-convertor(② 데이터 → HTML
 - 형식 추가와 원본 사이트 종료 시 지원 방안: [MAINTENANCE.md](MAINTENANCE.md).
 - 로컬 검증: 폴더판·단일판 HTML 입력 27개 기능 그룹, 기존 make 흐름(엑셀·CSV·다운로드·spec·모바일), 렌더러 비교 54/54, 정적 검사 48/48 통과. 문자열 요약·빈 영역·meta 전용 기존 spec의 복원과 손상 spec 거부도 포함한다.
 
+### 원문 텍스트 입력
+
+- 파일 업로드가 어려울 때 ② 데이터 패널의 "원문 텍스트로 입력"을 펼쳐 붙여 넣을 수 있다.
+- 형식은 자동 감지 또는 CSV(.csv)·TSV(.tsv)·TXT(.txt)·JSON(.json)·HTML(.html)·HTM(.htm)으로 지정한다. 선택 목록은 reader의 텍스트 지원 정보에서 생성한다.
+- 자동 감지는 `{`·`[` 시작을 JSON, `<` 시작을 HTML, 일관된 구분표를 CSV·TSV로 판별한다. 애매한 본문은 수동 형식 선택을 요청하고, 손상된 JSON·HTML을 CSV로 다시 읽지 않는다.
+- 엑셀 바이너리 원문은 지원하지 않으며 엑셀에서 복사한 셀의 TSV·CSV는 입력할 수 있다.
+- 파일 입력과 같은 reader·profile·spec·render 경로를 사용한다. 실패해도 입력 본문은 유지하고 이전 결과·미리보기·다운로드는 제거한다. HTML 원본 스크립트는 비활성 상태로 읽으며 사내·외부 모델 연계는 없다.
+- 빈 첫 TSV 머리글·마지막 빈 TSV 열과 따옴표 안의 구분자·줄바꿈이 있는 CSV 머리글을 보존한다. CSV 구분자 수정은 파일 입력에도 적용한다.
+- 로컬 검증: 폴더판·단일판 원문 입력 32개 기능 그룹씩 통과. 자동·수동 형식, 오류 후 본문 유지와 결과 제거, HTML spec·다중 표, 파일/텍스트 읽기 경쟁, 모바일 화면, 실제 CSV 파일 선택을 포함한다. 수정 후 기존 HTML 입력 27개 기능 그룹도 통과했다.
+
 ### 문장 다듬기 표시 보류
 
 ②의 "Claude로 문장 다듬기"는 현재 화면에서 숨겼으며 기존 기능 코드는 보존한다. 자동 외부 전송과 모델 API 연결은 구현하지 않았다. 사내 모델 또는 승인된 Claude Enterprise 연계는 아래 G 항목의 후속 작업이다. spec.json 저장·불러오기는 계속 사용한다.
@@ -41,7 +51,8 @@ HTML Previewer(① 디자인 고르기)와 html-convertor(② 데이터 → HTML
    │
    ├─ (A) 같은 페이지의 ② HTML 만들기 ── 브라우저 안에서 규칙대로, AI 없음, 데이터 외부 전송 없음
    │     ① 선택 자동 적용 (차트가 아닌 첫 항목 = 디자인, 차트 항목 = 차트 라이브러리)
-   │     파일 → 입력 reader: CSV·TSV·TXT / 엑셀(SheetJS) / JSON(레코드·spec) / HTML(표·내장 spec)
+   │     파일 또는 원문 텍스트 → 공통 입력 reader
+   │     CSV·TSV·TXT / 엑셀(파일·SheetJS) / JSON(레코드·spec) / HTML(표·내장 spec)
    │     → profile: 열 판별(날짜·숫자·범주) → buildSpec: KPI·차트·표·요약 자동 구성
    │     → HC.build(렌더링) → 미리보기 → HTML 다운로드 · spec.json 저장
    │
@@ -72,7 +83,7 @@ HTML Previewer(① 디자인 고르기)와 html-convertor(② 데이터 → HTML
 | PDF · DOCX · 이미지 | ❌ 미지원 확장자로 오류 표시 | PDF는 Claude가 읽음 |
 | ① 내보내기 .md/.json | ❌ 디자인 선택이 아니라 데이터로 처리됨 | ✅ 정확히 해석 |
 
-MD·HTML은 ②의 파일 선택 창(`accept`)에는 없지만 끌어다 놓기로는 확장자 검사 없이 들어온다.
+파일 선택과 끌어다 놓기는 등록된 확장자만 읽는다. HTML·HTM은 파일과 원문 텍스트 입력을 지원하고, MD는 현재 미지원이다. 원문 텍스트의 수동 형식 선택도 텍스트 지원 reader 목록으로 제한한다.
 
 ## 4. 검증된 문제
 
@@ -134,6 +145,7 @@ MD·HTML은 ②의 파일 선택 창(`accept`)에는 없지만 끌어다 놓기�
 
 - [ ] **A. 입력 처리 (P1·P2)**
   - [x] HTML `<table>`과 우리 출력의 내장 spec을 읽는다.
+  - [x] 원문 텍스트 붙여넣기와 자동 감지·수동 형식 선택을 지원한다.
   - [ ] MD 표를 읽는다.
   - MD 보고서처럼 표가 아닌 글은 "Claude 스킬로 처리" 안내를 띄운다.
   - [x] 브라우저에서 등록되지 않은 확장자는 오류로 막는다.
@@ -178,6 +190,9 @@ MD·HTML은 ②의 파일 선택 창(`accept`)에는 없지만 끌어다 놓기�
 | `python tests/convertor/run_regress.py` | 48개 조합 렌더링·정적 검사 통과 |
 | `node tests/previewer/browser_test.mjs page` | ① 고르기 전 기능 통과, 콘솔 오류 0 |
 | `node tests/previewer/browser_test.mjs make` | ② 만들기(샘플·엑셀·cp949 CSV·다운로드·spec·모바일) 통과, 콘솔 오류 0 |
+| `node tests/previewer/browser_test.mjs html` | HTML 입력 27개 기능 그룹 통과, 콘솔 오류 0 |
+| `node tests/previewer/browser_test.mjs text` | 원문 텍스트 입력 32개 기능 그룹 통과, 콘솔 오류 0 |
+| `node tests/previewer/browser_test.mjs text dist/html-previewer.html` | 단일 파일판 원문 입력 32개 기능 그룹 통과, 콘솔 오류 0 |
 | 단일 파일 | 빈 폴더에서 ①·② 모두 동작 |
 
 - 위 테스트는 "지원하는 입력"의 정상 동작을 확인한다. P1~P5는 테스트에 없는 입력·조작에서 나온 문제다(F 항목).
