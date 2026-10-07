@@ -303,6 +303,8 @@ try {
     await expectRedesign();
     log('PASS: redesign uses rendered rows and mode round trips keep the same original');
 
+    // The textarea value setter normalizes CRLF/CR to LF before the app reads pasted input.
+    const expectedPastedSource = source.replace(/\r\n?/g, '\n');
     await evaluate(`(() => { document.getElementById('mk-text-input').open = true; document.getElementById('mk-text-format').value = 'auto'; document.getElementById('mk-text-source').value = ${JSON.stringify(source)}; document.getElementById('mk-text-apply').click(); })()`);
     await waitUntil(`${S}.htmlInput?.name === '붙여넣은 데이터.html'`, 'pasted HTML source');
     assert.equal(await evaluate(`${S}.htmlInput.rendered`), null);
@@ -310,7 +312,7 @@ try {
     await applyMode('redesign');
     await expectRedesign();
     await applyMode('preserve');
-    assert.equal(await evaluate(`${S}.html`), source);
+    assert.equal(await evaluate(`${S}.html`), expectedPastedSource);
     log('PASS: pasted HTML offers both source and redesigned modes');
 
     await load('render-body.html');
@@ -549,7 +551,7 @@ try {
         await waitUntil(`!document.getElementById('mk-error').hidden || (${S}.source?.name === '붙여넣은 데이터.html' && ${S}.html.length > 0)`, `pasted embedded ${format}`);
         assert.equal(await evaluate("document.getElementById('mk-error').hidden"), true);
         assert.deepEqual(await table(), metals);
-        assert.equal(await evaluate("document.getElementById('mk-text-source').value"), source);
+        assert.equal(await evaluate("document.getElementById('mk-text-source').value"), source.replace(/\r\n?/g, '\n'), 'textarea preserves the input with its native LF line endings');
       });
     }
 
